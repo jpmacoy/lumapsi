@@ -18,11 +18,18 @@ const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 // ── AUTH ──
 async function goToApp() {
-  const email = document.querySelector('#login-email').value;
-  const senha = document.querySelector('#login-senha').value;
-  if (!email || !senha) { alert('Preencha e-mail e senha.'); return; }
+  const emailEl = document.getElementById('login-email');
+  const senhaEl = document.getElementById('login-senha');
+  const btnEl = document.getElementById('btn-entrar');
+  if (!emailEl || !senhaEl) { alert('Erro nos campos de login.'); return; }
+  const email = emailEl.value.trim();
+  const senha = senhaEl.value;
+  if (!email) { emailEl.focus(); alert('Preencha o e-mail.'); return; }
+  if (!senha) { senhaEl.focus(); alert('Preencha a senha.'); return; }
+  if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Entrando...'; }
   const { data, error } = await supa.auth.signInWithPassword({ email, password: senha });
-  if (error) { alert('E-mail ou senha incorretos.'); return; }
+  if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = '<i class="ti ti-login"></i> Entrar no Luma'; }
+  if (error) { alert('E-mail ou senha incorretos. Verifique e tente novamente.'); return; }
   document.getElementById('page-login').style.display = 'none';
   document.getElementById('page-login').classList.remove('active');
   document.getElementById('app-shell').style.display = 'flex';
@@ -489,7 +496,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         </label>
         <span style="font-size:12px;color:var(--brand);cursor:pointer;">Esqueci a senha</span>
       </div>
-      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:10px;" onclick="goToApp()">
+      <button id="btn-entrar" class="btn btn-primary" style="width:100%;justify-content:center;padding:10px;" onclick="goToApp()">
         <i class="ti ti-login"></i> Entrar no Luma
       </button>
       <div style="display:flex;align-items:center;gap:10px;margin:16px 0;">
