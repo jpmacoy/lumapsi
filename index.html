@@ -9,6 +9,163 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ── SUPABASE CONFIG ──
+const SUPA_URL = 'https://pbqvfokpounurzmmlcor.supabase.co';
+const SUPA_KEY = 'sb_publishable_ERIUNIAjp2FJyXNF6IS_dw_RNopwplO';
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// ── AUTH ──
+async function goToApp() {
+  const email = document.querySelector('#login-email').value;
+  const senha = document.querySelector('#login-senha').value;
+  if (!email || !senha) { alert('Preencha e-mail e senha.'); return; }
+  const { data, error } = await supa.auth.signInWithPassword({ email, password: senha });
+  if (error) { alert('E-mail ou senha incorretos.'); return; }
+  document.getElementById('page-login').style.display = 'none';
+  document.getElementById('page-login').classList.remove('active');
+  document.getElementById('app-shell').style.display = 'flex';
+  carregarDados();
+  setTimeout(initCharts, 200);
+}
+
+async function logout() {
+  await supa.auth.signOut();
+  location.reload();
+}
+
+// ── CARREGAR DADOS REAIS ──
+async function carregarDados() {
+  carregarPacientes();
+  carregarSessoes();
+  carregarFinanceiro();
+}
+
+async function carregarPacientes() {
+  const { data, error } = await supa.from('pacientes').select('*').order('nome');
+  if (error || !data) return;
+  const grid = document.getElementById('grid-pacientes');
+  if (!grid) return;
+  const cores = ['av-purple','av-teal','av-amber','av-coral','av-blue','av-pink','av-green'];
+  grid.innerHTML = data.map((p, i) => {
+    const iniciais = p.nome ? p.nome.split(' ').map(n=>n[0]).slice(0,2).join('') : 'PS';
+    const cor = cores[i % cores.length];
+    return `<div class="patient-card" onclick="nav('prontuario',null)">
+      <div class="avatar md ${cor}">${iniciais}</div>
+      <div class="pat-info">
+        <div class="pat-name">${p.nome || '—'}</div>
+        <div class="pat-meta">${p.modalidade || ''}</div>
+        <div class="pat-tags">
+          <span class="tag ${p.status==='ativo'?'tag-green':'tag-gray'}">${p.status || 'ativo'}</span>
+        </div>
+      </div>
+      <div class="pat-stat">
+        <div class="pat-val">R$${p.valor_sessao || '—'}</div>
+        <div class="pat-freq">por sessão</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function carregarSessoes() {
+  const { data, error } = await supa.from('sessoes').select('*, pacientes(nome)').order('data_hora', { ascending: false }).limit(20);
+  if (error || !data) return;
+  const tbody = document.getElementById('tbody-sessoes');
+  if (!tbody) return;
+  const cores = ['av-purple','av-teal','av-amber','av-coral','av-blue'];
+  tbody.innerHTML = data.map((s, i) => {
+    const nome = s.pacientes?.nome || '—';
+    const iniciais = nome.split(' ').map(n=>n[0]).slice(0,2).join('');
+    const cor = cores[i % cores.length];
+    const dt = s.data_hora ? new Date(s.data_hora).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+    return `<tr>
+      <td style="color:var(--text-2);">${dt}</td>
+      <td><div class="pat-cell"><div class="avatar sm ${cor}">${iniciais}</div>${nome}</div></td>
+      <td><span class="tag ${s.tipo==='Online'?'tag-teal':'tag-brand'}">${s.tipo||'—'}</span></td>
+      <td><span class="tag ${s.status==='Realizada'?'tag-green':s.status==='Confirmada'?'tag-teal':'tag-amber'}">${s.status||'—'}</span></td>
+      <td style="font-weight:500;">R$${s.valor||'—'}</td>
+      <td style="color:var(--text-3);">${s.pagamento||'—'}</td>
+      <td><span class="tag ${s.status_pagamento==='Pago'?'tag-green':'tag-amber'}">${s.status_pagamento||'Pendente'}</span></td>
+      <td><button class="btn btn-ghost btn-sm" style="padding:3px 8px;"><i class="ti ti-brand-whatsapp"></i></button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function carregarFinanceiro() {
+  const { data, error } = await supa.from('financeiro').select('*').order('data_lancamento', { ascending: false }).limit(20);
+  if (error || !data) return;
+  const tbody = document.getElementById('tbody-financeiro');
+  if (!tbody) return;
+  tbody.innerHTML = data.map(f => `<tr>
+    <td style="color:var(--text-3);">${f.data_lancamento ? new Date(f.data_lancamento).toLocaleDateString('pt-BR') : '—'}</td>
+    <td>${f.descricao||'—'}</td>
+    <td><span class="tag tag-gray">${f.categoria||'—'}</span></td>
+    <td><span class="tag ${f.tipo==='Receita'?'tag-green':'tag-red'}">${f.tipo||'—'}</span></td>
+    <td style="font-weight:500;color:${f.tipo==='Receita'?'var(--green)':'var(--red)'};">${f.tipo==='Receita'?'+':'-'}R$${f.valor||'0'}</td>
+    <td style="color:var(--text-3);">${f.forma_pagamento||'—'}</td>
+    <td><span class="tag tag-green">${f.status||'—'}</span></td>
+  </tr>`).join('');
+}
+
+// ── SALVAR DADOS ──
+async function salvarSessao() {
+  const paciente_id = document.querySelector('#form-sessao-paciente')?.value;
+  const tipo = document.querySelector('#form-sessao-tipo')?.value;
+  const data_hora = document.querySelector('#form-sessao-data')?.value + 'T' + document.querySelector('#form-sessao-hora')?.value;
+  const valor = document.querySelector('#form-sessao-valor')?.value?.replace('R$ ','').replace(',','.');
+  const { error } = await supa.from('sessoes').insert([{ paciente_id, tipo, data_hora, valor, status:'Agendada', status_pagamento:'Pendente' }]);
+  if (error) { alert('Erro ao salvar sessão.'); return; }
+  closeModal(); carregarSessoes(); alert('Sessão agendada!');
+}
+
+async function salvarPaciente() {
+  const nome = document.querySelector('#form-pac-nome')?.value;
+  const email = document.querySelector('#form-pac-email')?.value;
+  const telefone = document.querySelector('#form-pac-tel')?.value;
+  const modalidade = document.querySelector('#form-pac-modalidade')?.value;
+  const valor_sessao = document.querySelector('#form-pac-valor')?.value?.replace('R$ ','').replace(',','.');
+  const queixa_principal = document.querySelector('#form-pac-queixa')?.value;
+  const { error } = await supa.from('pacientes').insert([{ nome, email, telefone, modalidade, valor_sessao, queixa_principal, status:'ativo' }]);
+  if (error) { alert('Erro ao salvar paciente.'); return; }
+  closeModal(); carregarPacientes(); alert('Paciente cadastrado!');
+}
+
+async function salvarEvolucao() {
+  const texto = document.querySelector('#form-evol-texto')?.value;
+  const tecnicas = document.querySelector('#form-evol-tecnicas')?.value;
+  const proximos_passos = document.querySelector('#form-evol-proxpassos')?.value;
+  const data_sessao = document.querySelector('#form-evol-data')?.value;
+  const { error } = await supa.from('evolucoes').insert([{ texto, tecnicas, proximos_passos, data_sessao }]);
+  if (error) { alert('Erro ao salvar evolução.'); return; }
+  closeModal(); alert('Evolução salva!');
+}
+
+async function salvarLancamento() {
+  const descricao = document.querySelector('#form-fin-desc')?.value;
+  const tipo = document.querySelector('#form-fin-tipo')?.value;
+  const valor = document.querySelector('#form-fin-valor')?.value?.replace('R$ ','').replace(',','.');
+  const forma_pagamento = document.querySelector('#form-fin-forma')?.value;
+  const categoria = document.querySelector('#form-fin-cat')?.value;
+  const status = document.querySelector('#form-fin-status')?.value;
+  const data_lancamento = document.querySelector('#form-fin-data')?.value;
+  const { error } = await supa.from('financeiro').insert([{ descricao, tipo, valor, forma_pagamento, categoria, status, data_lancamento }]);
+  if (error) { alert('Erro ao salvar lançamento.'); return; }
+  closeModal(); carregarFinanceiro(); alert('Lançamento salvo!');
+}
+
+// Verificar sessão ativa ao carregar
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await supa.auth.getSession();
+  if (session) {
+    document.getElementById('page-login').style.display = 'none';
+    document.getElementById('page-login').classList.remove('active');
+    document.getElementById('app-shell').style.display = 'flex';
+    carregarDados();
+    setTimeout(initCharts, 200);
+  }
+});
+</script>
 <style>
   :root {
     --brand: #5046E5;
@@ -315,14 +472,14 @@
       <div class="form-group">
         <label class="form-label">E-mail profissional</label>
         <div class="input-wrap">
-          <input class="form-input" type="email" value="dra.psicóloga@email.com" style="padding-right:36px;">
+          <input class="form-input" type="email" id="login-email" placeholder="seu@email.com" style="padding-right:36px;">
           <i class="ti ti-mail input-icon"></i>
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">Senha</label>
         <div class="input-wrap">
-          <input class="form-input" type="password" value="••••••••" style="padding-right:36px;">
+          <input class="form-input" type="password" id="login-senha" placeholder="••••••••" style="padding-right:36px;">
           <i class="ti ti-eye input-icon" style="cursor:pointer;"></i>
         </div>
       </div>
@@ -474,7 +631,7 @@
             </div>
             <table>
               <thead><tr><th>Horário</th><th>Paciente</th><th>Tipo</th><th>Valor</th><th>Status</th></tr></thead>
-              <tbody>
+              <tbody id="tbody-sessoes">
                 <tr><td>08:00</td><td><div class="pat-cell"><div class="avatar sm av-purple">AC</div> Ana Clara</div></td><td><span class="tag tag-brand">Presencial</span></td><td style="font-weight:500;">R$180</td><td><span class="tag tag-green">Pago</span></td></tr>
                 <tr><td>09:30</td><td><div class="pat-cell"><div class="avatar sm av-teal">BF</div> Bruno Farias</div></td><td><span class="tag tag-teal">Online</span></td><td style="font-weight:500;">R$180</td><td><span class="tag tag-amber">Pendente</span></td></tr>
                 <tr><td>11:00</td><td><div class="pat-cell"><div class="avatar sm av-amber">CS</div> Camila Souza</div></td><td><span class="tag tag-brand">Presencial</span></td><td style="font-weight:500;">R$160</td><td><span class="tag tag-green">Pago</span></td></tr>
@@ -615,7 +772,7 @@
           <div class="metric-card"><div class="metric-label">Ticket médio</div><div class="metric-val">R$183</div></div>
           <div class="metric-card"><div class="metric-label">Total geral</div><div class="metric-val">10</div></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;">
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;" id="grid-pacientes">
           ${[
             {av:'AC',ac:'av-purple',name:'Ana Clara Mendonça',age:'33 anos',tipo:'Semanal',status:'Ativo',val:'R$180',freq:'4×/mês'},
             {av:'BF',ac:'av-teal',name:'Bruno Farias Lima',age:'28 anos',tipo:'Quinzenal',status:'Ativo',val:'R$180',freq:'2×/mês'},
