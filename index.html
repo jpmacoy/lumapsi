@@ -1139,12 +1139,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 </div>
 
 <script>
-function goToApp() {
-  document.getElementById('page-login').style.display = 'none';
-  document.getElementById('page-login').classList.remove('active');
-  document.getElementById('app-shell').style.display = 'flex';
-  setTimeout(initCharts, 100);
-}
+// goToApp handled by Supabase auth above
 
 const screenMeta = {
   dashboard:  { title:'Dashboard',      sub:'Terça-feira, 19 de maio de 2026', action:'Nova sessão',    modal:'nova-sessao' },
