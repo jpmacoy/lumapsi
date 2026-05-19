@@ -163,14 +163,8 @@ async function salvarLancamento() {
 
 // Verificar sessão ativa ao carregar
 window.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await supa.auth.getSession();
-  if (session) {
-    document.getElementById('page-login').style.display = 'none';
-    document.getElementById('page-login').classList.remove('active');
-    document.getElementById('app-shell').style.display = 'flex';
-    carregarDados();
-    setTimeout(initCharts, 200);
-  }
+  // Sempre fazer logout ao carregar para forçar login
+  await supa.auth.signOut();
 });
 </script>
 <style>
