@@ -2136,9 +2136,8 @@ async function enviarCobranca(pacienteId, valor, numSessoes) {
 }
 
 async function cobrarWhatsApp() {
-  const hoje = new Date().toISOString().substring(0, 7);
   const { data: pendentes } = await sb.from('sessoes')
-    .select('*, pacientes(nome,telefone)')
+    .select('paciente_id, valor, status_pagamento, status, pacientes(nome, telefone)')
     .eq('status_pagamento', 'Pendente')
     .eq('status', 'Realizada');
   
