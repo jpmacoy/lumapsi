@@ -596,6 +596,7 @@ tr:hover td{background:#FAFAFB}
             <option value="">Selecione um paciente...</option>
           </select>
           <button class="btn btn-ghost btn-sm" onclick="exportarPDF()"><i class="ti ti-file-type-pdf"></i> Exportar PDF</button>
+          <button class="btn btn-sm" style="background:var(--brand-light);color:var(--brand-dark);border:none;" onclick="gerarResumoProntuarioIA(document.getElementById('sel-pac-pront').value)"><i class="ti ti-sparkles"></i> Resumo com IA</button>
           <div style="flex:1;"></div>
           <button class="btn btn-primary btn-sm" onclick="abrirModal('nova-evolucao')"><i class="ti ti-plus"></i> Nova evolução</button>
         </div>
@@ -898,7 +899,22 @@ tr:hover td{background:#FAFAFB}
         <div class="form-group"><label class="form-label">Paciente *</label><select class="form-input" id="ne-pac"><option value="">Selecione...</option></select></div>
         <div class="form-group"><label class="form-label">Data da sessão *</label><input class="form-input" type="date" id="ne-data"></div>
       </div>
-      <div class="form-group"><label class="form-label">Evolução clínica *</label><textarea class="form-input" id="ne-texto" style="min-height:120px;" placeholder="Descreva a evolução da sessão..."></textarea></div>
+      <div class="form-group">
+        <label class="form-label">Evolução clínica *</label>
+        <div style="position:relative;">
+          <textarea class="form-input" id="ne-texto" style="min-height:120px;" placeholder="Descreva a evolução da sessão..."></textarea>
+        </div>
+        <div style="background:var(--brand-light);border-radius:var(--rs);padding:10px 12px;margin-top:8px;">
+          <div style="font-size:11px;font-weight:500;color:var(--brand-dark);margin-bottom:6px;display:flex;align-items:center;gap:5px;">
+            <i class="ti ti-sparkles"></i> Gerar com IA
+          </div>
+          <input class="form-input" id="ne-palavras" placeholder="Ex: ansiedade, respiração, TCC, tarefa de casa..." style="margin-bottom:6px;font-size:12px;">
+          <button class="btn btn-sm" style="background:var(--brand);color:#fff;border:none;" onclick="gerarEvolucaoIA()" id="btn-gerar-ia">
+            <i class="ti ti-sparkles"></i> Gerar evolução clínica
+          </button>
+          <div style="font-size:10px;color:var(--brand-dark);margin-top:5px;opacity:0.7;">Digite palavras-chave e a IA escreve a evolução completa</div>
+        </div>
+      </div>
       <div class="form-group"><label class="form-label">Técnicas utilizadas</label><input class="form-input" id="ne-tec" placeholder="Ex: Reestruturação cognitiva, Exposição graduada..."></div>
       <div class="form-group"><label class="form-label">Próximos passos</label><textarea class="form-input" id="ne-prox" placeholder="Tarefas, objetivos para próxima sessão..."></textarea></div>
       <div class="form-group"><label class="form-label">Tags (separadas por vírgula)</label><input class="form-input" id="ne-tags" placeholder="Ex: TCC, Ansiedade, Trabalho"></div>
@@ -2792,6 +2808,131 @@ async function renderAgendaLista(sessoes) {
     });
   });
   el.innerHTML = html;
+}
+
+
+// ════════════════════════════════════
+// IA — GEMINI PARA EVOLUÇÕES
+// ════════════════════════════════════
+const GEMINI_KEY = 'AIzaSyBD8I2dLkFaTATt8pyVQ-SR2OK9amHHAqs';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_KEY;
+
+async function gerarEvolucaoIA() {
+  const palavras = document.getElementById('ne-palavras').value.trim();
+  const pacId = document.getElementById('ne-pac').value;
+  const btn = document.getElementById('btn-gerar-ia');
+
+  if (!palavras) { toast('Digite palavras-chave para gerar a evolução', 'error'); return; }
+
+  // Buscar dados do paciente para contextualizar
+  const pac = todosPacientes.find(p => p.id == pacId);
+  const abordagem = pac?.abordagem || 'psicoterapia';
+  const queixa = pac?.queixa_principal || '';
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;"></i> Gerando...';
+
+  const prompt = `Você é um assistente especializado em psicologia clínica. Gere uma evolução clínica profissional e estruturada em português brasileiro para um prontuário psicológico.
+
+Abordagem terapêutica: ${abordagem}
+${queixa ? 'Queixa principal do paciente: ' + queixa : ''}
+Palavras-chave da sessão: ${palavras}
+
+Escreva uma evolução clínica completa com 2 a 3 parágrafos que:
+- Descreva o estado emocional e comportamental do paciente na sessão
+- Relate as intervenções terapêuticas realizadas
+- Indique a resposta do paciente às intervenções
+- Use linguagem clínica adequada e profissional
+- Seja objetiva e em terceira pessoa
+
+Escreva apenas a evolução, sem títulos, sem introdução e sem explicações adicionais.`;
+
+  try {
+    const res = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 500 }
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error?.message || 'Erro na API do Gemini');
+    }
+
+    const texto = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!texto) throw new Error('Resposta vazia da IA');
+
+    document.getElementById('ne-texto').value = texto.trim();
+    toast('Evolução gerada com sucesso!', 'success');
+
+  } catch (e) {
+    toast('Erro ao gerar evolução: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-sparkles"></i> Gerar evolução clínica';
+  }
+}
+
+async function gerarResumoProntuarioIA(pacId) {
+  const pac = todosPacientes.find(p => p.id == pacId);
+  if (!pac) return;
+
+  const { data: evolucoes } = await sb.from('evolucoes')
+    .select('*')
+    .eq('paciente_id', pacId)
+    .order('data_sessao', { ascending: false })
+    .limit(10);
+
+  if (!evolucoes || !evolucoes.length) {
+    toast('Nenhuma evolução encontrada para resumir', 'error');
+    return;
+  }
+
+  toast('Gerando resumo clínico com IA...', 'success');
+
+  const textos = evolucoes.map((e, i) =>
+    'Sessão ' + (i + 1) + ' (' + (e.data_sessao || '—') + '): ' + (e.texto || '')
+  ).join('\n\n');
+
+  const prompt = `Você é um assistente especializado em psicologia clínica. Com base nas evoluções clínicas abaixo, gere um resumo consolidado do progresso terapêutico do paciente.
+
+Abordagem: ${pac.abordagem || 'psicoterapia'}
+Queixa: ${pac.queixa_principal || 'não informada'}
+
+Evoluções:
+${textos}
+
+Escreva um resumo clínico em 3 parágrafos sobre:
+1. Estado geral e evolução do paciente
+2. Principais temas e padrões identificados
+3. Progresso terapêutico e próximos objetivos
+
+Use linguagem clínica profissional em português brasileiro.`;
+
+  try {
+    const res = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.5, maxOutputTokens: 600 }
+      })
+    });
+
+    const data = await res.json();
+    const texto = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!texto) throw new Error('Resposta vazia');
+
+    // Mostrar resumo em modal de alerta
+    alert('RESUMO CLÍNICO GERADO POR IA:\n\n' + texto);
+
+  } catch (e) {
+    toast('Erro ao gerar resumo: ' + e.message, 'error');
+  }
 }
 
 // ════════════════════════════════════
