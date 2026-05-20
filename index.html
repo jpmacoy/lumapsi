@@ -1031,9 +1031,25 @@ function abrirCadastro() {
 
 function iniciarApp(user) {
   usuarioAtual = user;
+
+  // Limpar dados do usuário anterior
+  todosPacientes = [];
+  filtroStatus = '';
+  filtroFinTipo = '';
+  filtroSessaoStatus = '';
+  semanaBase = new Date();
+
+  // Limpar campos da UI
+  ['grid-pacientes','tbody-sessoes','tbody-financeiro','lista-pessoal',
+   'dash-sessoes-hoje','dash-pendentes','pront-evolucoes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<div class="loading">Carregando...</div>';
+  });
+
   document.getElementById('pg-login').style.display = 'none';
   document.getElementById('pg-app').style.display = 'block';
   document.getElementById('user-email-display').textContent = user.email;
+  document.getElementById('user-nome').textContent = 'Profissional';
   const initials = user.email.substring(0, 2).toUpperCase();
   document.getElementById('user-av').textContent = initials;
   // Set today date on forms
