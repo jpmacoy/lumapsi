@@ -2814,8 +2814,8 @@ async function renderAgendaLista(sessoes) {
 // ════════════════════════════════════
 // IA — GEMINI PARA EVOLUÇÕES
 // ════════════════════════════════════
-const GEMINI_KEY = 'AIzaSyBS0UjTcdgj8KfDyPUyDELNLJcSe3LyHcI';
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=' + GEMINI_KEY;
+const GROQ_KEY = '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';
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 async function gerarEvolucaoIA() {
   const palavras = document.getElementById('ne-palavras').value.trim();
@@ -2848,22 +2848,27 @@ Escreva uma evolução clínica completa com 2 a 3 parágrafos que:
 Escreva apenas a evolução, sem títulos, sem introdução e sem explicações adicionais.`;
 
   try {
-    const res = await fetch(GEMINI_URL, {
+    const res = await fetch(GROQ_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + GROQ_KEY
+      },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 500 }
+        model: 'llama-3.1-8b-instant',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        max_tokens: 500
       })
     });
 
     const data = await res.json();
 
     if (!res.ok) {
-      throw new Error(data.error?.message || 'Erro na API do Gemini');
+      throw new Error(data.error?.message || 'Erro na API');
     }
 
-    const texto = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const texto = data.choices?.[0]?.message?.content;
     if (!texto) throw new Error('Resposta vazia da IA');
 
     document.getElementById('ne-texto').value = texto.trim();
@@ -2914,17 +2919,22 @@ Escreva um resumo clínico em 3 parágrafos sobre:
 Use linguagem clínica profissional em português brasileiro.`;
 
   try {
-    const res = await fetch(GEMINI_URL, {
+    const res = await fetch(GROQ_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + GROQ_KEY
+      },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.5, maxOutputTokens: 600 }
+        model: 'llama-3.1-8b-instant',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.5,
+        max_tokens: 600
       })
     });
 
     const data = await res.json();
-    const texto = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const texto = data.choices?.[0]?.message?.content;
     if (!texto) throw new Error('Resposta vazia');
 
     // Mostrar resumo em modal de alerta
