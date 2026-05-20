@@ -1102,6 +1102,7 @@ function iniciarApp(user) {
   const finMes = document.getElementById('fin-mes');
   if (finMes) finMes.value = mes;
   carregarTudo();
+  carregarConfig();
 }
 
 // Verificar sessão existente
@@ -2073,8 +2074,50 @@ async function carregarRelatorios() {
 // ════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════
-function salvarConfig() {
+async function salvarConfig() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+  const nome = document.getElementById('cfg-nome').value;
+  const crp = document.getElementById('cfg-crp').value;
+  const email = document.getElementById('cfg-email').value;
+  const whats = document.getElementById('cfg-whats').value;
+  const valPres = document.getElementById('cfg-val-pres').value;
+  const valOnline = document.getElementById('cfg-val-online').value;
+
+  const { error } = await sb.from('configuracoes').upsert({
+    user_id: user.id,
+    nome, crp, email, whatsapp: whats,
+    valor_presencial: parseFloat(valPres) || null,
+    valor_online: parseFloat(valOnline) || null,
+  }, { onConflict: 'user_id' });
+
+  if (error) { toast('Erro ao salvar: ' + error.message, 'error'); return; }
+
+  // Atualizar nome no sidebar
+  if (nome) {
+    document.getElementById('user-nome').textContent = nome;
+    const ini = nome.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase();
+    document.getElementById('user-av').textContent = ini;
+  }
   toast('Configurações salvas!', 'success');
+}
+
+async function carregarConfig() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+  const { data } = await sb.from('configuracoes').select('*').eq('user_id', user.id).single();
+  if (!data) return;
+  if (data.nome) {
+    document.getElementById('cfg-nome').value = data.nome;
+    document.getElementById('user-nome').textContent = data.nome;
+    const ini = data.nome.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase();
+    document.getElementById('user-av').textContent = ini;
+  }
+  if (data.crp) document.getElementById('cfg-crp').value = data.crp;
+  if (data.email) document.getElementById('cfg-email').value = data.email;
+  if (data.whatsapp) document.getElementById('cfg-whats').value = data.whatsapp;
+  if (data.valor_presencial) document.getElementById('cfg-val-pres').value = data.valor_presencial;
+  if (data.valor_online) document.getElementById('cfg-val-online').value = data.valor_online;
 }
 
 
@@ -2175,7 +2218,7 @@ async function verificarLembretes() {
   const data = amanha.toISOString().split('T')[0];
   
   const { data: sessoes } = await sb.from('sessoes')
-    .select('*, pacientes(nome,telefone)')
+    .select('*')
     .gte('data_hora', data + 'T00:00:00')
     .lte('data_hora', data + 'T23:59:59')
     .in('status', ['Agendada', 'Confirmada']);
@@ -2191,7 +2234,7 @@ async function verificarLembretes() {
 async function enviarResumoDia() {
   const hoje = new Date().toISOString().split('T')[0];
   const { data: sessoes } = await sb.from('sessoes')
-    .select('*, pacientes(nome)')
+    .select('*')
     .gte('data_hora', hoje + 'T00:00:00')
     .lte('data_hora', hoje + 'T23:59:59')
     .order('data_hora');
@@ -2204,7 +2247,8 @@ async function enviarResumoDia() {
   let msg = '🌅 *Bom dia! Resumo da sua agenda de hoje:*\n\n';
   sessoes.forEach((s, i) => {
     const hr = new Date(s.data_hora).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
-    msg += (i+1) + '. ' + hr + ' — ' + (s.pacientes?.nome || '—') + ' (' + (s.tipo||'Presencial') + ')\n';
+    const pacRes = todosPacientes.find(p => p.id === s.paciente_id);
+    msg += (i+1) + '. ' + hr + ' — ' + (pacRes?.nome || '—') + ' (' + (s.tipo||'Presencial') + ')\n';
   });
   msg += '\nTotal: *' + sessoes.length + ' sessão(ões)*\n\nBom trabalho! 💪';
 
