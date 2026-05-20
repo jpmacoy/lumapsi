@@ -439,6 +439,7 @@ tr:hover td{background:#FAFAFB}
       <button class="icon-btn btn-menu" onclick="toggleMenu()"><i class="ti ti-menu-2"></i></button>
       <div><div class="tb-title" id="tb-title">Dashboard</div><div class="tb-sub" id="tb-sub"></div></div>
       <div style="flex:1;"></div>
+      <button class="icon-btn" title="Enviar lembretes de amanhã" onclick="verificarLembretes()" style="color:#25D366;"><i class="ti ti-brand-whatsapp"></i></button>
       <button class="icon-btn" title="Exportar"><i class="ti ti-download"></i></button>
       <button class="btn btn-primary" style="font-size:12px;padding:6px 14px;" id="btn-acao" onclick="acaoPrincipal()">
         <i class="ti ti-plus"></i> <span id="btn-acao-txt">Nova sessão</span>
@@ -739,6 +740,21 @@ tr:hover td{background:#FAFAFB}
               <div style="padding:16px;">
                 <div class="form-group"><label class="form-label">Nova senha</label><input class="form-input" type="password" id="cfg-senha" placeholder="Nova senha"></div>
                 <button class="btn btn-ghost btn-sm" onclick="alterarSenha()"><i class="ti ti-lock"></i> Alterar senha</button>
+              </div>
+            </div>
+            <div class="card mb16">
+              <div class="card-head"><span class="card-title">WhatsApp automático</span></div>
+              <div style="padding:16px;display:flex;flex-direction:column;gap:8px;">
+                <button class="btn btn-sm btn-full" style="background:#25D366;color:#fff;border:none;justify-content:center;" onclick="verificarLembretes()">
+                  <i class="ti ti-bell"></i> Enviar lembretes de amanhã agora
+                </button>
+                <button class="btn btn-sm btn-full" style="background:#25D366;color:#fff;border:none;justify-content:center;" onclick="enviarResumoDia()">
+                  <i class="ti ti-calendar"></i> Enviar resumo do dia para mim
+                </button>
+                <button class="btn btn-sm btn-full" style="background:#25D366;color:#fff;border:none;justify-content:center;" onclick="cobrarWhatsApp()">
+                  <i class="ti ti-currency-real"></i> Cobrar todos os pendentes agora
+                </button>
+                <div style="font-size:11px;color:var(--t3);margin-top:4px;">Os lembretes são enviados automaticamente para os pacientes. As cobranças são agrupadas por paciente.</div>
               </div>
             </div>
             <div class="card">
@@ -1706,6 +1722,11 @@ async function salvarSessao() {
   if (error) { toast('Erro ao agendar: ' + error.message, 'error'); return; }
   fecharModal();
   toast('Sessão agendada!', 'success');
+  // Enviar confirmação automática via WhatsApp
+  const pacId = document.getElementById('ns-pac').value;
+  const dataHora = document.getElementById('ns-data').value + 'T' + document.getElementById('ns-hora').value + ':00';
+  const tipoSess = document.getElementById('ns-tipo').value;
+  enviarConfirmacaoAgendamento(pacId, dataHora, tipoSess);
   limparFormSessao();
   if (paginaAtual === 'sessoes') carregarSessoes();
   if (paginaAtual === 'dashboard') carregarDashboard();
@@ -2051,12 +2072,137 @@ function salvarConfig() {
   toast('Configurações salvas!', 'success');
 }
 
+
 // ════════════════════════════════════
-// WHATSAPP
+// WHATSAPP AUTOMÁTICO — Z-API
 // ════════════════════════════════════
-function cobrarWhatsApp() {
-  toast('Cobrança via WhatsApp em breve!', 'success');
+const ZAPI_ID = '3F366F99B88D9309592F8E55E4F73592';
+const ZAPI_TOKEN = '4DC837C08B7D50E470AD898D';
+const ZAPI_URL = 'https://api.z-api.io/instances/' + ZAPI_ID + '/token/' + ZAPI_TOKEN;
+
+async function enviarWhatsApp(telefone, mensagem) {
+  if (!telefone) return { ok: false, erro: 'Sem telefone' };
+  const tel = '55' + telefone.replace(/\D/g, '');
+  try {
+    const res = await fetch(ZAPI_URL + '/send-text', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Client-Token': ZAPI_TOKEN },
+      body: JSON.stringify({ phone: tel, message: mensagem })
+    });
+    const data = await res.json();
+    return { ok: res.ok, data };
+  } catch (e) {
+    return { ok: false, erro: e.message };
+  }
 }
+
+async function enviarConfirmacaoAgendamento(pacienteId, dataHora, tipo) {
+  const pac = todosPacientes.find(p => p.id == pacienteId);
+  if (!pac || !pac.telefone) return;
+  const dt = new Date(dataHora);
+  const dtStr = dt.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' });
+  const hrStr = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const nome = pac.nome.split(' ')[0];
+  const msg = 'Olá ' + nome + '! 😊\n\nSua sessão foi agendada com sucesso:\n\n📅 *' + dtStr + '* às *' + hrStr + '*\n📍 Modalidade: ' + (tipo || 'Presencial') + '\n\nCaso precise reagendar, entre em contato. Até lá! 🌟';
+  const result = await enviarWhatsApp(pac.telefone, msg);
+  if (result.ok) toast('Confirmação enviada para ' + nome + ' no WhatsApp!', 'success');
+}
+
+async function enviarLembrete24h(sessao) {
+  const pac = todosPacientes.find(p => p.id == sessao.paciente_id);
+  if (!pac || !pac.telefone) return;
+  const dt = new Date(sessao.data_hora);
+  const hrStr = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const nome = pac.nome.split(' ')[0];
+  const msg = 'Olá ' + nome + '! 👋\n\nPassando para lembrar que você tem uma sessão *amanhã* às *' + hrStr + '*.' + (sessao.tipo === 'Online' ? '\n\n💻 A sessão será online. O link será enviado em breve.' : '\n\n📍 A sessão será presencial.') + '\n\nPor favor, confirme sua presença respondendo *SIM* ou *NÃO*. ✅';
+  await enviarWhatsApp(pac.telefone, msg);
+}
+
+async function enviarCobranca(pacienteId, valor, numSessoes) {
+  const pac = todosPacientes.find(p => p.id == pacienteId);
+  if (!pac || !pac.telefone) return false;
+  const nome = pac.nome.split(' ')[0];
+  const msg = 'Olá ' + nome + '! 😊\n\nPassando para informar que há *' + numSessoes + ' sessão(ões)* com pagamento pendente no valor total de *R$' + valor.toLocaleString('pt-BR') + '*.' + '\n\nVocê pode realizar o pagamento via Pix ou da forma que preferir. Qualquer dúvida, estou à disposição! 🙏';
+  const result = await enviarWhatsApp(pac.telefone, msg);
+  return result.ok;
+}
+
+async function cobrarWhatsApp() {
+  const hoje = new Date().toISOString().substring(0, 7);
+  const { data: pendentes } = await sb.from('sessoes')
+    .select('*, pacientes(nome,telefone)')
+    .eq('status_pagamento', 'Pendente')
+    .eq('status', 'Realizada');
+  
+  if (!pendentes || !pendentes.length) {
+    toast('Nenhuma sessão pendente encontrada', 'error');
+    return;
+  }
+
+  const porPac = {};
+  pendentes.forEach(s => {
+    if (!porPac[s.paciente_id]) porPac[s.paciente_id] = { total: 0, count: 0 };
+    porPac[s.paciente_id].total += s.valor || 0;
+    porPac[s.paciente_id].count++;
+  });
+
+  let enviados = 0;
+  for (const [pacId, dados] of Object.entries(porPac)) {
+    const ok = await enviarCobranca(pacId, dados.total, dados.count);
+    if (ok) enviados++;
+  }
+  toast(enviados + ' cobrança(s) enviada(s) via WhatsApp!', 'success');
+}
+
+async function verificarLembretes() {
+  const amanha = new Date();
+  amanha.setDate(amanha.getDate() + 1);
+  const data = amanha.toISOString().split('T')[0];
+  
+  const { data: sessoes } = await sb.from('sessoes')
+    .select('*, pacientes(nome,telefone)')
+    .gte('data_hora', data + 'T00:00:00')
+    .lte('data_hora', data + 'T23:59:59')
+    .in('status', ['Agendada', 'Confirmada']);
+
+  if (!sessoes || !sessoes.length) return;
+  
+  for (const s of sessoes) {
+    await enviarLembrete24h(s);
+  }
+  toast(sessoes.length + ' lembrete(s) enviado(s) para as sessões de amanhã!', 'success');
+}
+
+async function enviarResumoDia() {
+  const hoje = new Date().toISOString().split('T')[0];
+  const { data: sessoes } = await sb.from('sessoes')
+    .select('*, pacientes(nome)')
+    .gte('data_hora', hoje + 'T00:00:00')
+    .lte('data_hora', hoje + 'T23:59:59')
+    .order('data_hora');
+
+  if (!sessoes || !sessoes.length) {
+    toast('Nenhuma sessão hoje para enviar resumo', 'error');
+    return;
+  }
+
+  let msg = '🌅 *Bom dia! Resumo da sua agenda de hoje:*\n\n';
+  sessoes.forEach((s, i) => {
+    const hr = new Date(s.data_hora).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+    msg += (i+1) + '. ' + hr + ' — ' + (s.pacientes?.nome || '—') + ' (' + (s.tipo||'Presencial') + ')\n';
+  });
+  msg += '\nTotal: *' + sessoes.length + ' sessão(ões)*\n\nBom trabalho! 💪';
+
+  const { data: { user } } = await sb.auth.getUser();
+  const perfil = await sb.from('configuracoes').select('whatsapp').eq('user_id', user.id).single();
+  const tel = perfil?.data?.whatsapp || '';
+  if (!tel) { toast('Configure seu WhatsApp nas Configurações', 'error'); return; }
+  
+  const result = await enviarWhatsApp(tel, msg);
+  if (result.ok) toast('Resumo do dia enviado para o seu WhatsApp!', 'success');
+  else toast('Erro ao enviar resumo. Verifique o WhatsApp nas configurações.', 'error');
+}
+
 
 function whatsappPaciente(pacId) {
   const pac = todosPacientes.find(p => p.id === pacId);
