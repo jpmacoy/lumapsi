@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LumaPsi — Criar conta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand:#5046E5;--brand-dark:#3C3489;--brand-light:#EEEDFE;
+  --green:#16A34A;--green-light:#EAF3DE;
+  --red:#DC2626;--red-light:#FCEBEB;
+  --border:rgba(0,0,0,0.08);--border-s:rgba(0,0,0,0.14);
+  --t1:#111110;--t2:#555452;--t3:#8C8A85;
+  --r:10px;--rs:7px;
+}
+body{font-family:'DM Sans',sans-serif;color:var(--t1);-webkit-font-smoothing:antialiased;min-height:100vh;background:#fff}
+button{font-family:inherit;cursor:pointer}
+input,select{font-family:inherit}
+
+.page{display:flex;min-height:100vh}
+.left{width:48%;background:var(--brand);padding:48px;display:flex;flex-direction:column}
+.right{flex:1;display:flex;align-items:center;justify-content:center;padding:40px;overflow-y:auto}
+
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:48px}
+.logo-icon{width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.2)}
+.logo-icon i{color:#fff;font-size:19px}
+.logo-name{font-size:18px;font-weight:500;color:#fff}
+
+.hero-title{font-size:28px;font-weight:500;color:#fff;line-height:1.2;letter-spacing:-0.8px;margin-bottom:12px}
+.hero-sub{font-size:14px;color:rgba(255,255,255,0.65);line-height:1.65;margin-bottom:36px}
+
+.steps{display:flex;flex-direction:column;gap:14px;margin-bottom:auto}
+.step{display:flex;align-items:flex-start;gap:12px}
+.step-num{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff;flex-shrink:0;margin-top:1px}
+.step-text strong{display:block;font-size:13px;color:#fff;font-weight:500}
+.step-text span{font-size:11px;color:rgba(255,255,255,0.6)}
+
+.price-box{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:var(--r);padding:18px 20px;margin-top:32px}
+.price-label{font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.price-val{font-size:26px;font-weight:500;color:#fff;letter-spacing:-0.8px}
+.price-rec{font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:12px}
+.price-feats{display:flex;flex-direction:column;gap:6px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1)}
+.price-feat{display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.8)}
+.price-feat i{font-size:14px;color:#4ADE80}
+
+.form-wrap{width:100%;max-width:380px}
+.form-title{font-size:22px;font-weight:500;letter-spacing:-0.5px;margin-bottom:4px}
+.form-sub{font-size:13px;color:var(--t3);margin-bottom:28px}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px}
+.form-input{width:100%;padding:10px 12px;border:1px solid var(--border-s);border-radius:var(--rs);font-size:13px;color:var(--t1);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s}
+.form-input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(80,70,229,0.1)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.input-wrap{position:relative}
+.input-icon{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--t3);cursor:pointer}
+.btn-primary{width:100%;padding:11px;background:var(--brand);color:#fff;border:none;border-radius:var(--rs);font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
+.btn-primary:hover{opacity:0.88}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed}
+.btn-primary i{font-size:16px}
+.err-msg{background:var(--red-light);color:var(--red);font-size:12px;padding:9px 12px;border-radius:var(--rs);margin-bottom:14px;display:none;align-items:center;gap:7px}
+.err-msg i{font-size:15px;flex-shrink:0}
+.success-box{background:var(--green-light);border:1px solid #BBF7D0;border-radius:var(--r);padding:24px;text-align:center;display:none}
+.success-icon{width:52px;height:52px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.success-icon i{color:#fff;font-size:26px}
+.success-title{font-size:18px;font-weight:500;margin-bottom:6px;color:#166534}
+.success-sub{font-size:13px;color:#166534;margin-bottom:18px;line-height:1.5}
+.btn-success{display:inline-flex;align-items:center;gap:7px;background:var(--green);color:#fff;padding:10px 22px;border-radius:var(--rs);font-size:13px;font-weight:500;border:none;cursor:pointer}
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0}
+.divider .line{flex:1;height:1px;background:var(--border)}
+.divider span{font-size:11px;color:var(--t3)}
+.link-login{text-align:center;font-size:12px;color:var(--t3);margin-top:16px}
+.link-login a{color:var(--brand);cursor:pointer;font-weight:500}
+.step-indicator{display:flex;align-items:center;gap:8px;margin-bottom:28px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border-s);transition:background .2s}
+.step-dot.active{background:var(--brand);width:24px;border-radius:4px}
+.step-dot.done{background:var(--green)}
+.senha-hint{font-size:11px;color:var(--t3);margin-top:5px;display:flex;align-items:center;gap:4px}
+.senha-hint i{font-size:13px}
+
+@media(max-width:768px){
+  .page{flex-direction:column}
+  .left{width:100%;padding:28px 20px}
+  .hero-title{font-size:22px}
+  .steps{display:none}
+  .price-box{display:none}
+  .right{padding:28px 20px;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <!-- ESQUERDA -->
+  <div class="left">
+    <div>
+      <div class="logo">
+        <div class="logo-icon"><i class="ti ti-sun"></i></div>
+        <span class="logo-name">LumaPsi</span>
+      </div>
+      <div class="hero-title">Bem-vindo ao seu novo consultório digital.</div>
+      <div class="hero-sub">Configure sua conta em menos de 2 minutos e comece a usar hoje mesmo.</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text"><strong>Crie sua conta</strong><span>Preencha seus dados profissionais</span></div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text"><strong>Acesse o sistema</strong><span>Login imediato após o cadastro</span></div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text"><strong>Cadastre seus pacientes</strong><span>Importe ou adicione um a um</span></div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text"><strong>Organize sua agenda</strong><span>Agende sessões e receba lembretes automáticos</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="price-box">
+      <div class="price-label">Seu plano</div>
+      <div class="price-val">R$197<span style="font-size:14px;font-weight:400;color:rgba(255,255,255,0.6)">/mês</span></div>
+      <div class="price-rec">Após os primeiros 30 dias gratuitos</div>
+      <div class="price-feats">
+        <div class="price-feat"><i class="ti ti-check"></i> Agenda e prontuário completos</div>
+        <div class="price-feat"><i class="ti ti-check"></i> Financeiro do consultório</div>
+        <div class="price-feat"><i class="ti ti-check"></i> Lembretes e cobranças via WhatsApp</div>
+        <div class="price-feat"><i class="ti ti-check"></i> Suporte via WhatsApp incluído</div>
+        <div class="price-feat"><i class="ti ti-check"></i> Sem fidelidade — cancele quando quiser</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIREITA -->
+  <div class="right">
+    <div class="form-wrap">
+
+      <!-- STEP INDICATOR -->
+      <div class="step-indicator">
+        <div class="step-dot active" id="dot1"></div>
+        <div class="step-dot" id="dot2"></div>
+        <div class="step-dot" id="dot3"></div>
+      </div>
+
+      <!-- STEP 1 — Código de acesso -->
+      <div id="step1">
+        <div class="form-title">Código de acesso</div>
+        <div class="form-sub">Digite o código que você recebeu para criar sua conta</div>
+
+        <div id="err-codigo" class="err-msg"><i class="ti ti-alert-circle"></i> <span id="err-codigo-txt"></span></div>
+
+        <div class="form-group">
+          <label class="form-label">Código de acesso *</label>
+          <div class="input-wrap">
+            <input id="codigo" class="form-input" type="password" placeholder="••••••••••••" style="padding-right:36px;letter-spacing:2px;">
+            <i class="ti ti-eye input-icon" onclick="toggleCodigo()"></i>
+          </div>
+          <div class="senha-hint"><i class="ti ti-info-circle"></i> Recebido via WhatsApp após contratação</div>
+        </div>
+
+        <button class="btn-primary" onclick="verificarCodigo()">
+          <i class="ti ti-arrow-right"></i> Continuar
+        </button>
+
+        <div class="link-login">Já tem conta? <a onclick="irLogin()">Entrar no sistema</a></div>
+      </div>
+
+      <!-- STEP 2 — Dados pessoais -->
+      <div id="step2" style="display:none;">
+        <div class="form-title">Seus dados</div>
+        <div class="form-sub">Preencha suas informações profissionais</div>
+
+        <div id="err-dados" class="err-msg"><i class="ti ti-alert-circle"></i> <span id="err-dados-txt"></span></div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Nome completo *</label>
+            <input id="reg-nome" class="form-input" type="text" placeholder="Seu nome completo">
+          </div>
+          <div class="form-group">
+            <label class="form-label">CRP</label>
+            <input id="reg-crp" class="form-input" type="text" placeholder="00/00000">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">WhatsApp *</label>
+          <input id="reg-whats" class="form-input" type="tel" placeholder="(11) 99999-9999">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Abordagem terapêutica</label>
+          <select id="reg-abord" class="form-input">
+            <option value="">Selecione...</option>
+            <option>TCC — Terapia Cognitivo-Comportamental</option>
+            <option>Psicanálise</option>
+            <option>Humanista / Rogeriana</option>
+            <option>Gestalt</option>
+            <option>Sistêmica</option>
+            <option>EMDR</option>
+            <option>Outra</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Valor presencial (R$)</label>
+            <input id="reg-val-pres" class="form-input" type="number" placeholder="180">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Valor online (R$)</label>
+            <input id="reg-val-online" class="form-input" type="number" placeholder="180">
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="irStep3()">
+          <i class="ti ti-arrow-right"></i> Continuar
+        </button>
+      </div>
+
+      <!-- STEP 3 — E-mail e senha -->
+      <div id="step3" style="display:none;">
+        <div class="form-title">Criar acesso</div>
+        <div class="form-sub">Defina o e-mail e senha para entrar no LumaPsi</div>
+
+        <div id="err-acesso" class="err-msg"><i class="ti ti-alert-circle"></i> <span id="err-acesso-txt"></span></div>
+
+        <div class="form-group">
+          <label class="form-label">E-mail profissional *</label>
+          <div class="input-wrap">
+            <input id="reg-email" class="form-input" type="email" placeholder="seu@email.com" style="padding-right:36px;">
+            <i class="ti ti-mail input-icon"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Senha *</label>
+          <div class="input-wrap">
+            <input id="reg-senha" class="form-input" type="password" placeholder="Mínimo 6 caracteres" style="padding-right:36px;">
+            <i class="ti ti-eye input-icon" onclick="toggleSenha('reg-senha')"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirmar senha *</label>
+          <div class="input-wrap">
+            <input id="reg-senha2" class="form-input" type="password" placeholder="Repita a senha" style="padding-right:36px;">
+            <i class="ti ti-eye input-icon" onclick="toggleSenha('reg-senha2')"></i>
+          </div>
+        </div>
+
+        <div style="background:#F7F7F8;border-radius:var(--rs);padding:10px 12px;font-size:11px;color:var(--t3);margin-bottom:16px;display:flex;gap:8px;">
+          <i class="ti ti-lock" style="font-size:14px;flex-shrink:0;margin-top:1px;"></i>
+          <span>Seus dados são protegidos com criptografia. Nenhum outro usuário tem acesso às suas informações.</span>
+        </div>
+
+        <button class="btn-primary" id="btn-cadastrar" onclick="criarConta()">
+          <i class="ti ti-user-plus"></i> Criar minha conta
+        </button>
+
+        <div class="link-login" style="margin-top:12px;">
+          <a onclick="voltarStep2()" style="color:var(--t3);">← Voltar</a>
+        </div>
+      </div>
+
+      <!-- SUCESSO -->
+      <div id="step-sucesso" style="display:none;">
+        <div class="success-box" style="display:block;">
+          <div class="success-icon"><i class="ti ti-check"></i></div>
+          <div class="success-title">Conta criada com sucesso! 🎉</div>
+          <div class="success-sub" id="sucesso-nome">Bem-vindo ao LumaPsi! Sua conta está pronta. Clique abaixo para acessar o sistema.</div>
+          <button class="btn-success" onclick="irSistema()">
+            <i class="ti ti-arrow-right"></i> Acessar o sistema agora
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPA_URL = 'https://pbqvfokpounurzmmlcor.supabase.co';
+const SUPA_KEY = 'sb_publishable_ERIUNIAjp2FJyXNF6IS_dw_RNopwplO';
+const CODIGO_ACESSO = 'lumapsi2026';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// Dados coletados nos steps
+let dadosCadastro = {};
+
+function toggleCodigo() {
+  const i = document.getElementById('codigo');
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+
+function toggleSenha(id) {
+  const i = document.getElementById(id);
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+
+function mostrarErro(id, msg) {
+  const el = document.getElementById('err-' + id);
+  document.getElementById('err-' + id + '-txt').textContent = msg;
+  el.style.display = 'flex';
+}
+
+function esconderErro(id) {
+  document.getElementById('err-' + id).style.display = 'none';
+}
+
+function atualizarDots(step) {
+  document.getElementById('dot1').className = 'step-dot' + (step >= 1 ? (step > 1 ? ' done' : ' active') : '');
+  document.getElementById('dot2').className = 'step-dot' + (step >= 2 ? (step > 2 ? ' done' : ' active') : '');
+  document.getElementById('dot3').className = 'step-dot' + (step >= 3 ? ' active' : '');
+}
+
+function verificarCodigo() {
+  const codigo = document.getElementById('codigo').value.trim();
+  esconderErro('codigo');
+  if (!codigo) { mostrarErro('codigo', 'Digite o código de acesso.'); return; }
+  if (codigo !== CODIGO_ACESSO) { mostrarErro('codigo', 'Código inválido. Verifique o código enviado via WhatsApp.'); return; }
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('step2').style.display = 'block';
+  atualizarDots(2);
+}
+
+function irStep3() {
+  const nome = document.getElementById('reg-nome').value.trim();
+  const whats = document.getElementById('reg-whats').value.trim();
+  esconderErro('dados');
+  if (!nome) { mostrarErro('dados', 'Nome completo é obrigatório.'); return; }
+  if (!whats) { mostrarErro('dados', 'WhatsApp é obrigatório.'); return; }
+  dadosCadastro.nome = nome;
+  dadosCadastro.crp = document.getElementById('reg-crp').value;
+  dadosCadastro.whatsapp = whats;
+  dadosCadastro.abordagem = document.getElementById('reg-abord').value;
+  dadosCadastro.valor_presencial = parseFloat(document.getElementById('reg-val-pres').value) || null;
+  dadosCadastro.valor_online = parseFloat(document.getElementById('reg-val-online').value) || null;
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step3').style.display = 'block';
+  atualizarDots(3);
+}
+
+function voltarStep2() {
+  document.getElementById('step3').style.display = 'none';
+  document.getElementById('step2').style.display = 'block';
+  atualizarDots(2);
+}
+
+async function criarConta() {
+  const email = document.getElementById('reg-email').value.trim();
+  const senha = document.getElementById('reg-senha').value;
+  const senha2 = document.getElementById('reg-senha2').value;
+  const btn = document.getElementById('btn-cadastrar');
+  esconderErro('acesso');
+
+  if (!email) { mostrarErro('acesso', 'E-mail é obrigatório.'); return; }
+  if (!senha || senha.length < 6) { mostrarErro('acesso', 'Senha deve ter no mínimo 6 caracteres.'); return; }
+  if (senha !== senha2) { mostrarErro('acesso', 'As senhas não coincidem.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;"></i> Criando conta...';
+
+  const { data, error } = await sb.auth.signUp({ email, password: senha });
+
+  if (error) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-user-plus"></i> Criar minha conta';
+    if (error.message.includes('already registered')) {
+      mostrarErro('acesso', 'Este e-mail já está cadastrado. Tente fazer login.');
+    } else {
+      mostrarErro('acesso', 'Erro ao criar conta: ' + error.message);
+    }
+    return;
+  }
+
+  // Salvar configurações do profissional
+  if (data.user) {
+    await sb.from('configuracoes').upsert({
+      user_id: data.user.id,
+      nome: dadosCadastro.nome,
+      crp: dadosCadastro.crp,
+      email: email,
+      whatsapp: dadosCadastro.whatsapp,
+      valor_presencial: dadosCadastro.valor_presencial,
+      valor_online: dadosCadastro.valor_online,
+    }, { onConflict: 'user_id' });
+  }
+
+  // Mostrar sucesso
+  document.getElementById('step3').style.display = 'none';
+  document.getElementById('step-sucesso').style.display = 'block';
+  document.querySelector('.step-indicator').style.display = 'none';
+  document.getElementById('sucesso-nome').textContent =
+    'Bem-vindo(a), ' + dadosCadastro.nome.split(' ')[0] + '! Sua conta está pronta. Clique abaixo para acessar o sistema.';
+}
+
+function irSistema() {
+  window.location.href = '/';
+}
+
+function irLogin() {
+  window.location.href = '/';
+}
+
+// Permitir Enter nos campos
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  const step1 = document.getElementById('step1');
+  const step2 = document.getElementById('step2');
+  const step3 = document.getElementById('step3');
+  if (step1.style.display !== 'none' && !step1.style.display || step1.offsetParent) verificarCodigo();
+  else if (step2.offsetParent) irStep3();
+  else if (step3.offsetParent) criarConta();
+});
+</script>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</body>
+</html>
