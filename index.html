@@ -2136,18 +2136,19 @@ async function enviarCobranca(pacienteId, valor, numSessoes) {
 }
 
 async function cobrarWhatsApp() {
-  const { data: pendentes } = await sb.from('sessoes')
-    .select('paciente_id, valor, status_pagamento, status, pacientes(nome, telefone)')
-    .eq('status_pagamento', 'Pendente')
-    .eq('status', 'Realizada');
-  
-  if (!pendentes || !pendentes.length) {
-    toast('Nenhuma sessão pendente encontrada', 'error');
-    return;
-  }
+  // Buscar sessões realizadas com pagamento pendente
+  const { data: sessoes, error: errSess } = await sb
+    .from('sessoes')
+    .select('paciente_id, valor')
+    .eq('status', 'Realizada')
+    .eq('status_pagamento', 'Pendente');
 
+  if (errSess) { toast('Erro ao buscar sessões: ' + errSess.message, 'error'); return; }
+  if (!sessoes || !sessoes.length) { toast('Nenhuma sessão realizada com pagamento pendente', 'error'); return; }
+
+  // Agrupar por paciente
   const porPac = {};
-  pendentes.forEach(s => {
+  sessoes.forEach(s => {
     if (!porPac[s.paciente_id]) porPac[s.paciente_id] = { total: 0, count: 0 };
     porPac[s.paciente_id].total += s.valor || 0;
     porPac[s.paciente_id].count++;
@@ -2155,10 +2156,12 @@ async function cobrarWhatsApp() {
 
   let enviados = 0;
   for (const [pacId, dados] of Object.entries(porPac)) {
-    const ok = await enviarCobranca(pacId, dados.total, dados.count);
+    const ok = await enviarCobranca(parseInt(pacId), dados.total, dados.count);
     if (ok) enviados++;
   }
-  toast(enviados + ' cobrança(s) enviada(s) via WhatsApp!', 'success');
+
+  if (enviados > 0) toast(enviados + ' cobrança(s) enviada(s) via WhatsApp!', 'success');
+  else toast('Nenhuma cobrança enviada. Verifique se os pacientes têm telefone cadastrado.', 'error');
 }
 
 async function verificarLembretes() {
