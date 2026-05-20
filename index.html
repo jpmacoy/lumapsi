@@ -771,9 +771,9 @@ tr:hover td{background:#FAFAFB}
       <div class="screen" id="sc-agenda">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
           <div class="tabs">
-            <div class="tab active">Semana</div>
-            <div class="tab">Mês</div>
-            <div class="tab">Lista</div>
+            <div class="tab active" onclick="mudarViewAgenda(this,'semana')">Semana</div>
+            <div class="tab" onclick="mudarViewAgenda(this,'mes')">Mês</div>
+            <div class="tab" onclick="mudarViewAgenda(this,'lista')">Lista</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <button class="icon-btn" onclick="semanaAnterior()"><i class="ti ti-chevron-left"></i></button>
@@ -783,6 +783,8 @@ tr:hover td{background:#FAFAFB}
         </div>
         <div class="card mb16" style="padding:0;overflow:hidden;">
           <div id="agenda-grid"></div>
+          <div id="agenda-mes" style="display:none;padding:14px;"></div>
+          <div id="agenda-lista" style="display:none;"></div>
         </div>
         <div class="card" style="padding:0;overflow:hidden;">
           <div class="card-head"><span class="card-title">Próximas sessões</span></div>
@@ -1912,8 +1914,22 @@ async function carregarAgenda() {
     .lte('data_hora', fim + 'T23:59:59')
     .order('data_hora');
 
-  renderAgendaGrid(dias, sessoes || []);
-  renderProximasSessoes(sessoes || []);
+  if (viewAgenda === 'semana') {
+    document.getElementById('agenda-grid').style.display = 'block';
+    renderAgendaGrid(dias, sessoes || []);
+    renderProximasSessoes(sessoes || []);
+  } else if (viewAgenda === 'mes') {
+    // Para visão mês, buscar sessões do mês inteiro
+    const mesInicio = new Date(semanaBase.getFullYear(), semanaBase.getMonth(), 1).toISOString().split('T')[0];
+    const mesFim = new Date(semanaBase.getFullYear(), semanaBase.getMonth() + 1, 0).toISOString().split('T')[0];
+    const { data: sessoesMes } = await sb.from('sessoes').select('*').gte('data_hora', mesInicio + 'T00:00:00').lte('data_hora', mesFim + 'T23:59:59').order('data_hora');
+    document.getElementById('agenda-periodo').textContent = new Date(semanaBase.getFullYear(), semanaBase.getMonth(), 1).toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+    renderAgendaMes(sessoesMes || []);
+    renderProximasSessoes(sessoesMes || []);
+  } else if (viewAgenda === 'lista') {
+    renderAgendaLista(sessoes || []);
+    renderProximasSessoes(sessoes || []);
+  }
 }
 
 function obterDiasSemana(base) {
@@ -1999,12 +2015,20 @@ function renderProximasSessoes(sessoes) {
 }
 
 function semanaAnterior() {
-  semanaBase.setDate(semanaBase.getDate() - 7);
+  if (viewAgenda === 'mes') {
+    semanaBase = new Date(semanaBase.getFullYear(), semanaBase.getMonth() - 1, 1);
+  } else {
+    semanaBase.setDate(semanaBase.getDate() - 7);
+  }
   carregarAgenda();
 }
 
 function proximaSemana() {
-  semanaBase.setDate(semanaBase.getDate() + 7);
+  if (viewAgenda === 'mes') {
+    semanaBase = new Date(semanaBase.getFullYear(), semanaBase.getMonth() + 1, 1);
+  } else {
+    semanaBase.setDate(semanaBase.getDate() + 7);
+  }
   carregarAgenda();
 }
 
@@ -2661,6 +2685,113 @@ async function salvarSessoesRecorrentes(dadosBase, freq, reps) {
   }
   const { error } = await sb.from('sessoes').insert(sessoes);
   return error;
+}
+
+
+// ════════════════════════════════════
+// AGENDA — VIEWS
+// ════════════════════════════════════
+let viewAgenda = 'semana';
+
+function mudarViewAgenda(el, view) {
+  viewAgenda = view;
+  document.querySelectorAll('#sc-agenda .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('agenda-grid').style.display = view === 'semana' ? 'block' : 'none';
+  document.getElementById('agenda-mes').style.display = view === 'mes' ? 'block' : 'none';
+  document.getElementById('agenda-lista').style.display = view === 'lista' ? 'block' : 'none';
+  carregarAgenda();
+}
+
+async function renderAgendaMes(sessoes) {
+  const agora = semanaBase;
+  const ano = agora.getFullYear();
+  const mes = agora.getMonth();
+  const primeiroDia = new Date(ano, mes, 1);
+  const ultimoDia = new Date(ano, mes + 1, 0);
+  const diaSemana = primeiroDia.getDay();
+  const hoje = new Date().toDateString();
+  const nomes = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+  let html = '<div style="padding:14px;">';
+  html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;">';
+  nomes.forEach(n => {
+    html += '<div style="text-align:center;font-size:11px;color:var(--t3);font-weight:500;padding:4px;">' + n + '</div>';
+  });
+  html += '</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">';
+
+  // Dias vazios antes do primeiro
+  for (let i = 0; i < diaSemana; i++) {
+    html += '<div style="min-height:64px;"></div>';
+  }
+
+  for (let d = 1; d <= ultimoDia.getDate(); d++) {
+    const data = new Date(ano, mes, d);
+    const dataStr = data.toISOString().split('T')[0];
+    const isHoje = data.toDateString() === hoje;
+    const sessDia = (sessoes || []).filter(s => s.data_hora && s.data_hora.startsWith(dataStr));
+
+    html += '<div style="min-height:64px;border:0.5px solid var(--border);border-radius:var(--rs);padding:4px;' + (isHoje ? 'background:var(--brand-light);' : '') + '">';
+    html += '<div style="font-size:11px;font-weight:500;' + (isHoje ? 'color:var(--brand);' : 'color:var(--t2);') + 'margin-bottom:3px;">' + d + '</div>';
+    sessDia.slice(0,2).forEach(s => {
+      const pac = todosPacientes.find(p => p.id === s.paciente_id);
+      const nome = pac?.nome?.split(' ')[0] || '—';
+      const hr = new Date(s.data_hora).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+      const cor = s.tipo === 'Online' ? 'var(--teal)' : 'var(--brand)';
+      const bg = s.tipo === 'Online' ? 'var(--teal-light)' : 'var(--brand-light)';
+      html += '<div style="background:' + bg + ';color:' + cor + ';font-size:9px;font-weight:500;padding:1px 4px;border-radius:3px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + hr + ' ' + nome + '</div>';
+    });
+    if (sessDia.length > 2) {
+      html += '<div style="font-size:9px;color:var(--t3);">+' + (sessDia.length - 2) + ' mais</div>';
+    }
+    html += '</div>';
+  }
+
+  html += '</div></div>';
+  document.getElementById('agenda-mes').innerHTML = html;
+}
+
+async function renderAgendaLista(sessoes) {
+  const el = document.getElementById('agenda-lista');
+  if (!sessoes || !sessoes.length) {
+    el.innerHTML = '<div class="empty" style="padding:32px;"><i class="ti ti-calendar-off"></i><p>Nenhuma sessão no período</p></div>';
+    return;
+  }
+
+  const cores = ['av-purple','av-teal','av-amber','av-coral','av-blue'];
+  const agrupado = {};
+  sessoes.forEach(s => {
+    if (!s.data_hora) return;
+    const dia = s.data_hora.split('T')[0];
+    if (!agrupado[dia]) agrupado[dia] = [];
+    agrupado[dia].push(s);
+  });
+
+  let html = '';
+  Object.keys(agrupado).sort().forEach(dia => {
+    const data = new Date(dia + 'T12:00:00');
+    const label = data.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long'});
+    html += '<div style="padding:10px 16px;background:var(--bg);border-bottom:1px solid var(--border);font-size:11px;font-weight:500;color:var(--t3);text-transform:capitalize;">' + label + '</div>';
+    agrupado[dia].forEach((s, i) => {
+      const pac = todosPacientes.find(p => p.id === s.paciente_id);
+      const nome = pac?.nome || '—';
+      const ini = nome.split(' ').map(n=>n[0]).slice(0,2).join('');
+      const cor = cores[i % cores.length];
+      const hr = new Date(s.data_hora).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+      const tagTipo = s.tipo === 'Online' ? 'tag-teal' : 'tag-brand';
+      const tagSt = {Realizada:'tag-green',Confirmada:'tag-teal',Agendada:'tag-brand',Cancelada:'tag-red'}[s.status] || 'tag-amber';
+      html += '<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);">';
+      html += '<div style="font-size:12px;color:var(--t3);width:40px;flex-shrink:0;">' + hr + '</div>';
+      html += '<div class="av av-sm ' + cor + '">' + ini + '</div>';
+      html += '<div style="flex:1;"><div style="font-size:13px;font-weight:500;">' + nome + '</div>';
+      html += '<div style="display:flex;gap:5px;margin-top:3px;"><span class="tag ' + tagTipo + '">' + (s.tipo||'—') + '</span><span class="tag ' + tagSt + '">' + (s.status||'—') + '</span></div></div>';
+      html += '<div style="font-size:13px;font-weight:500;">R$' + (s.valor||'—') + '</div>';
+      html += '<button class="btn btn-ghost btn-sm" onclick="abrirEditarSessao(' + s.id + ')"><i class="ti ti-edit"></i></button>';
+      html += '</div>';
+    });
+  });
+  el.innerHTML = html;
 }
 
 // ════════════════════════════════════
