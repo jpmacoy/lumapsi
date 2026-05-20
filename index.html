@@ -681,7 +681,7 @@ tr:hover td{background:#FAFAFB}
           <div class="mc" style="border-left:3px solid var(--brand);"><div class="mc-lbl">Sobra do mês</div><div class="mc-val" id="pes-sobra">R$0</div></div>
         </div>
         <div class="card" style="padding:0;overflow:hidden;">
-          <div class="card-head"><span class="card-title">Lançamentos pessoais</span><button class="btn btn-primary btn-sm" onclick="abrirModal('novo-lancamento-pes')"><i class="ti ti-plus"></i> Adicionar</button></div>
+          <div class="card-head"><span class="card-title">Lançamentos pessoais</span><button class="btn btn-primary btn-sm" onclick="abrirModalPessoal()"><i class="ti ti-plus"></i> Adicionar</button></div>
           <div id="lista-pessoal" style="padding:0 16px;"><div class="loading">Carregando...</div></div>
         </div>
       </div>
@@ -953,66 +953,10 @@ tr:hover td{background:#FAFAFB}
 
 
   <!-- Editar Paciente -->
-  <div class="modal" id="m-editar-paciente" onclick="event.stopPropagation()" style="display:none;">
-    <div class="modal-hd"><span class="modal-title">Editar paciente</span><button class="modal-close" onclick="fecharModal()"><i class="ti ti-x"></i></button></div>
-    <div class="modal-body">
-      <input type="hidden" id="ep-id">
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Nome completo *</label><input class="form-input" id="ep-nome"></div>
-        <div class="form-group"><label class="form-label">Data de nascimento</label><input class="form-input" type="date" id="ep-nasc"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" id="ep-email"></div>
-        <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" id="ep-tel"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Modalidade</label><select class="form-input" id="ep-modal"><option>Semanal</option><option>Quinzenal</option><option>Mensal</option></select></div>
-        <div class="form-group"><label class="form-label">Valor da sessão (R$)</label><input class="form-input" type="number" id="ep-valor"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="ep-status"><option value="ativo">Ativo</option><option value="avaliacao">Em avaliação</option><option value="inativo">Inativo</option></select></div>
-        <div class="form-group"><label class="form-label">Abordagem</label><input class="form-input" id="ep-abord"></div>
-      </div>
-      <div class="form-group"><label class="form-label">Queixa principal</label><textarea class="form-input" id="ep-queixa"></textarea></div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn btn-red btn-sm" onclick="excluirPaciente()"><i class="ti ti-trash"></i> Excluir</button>
-      <div style="flex:1;"></div>
-      <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="atualizarPaciente()"><i class="ti ti-check"></i> Salvar</button>
-    </div>
   </div>
 
   <!-- Editar Sessão -->
-  <div class="modal" id="m-editar-sessao" onclick="event.stopPropagation()" style="display:none;">
-    <div class="modal-hd"><span class="modal-title">Editar sessão</span><button class="modal-close" onclick="fecharModal()"><i class="ti ti-x"></i></button></div>
-    <div class="modal-body">
-      <input type="hidden" id="es-id">
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Paciente</label><select class="form-input" id="es-pac"><option value="">Selecione...</option></select></div>
-        <div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="es-tipo"><option>Presencial</option><option>Online</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date" id="es-data"></div>
-        <div class="form-group"><label class="form-label">Horário</label><input class="form-input" type="time" id="es-hora"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Valor (R$)</label><input class="form-input" type="number" id="es-valor"></div>
-        <div class="form-group"><label class="form-label">Status sessão</label><select class="form-input" id="es-status"><option>Agendada</option><option>Confirmada</option><option>Realizada</option><option>Cancelada</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Forma de pagamento</label><select class="form-input" id="es-pag"><option value="">—</option><option>Pix</option><option>Transferência</option><option>Cartão</option><option>Dinheiro</option></select></div>
-        <div class="form-group"><label class="form-label">Status pagamento</label><select class="form-input" id="es-pagst"><option>Pendente</option><option>Pago</option></select></div>
-      </div>
-      <div class="form-group"><label class="form-label">Observações</label><textarea class="form-input" id="es-obs"></textarea></div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn btn-red btn-sm" onclick="excluirSessao()"><i class="ti ti-trash"></i> Excluir</button>
-      <div style="flex:1;"></div>
-      <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="atualizarSessao()"><i class="ti ti-check"></i> Salvar</button>
-    </div>
-  </div>
+  
 
 </div>
 
@@ -2527,6 +2471,19 @@ async function exportarPDF() {
   win.document.write(html);
   win.document.close();
   setTimeout(() => win.print(), 500);
+}
+
+
+// ════════════════════════════════════
+// FINANCEIRO PESSOAL
+// ════════════════════════════════════
+function abrirModalPessoal() {
+  // Pré-selecionar categoria Pessoal no modal de lançamento
+  abrirModal('novo-lancamento');
+  setTimeout(() => {
+    const cat = document.getElementById('nl-cat');
+    if (cat) cat.value = 'Pessoal';
+  }, 100);
 }
 
 // ════════════════════════════════════
