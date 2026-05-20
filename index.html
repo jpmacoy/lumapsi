@@ -1723,10 +1723,10 @@ async function salvarSessao() {
   fecharModal();
   toast('Sessão agendada!', 'success');
   // Enviar confirmação automática via WhatsApp
-  const pacId = document.getElementById('ns-pac').value;
-  const dataHora = document.getElementById('ns-data').value + 'T' + document.getElementById('ns-hora').value + ':00';
-  const tipoSess = document.getElementById('ns-tipo').value;
-  enviarConfirmacaoAgendamento(pacId, dataHora, tipoSess);
+  const pacIdWpp = document.getElementById('ns-pac').value;
+  const dataHoraWpp = document.getElementById('ns-data').value + 'T' + document.getElementById('ns-hora').value + ':00';
+  const tipoSessWpp = document.getElementById('ns-tipo').value;
+  enviarConfirmacaoAgendamento(pacIdWpp, dataHoraWpp, tipoSessWpp);
   limparFormSessao();
   if (paginaAtual === 'sessoes') carregarSessoes();
   if (paginaAtual === 'dashboard') carregarDashboard();
