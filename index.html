@@ -1346,7 +1346,7 @@ async function renderGraficosDash() {
     const mesStr = d.toISOString().substring(0, 7);
     const lbl = d.toLocaleDateString('pt-BR', {month:'short'}).replace('.','');
     meses.push(lbl);
-    const { data: dadosMes } = await sb.from('sessoes').select('valor, status_pagamento').gte('data_hora', mesStr + '-01T00:00:00').lte('data_hora', mesStr + '-31T23:59:59');
+    const { data: dadosMes } = await sb.from('sessoes').select('valor,status_pagamento,data_hora').gte('data_hora', mesStr + '-01').lte('data_hora', mesStr + '-31');
     const pagos = (dadosMes || []).filter(s => s.status_pagamento === 'Pago');
     fats.push(pagos.reduce((a, s) => a + (s.valor || 0), 0));
   }
@@ -2370,20 +2370,35 @@ async function abrirEditarSessao(id) {
 
 async function atualizarSessao() {
   const id = document.getElementById('es-id').value;
-  const data = document.getElementById('es-data').value;
+  const dataSess = document.getElementById('es-data').value;
   const hora = document.getElementById('es-hora').value;
-  if (!data || !hora) { toast('Preencha data e horário', 'error'); return; }
+  const novoStatus = document.getElementById('es-status').value;
+  const pacId = parseInt(document.getElementById('es-pac').value) || null;
+  if (!dataSess || !hora) { toast('Preencha data e horário', 'error'); return; }
+
   const { error } = await sb.from('sessoes').update({
-    paciente_id: parseInt(document.getElementById('es-pac').value) || null,
+    paciente_id: pacId,
     tipo: document.getElementById('es-tipo').value,
-    data_hora: data + 'T' + hora + ':00',
+    data_hora: dataSess + 'T' + hora + ':00',
     valor: parseFloat(document.getElementById('es-valor').value) || null,
-    status: document.getElementById('es-status').value,
+    status: novoStatus,
     pagamento: document.getElementById('es-pag').value || null,
     status_pagamento: document.getElementById('es-pagst').value,
     observacoes: document.getElementById('es-obs').value,
-  }).eq('id', id);
+  }).eq('id', parseInt(id));
+
   if (error) { toast('Erro ao atualizar: ' + error.message, 'error'); return; }
+
+  // Enviar mensagem de agradecimento quando marcar como Realizada
+  if (novoStatus === 'Realizada' && pacId) {
+    const pac = todosPacientes.find(p => p.id === pacId);
+    if (pac && pac.telefone) {
+      const nome = pac.nome.split(' ')[0];
+      const msg = 'Olá ' + nome + '! 😊\n\nObrigado pela sua presença na sessão de hoje! \n\nQualquer dúvida ou necessidade, pode me chamar. Até a próxima! 🌟';
+      enviarWhatsApp(pac.telefone, msg);
+    }
+  }
+
   fecharModal();
   toast('Sessão atualizada!', 'success');
   carregarSessoes();
