@@ -1346,7 +1346,7 @@ async function renderGraficosDash() {
     const mesStr = d.toISOString().substring(0, 7);
     const lbl = d.toLocaleDateString('pt-BR', {month:'short'}).replace('.','');
     meses.push(lbl);
-    const { data: dadosMes } = await sb.from('sessoes').select('valor,status_pagamento,data_hora').gte('data_hora', mesStr + '-01').lte('data_hora', mesStr + '-31');
+    const { data: dadosMes } = await sb.from('sessoes').select('*').gte('data_hora', mesStr + '-01').lte('data_hora', mesStr + '-31');
     const pagos = (dadosMes || []).filter(s => s.status_pagamento === 'Pago');
     fats.push(pagos.reduce((a, s) => a + (s.valor || 0), 0));
   }
@@ -2144,7 +2144,7 @@ async function cobrarWhatsApp() {
   // Buscar sessões realizadas com pagamento pendente
   const { data: sessoes, error: errSess } = await sb
     .from('sessoes')
-    .select('paciente_id, valor')
+    .select('*')
     .eq('status', 'Realizada')
     .eq('status_pagamento', 'Pendente');
 
