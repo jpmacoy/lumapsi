@@ -831,6 +831,34 @@ tr:hover td{background:#FAFAFB}
         </div>
       </div>
       <div class="form-group"><label class="form-label">Observações</label><textarea class="form-input" id="ns-obs" placeholder="Observações opcionais..."></textarea></div>
+      <div style="background:var(--brand-light);border-radius:var(--rs);padding:12px 14px;margin-top:4px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <input type="checkbox" id="ns-recorrente" style="accent-color:var(--brand);width:15px;height:15px;" onchange="toggleRecorrencia()">
+          <label for="ns-recorrente" style="font-size:12px;font-weight:500;color:var(--brand-dark);cursor:pointer;"><i class="ti ti-repeat"></i> Sessão recorrente</label>
+        </div>
+        <div id="ns-recorrencia-opts" style="display:none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Repetir</label>
+              <select class="form-input" id="ns-freq">
+                <option value="7">Semanalmente</option>
+                <option value="14">Quinzenalmente</option>
+                <option value="30">Mensalmente</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Quantas vezes</label>
+              <select class="form-input" id="ns-repeticoes">
+                <option value="4">4 sessões (1 mês)</option>
+                <option value="8">8 sessões (2 meses)</option>
+                <option value="12">12 sessões (3 meses)</option>
+                <option value="24">24 sessões (6 meses)</option>
+              </select>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--brand-dark);opacity:0.8;" id="ns-preview-rec">As sessões serão criadas automaticamente</div>
+        </div>
+      </div>
     </div>
     <div class="modal-ft"><button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" onclick="salvarSessao()"><i class="ti ti-check"></i> Agendar</button></div>
   </div>
@@ -1696,15 +1724,38 @@ async function salvarSessao() {
     observacoes: document.getElementById('ns-obs').value,
     link_sala: linkSala,
   }]);
-  if (error) { toast('Erro ao agendar: ' + error.message, 'error'); return; }
-  fecharModal();
-  toast('Sessão agendada!', 'success');
+  // Verificar se é recorrente
+  const isRecorrente = document.getElementById('ns-recorrente')?.checked;
+  if (isRecorrente) {
+    const freq = parseInt(document.getElementById('ns-freq').value);
+    const reps = parseInt(document.getElementById('ns-repeticoes').value);
+    const dadosBase = {
+      user_id: usuarioAtual.id,
+      paciente_id: parseInt(pacId),
+      data_hora: dataHora,
+      tipo: tipoSess,
+      status: document.getElementById('ns-status').value,
+      valor,
+      status_pagamento: 'Pendente',
+      observacoes: document.getElementById('ns-obs').value,
+      link_sala: linkSala,
+    };
+    // Remover a sessão individual já criada e criar todas as recorrentes
+    await sb.from('sessoes').delete().eq('user_id', usuarioAtual.id).eq('data_hora', dataHora).eq('paciente_id', parseInt(pacId));
+    const errRec = await salvarSessoesRecorrentes(dadosBase, freq, reps);
+    if (errRec) { toast('Erro ao criar sessões recorrentes: ' + errRec.message, 'error'); return; }
+    fecharModal();
+    toast(reps + ' sessões agendadas com sucesso!', 'success');
+  } else {
+    if (error) { toast('Erro ao agendar: ' + error.message, 'error'); return; }
+    fecharModal();
+    toast('Sessão agendada!', 'success');
+  }
   // Enviar confirmação automática via WhatsApp
   const pacIdWpp = document.getElementById('ns-pac').value;
   const dataHoraWpp = document.getElementById('ns-data').value + 'T' + document.getElementById('ns-hora').value + ':00';
   const tipoSessWpp = document.getElementById('ns-tipo').value;
   enviarConfirmacaoAgendamento(pacIdWpp, dataHoraWpp, tipoSessWpp);
-  // Se online, enviar link da sala também
   if (tipoSessWpp === 'Online' && linkSala) {
     setTimeout(() => enviarLinkSalaWhatsApp(parseInt(pacIdWpp), linkSala, dataHoraWpp), 2000);
   }
@@ -2571,6 +2622,45 @@ async function enviarLinkSalaWhatsApp(pacienteId, linkSala, dataHora) {
     '\n\nAcesse a sala clicando no link abaixo:\n' + linkSala +
     '\n\nO link abre direto no navegador, sem precisar instalar nada. Até logo! 🌟';
   await enviarWhatsApp(pac.telefone, msg);
+}
+
+
+// ════════════════════════════════════
+// RECORRÊNCIA DE SESSÕES
+// ════════════════════════════════════
+function toggleRecorrencia() {
+  const checked = document.getElementById('ns-recorrente').checked;
+  document.getElementById('ns-recorrencia-opts').style.display = checked ? 'block' : 'none';
+  atualizarPreviewRecorrencia();
+}
+
+function atualizarPreviewRecorrencia() {
+  const data = document.getElementById('ns-data').value;
+  const freq = parseInt(document.getElementById('ns-freq').value);
+  const reps = parseInt(document.getElementById('ns-repeticoes').value);
+  if (!data) return;
+  const inicio = new Date(data + 'T12:00:00');
+  const ultima = new Date(inicio);
+  ultima.setDate(ultima.getDate() + (freq * (reps - 1)));
+  const preview = document.getElementById('ns-preview-rec');
+  if (preview) {
+    preview.textContent = reps + ' sessões criadas · última em ' + ultima.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'});
+  }
+}
+
+async function salvarSessoesRecorrentes(dadosBase, freq, reps) {
+  const sessoes = [];
+  const dataBase = new Date(dadosBase.data_hora);
+  for (let i = 0; i < reps; i++) {
+    const novaData = new Date(dataBase);
+    novaData.setDate(novaData.getDate() + (freq * i));
+    sessoes.push({
+      ...dadosBase,
+      data_hora: novaData.toISOString().slice(0, 19),
+    });
+  }
+  const { error } = await sb.from('sessoes').insert(sessoes);
+  return error;
 }
 
 // ════════════════════════════════════
