@@ -631,7 +631,7 @@ tr:hover td{background:#FAFAFB}
         <div class="card" style="padding:0;overflow:hidden;">
           <div class="tbl-wrap">
             <table>
-              <thead><tr><th>Data / Hora</th><th>Paciente</th><th>Tipo</th><th>Status</th><th>Valor</th><th>Pagamento</th><th>Pag. Status</th><th></th></tr></thead>
+              <thead><tr><th>Data / Hora</th><th>Paciente</th><th>Tipo</th><th>Status</th><th>Valor</th><th>Pagamento</th><th>Pag. Status</th><th>Sala</th><th></th></tr></thead>
               <tbody id="tbody-sessoes"><tr><td colspan="8" class="loading">Carregando...</td></tr></tbody>
             </table>
           </div>
@@ -811,7 +811,7 @@ tr:hover td{background:#FAFAFB}
     <div class="modal-body">
       <div class="form-row">
         <div class="form-group"><label class="form-label">Paciente *</label><select class="form-input" id="ns-pac"><option value="">Selecione...</option></select></div>
-        <div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="ns-tipo"><option>Presencial</option><option>Online</option></select></div>
+        <div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="ns-tipo" onchange="toggleLinkNs(this.value)"><option>Presencial</option><option>Online</option></select></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Data *</label><input class="form-input" type="date" id="ns-data"></div>
@@ -820,6 +820,15 @@ tr:hover td{background:#FAFAFB}
       <div class="form-row">
         <div class="form-group"><label class="form-label">Valor (R$)</label><input class="form-input" type="number" id="ns-valor" placeholder="180"></div>
         <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="ns-status"><option>Agendada</option><option>Confirmada</option></select></div>
+      </div>
+      <div id="ns-link-wrap" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Link da sala <span style="font-size:10px;color:var(--t3);">(gerado automaticamente)</span></label>
+          <div style="display:flex;gap:8px;">
+            <input class="form-input" id="ns-link" placeholder="https://meet.jit.si/..." style="flex:1;">
+            <button class="btn btn-ghost btn-sm" onclick="gerarLinkJitsi()" type="button"><i class="ti ti-refresh"></i> Gerar</button>
+          </div>
+        </div>
       </div>
       <div class="form-group"><label class="form-label">Observações</label><textarea class="form-input" id="ns-obs" placeholder="Observações opcionais..."></textarea></div>
     </div>
@@ -927,7 +936,7 @@ tr:hover td{background:#FAFAFB}
       <input type="hidden" id="es-id">
       <div class="form-row">
         <div class="form-group"><label class="form-label">Paciente</label><select class="form-input" id="es-pac"><option value="">Selecione...</option></select></div>
-        <div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="es-tipo"><option>Presencial</option><option>Online</option></select></div>
+        <div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="es-tipo" onchange="toggleLinkEs(this.value)"><option>Presencial</option><option>Online</option></select></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date" id="es-data"></div>
@@ -1648,6 +1657,7 @@ function renderTabelaSessoes(sessoes) {
       '<td style="font-weight:500;">R$' + (s.valor||'—') + '</td>' +
       '<td style="color:var(--t3);">' + (s.pagamento||'—') + '</td>' +
       '<td><span class="tag ' + tagPag + '">' + (s.status_pagamento||'Pendente') + '</span></td>' +
+      '<td>' + (s.link_sala && s.tipo === 'Online' ? '<a href="' + s.link_sala + '" target="_blank" class="btn btn-sm" style="background:var(--teal-light);color:var(--teal);border:none;"><i class="ti ti-video"></i> Entrar</a>' : '—') + '</td>' +
       '<td style="display:flex;gap:4px;">' +
         '<button class="btn btn-ghost btn-sm" title="Editar" onclick="abrirEditarSessao(' + s.id + ')"><i class="ti ti-edit"></i></button>' +
         '<button class="btn btn-ghost btn-sm" title="WhatsApp" onclick="whatsappPaciente(' + s.paciente_id + ')"><i class="ti ti-brand-whatsapp"></i></button>' +
@@ -1673,15 +1683,18 @@ async function salvarSessao() {
   const pac = todosPacientes.find(p => p.id == pacId);
   const valorInput = document.getElementById('ns-valor').value;
   const valor = valorInput ? parseFloat(valorInput) : (pac?.valor_sessao || null);
+  const tipoSess = document.getElementById('ns-tipo').value;
+  const linkSala = tipoSess === 'Online' ? document.getElementById('ns-link').value || gerarUrlJitsi() : null;
   const { error } = await sb.from('sessoes').insert([{
     user_id: usuarioAtual.id,
     paciente_id: parseInt(pacId),
     data_hora: dataHora,
-    tipo: document.getElementById('ns-tipo').value,
+    tipo: tipoSess,
     status: document.getElementById('ns-status').value,
     valor,
     status_pagamento: 'Pendente',
     observacoes: document.getElementById('ns-obs').value,
+    link_sala: linkSala,
   }]);
   if (error) { toast('Erro ao agendar: ' + error.message, 'error'); return; }
   fecharModal();
@@ -1691,6 +1704,10 @@ async function salvarSessao() {
   const dataHoraWpp = document.getElementById('ns-data').value + 'T' + document.getElementById('ns-hora').value + ':00';
   const tipoSessWpp = document.getElementById('ns-tipo').value;
   enviarConfirmacaoAgendamento(pacIdWpp, dataHoraWpp, tipoSessWpp);
+  // Se online, enviar link da sala também
+  if (tipoSessWpp === 'Online' && linkSala) {
+    setTimeout(() => enviarLinkSalaWhatsApp(parseInt(pacIdWpp), linkSala, dataHoraWpp), 2000);
+  }
   limparFormSessao();
   if (paginaAtual === 'sessoes') carregarSessoes();
   if (paginaAtual === 'dashboard') carregarDashboard();
@@ -2359,6 +2376,8 @@ async function abrirEditarSessao(id) {
   document.getElementById('es-id').value = data.id;
   document.getElementById('es-pac').value = data.paciente_id || '';
   document.getElementById('es-tipo').value = data.tipo || 'Presencial';
+  toggleLinkEs(data.tipo || 'Presencial');
+  if (data.link_sala) document.getElementById('es-link').value = data.link_sala;
   if (data.data_hora) {
     const dt = new Date(data.data_hora);
     document.getElementById('es-data').value = dt.toISOString().split('T')[0];
@@ -2380,15 +2399,18 @@ async function atualizarSessao() {
   const pacId = parseInt(document.getElementById('es-pac').value) || null;
   if (!dataSess || !hora) { toast('Preencha data e horário', 'error'); return; }
 
+  const tipoEditar = document.getElementById('es-tipo').value;
+  const linkEditar = tipoEditar === 'Online' ? (document.getElementById('es-link').value || null) : null;
   const { error } = await sb.from('sessoes').update({
     paciente_id: pacId,
-    tipo: document.getElementById('es-tipo').value,
+    tipo: tipoEditar,
     data_hora: dataSess + 'T' + hora + ':00',
     valor: parseFloat(document.getElementById('es-valor').value) || null,
     status: novoStatus,
     pagamento: document.getElementById('es-pag').value || null,
     status_pagamento: document.getElementById('es-pagst').value,
     observacoes: document.getElementById('es-obs').value,
+    link_sala: linkEditar,
   }).eq('id', parseInt(id));
 
   if (error) { toast('Erro ao atualizar: ' + error.message, 'error'); return; }
@@ -2500,6 +2522,55 @@ function abrirModalPessoal() {
     const cat = document.getElementById('nl-cat');
     if (cat) cat.value = 'Pessoal';
   }, 100);
+}
+
+
+// ════════════════════════════════════
+// JITSI — SALA VIRTUAL
+// ════════════════════════════════════
+function gerarUrlJitsi() {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  const codigo = Array.from({length: 12}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  return 'https://meet.jit.si/lumapsi-' + codigo;
+}
+
+function gerarLinkJitsi() {
+  const url = gerarUrlJitsi();
+  document.getElementById('ns-link').value = url;
+}
+
+function gerarLinkJitsiEditar() {
+  const url = gerarUrlJitsi();
+  document.getElementById('es-link').value = url;
+}
+
+function toggleLinkNs(tipo) {
+  const wrap = document.getElementById('ns-link-wrap');
+  if (tipo === 'Online') {
+    wrap.style.display = 'block';
+    if (!document.getElementById('ns-link').value) {
+      document.getElementById('ns-link').value = gerarUrlJitsi();
+    }
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+function toggleLinkEs(tipo) {
+  const wrap = document.getElementById('es-link-wrap');
+  wrap.style.display = tipo === 'Online' ? 'block' : 'none';
+}
+
+async function enviarLinkSalaWhatsApp(pacienteId, linkSala, dataHora) {
+  const pac = todosPacientes.find(p => p.id === pacienteId);
+  if (!pac || !pac.telefone || !linkSala) return;
+  const nome = pac.nome.split(' ')[0];
+  const dt = new Date(dataHora);
+  const hora = dt.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+  const msg = 'Olá ' + nome + '! 💻\n\nSua sessão online está confirmada para as *' + hora + '*.' +
+    '\n\nAcesse a sala clicando no link abaixo:\n' + linkSala +
+    '\n\nO link abre direto no navegador, sem precisar instalar nada. Até logo! 🌟';
+  await enviarWhatsApp(pac.telefone, msg);
 }
 
 // ════════════════════════════════════
