@@ -1405,7 +1405,8 @@ function renderSessoesHoje(sessoes) {
   const cores = ['av-purple','av-teal','av-amber','av-coral','av-blue','av-pink','av-green'];
   let html = '<table><thead><tr><th>Horário</th><th>Paciente</th><th>Tipo</th><th>Valor</th><th>Status pag.</th></tr></thead><tbody>';
   sessoes.forEach((s, i) => {
-    const nome = s.pacientes?.nome || '—';
+    const pac = todosPacientes.find(p => p.id === s.paciente_id);
+    const nome = pac?.nome || '—';
     const ini = nome.split(' ').map(n => n[0]).slice(0,2).join('');
     const cor = cores[i % cores.length];
     const hora = s.data_hora ? new Date(s.data_hora).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}) : '—';
@@ -1639,7 +1640,7 @@ function exportarPDF() {
 // ════════════════════════════════════
 async function carregarSessoes() {
   const pacId = document.getElementById('sel-pac-sessoes')?.value;
-  let query = sb.from('sessoes').select('*, pacientes(nome)').order('data_hora', {ascending: false}).limit(50);
+  let query = sb.from('sessoes').select('*').order('data_hora', {ascending: false}).limit(50);
   if (pacId) query = query.eq('paciente_id', pacId);
 
   const { data: sessoes } = await query;
@@ -1669,7 +1670,8 @@ function renderTabelaSessoes(sessoes) {
   }
   const cores = ['av-purple','av-teal','av-amber','av-coral','av-blue','av-pink','av-green'];
   tbody.innerHTML = sessoes.map((s, i) => {
-    const nome = s.pacientes?.nome || '—';
+    const pac = todosPacientes.find(p => p.id === s.paciente_id);
+    const nome = pac?.nome || '—';
     const ini = nome.split(' ').map(n=>n[0]).slice(0,2).join('');
     const cor = cores[i % cores.length];
     const dt = s.data_hora ? new Date(s.data_hora).toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
@@ -1875,7 +1877,7 @@ async function carregarAgenda() {
   document.getElementById('agenda-periodo').textContent = formatarPeriodo(dias[0], dias[4]);
 
   const { data: sessoes } = await sb.from('sessoes')
-    .select('*, pacientes(nome)')
+    .select('*')
     .gte('data_hora', inicio + 'T00:00:00')
     .lte('data_hora', fim + 'T23:59:59')
     .order('data_hora');
@@ -1924,7 +1926,8 @@ function renderAgendaGrid(dias, sessoes) {
       });
       let inner = '';
       sessDia.forEach(s => {
-        const nome = s.pacientes?.nome?.split(' ')[0] || '—';
+        const pacAg = todosPacientes.find(p => p.id === s.paciente_id);
+        const nome = pacAg?.nome?.split(' ')[0] || '—';
         const bg = s.tipo === 'Online' ? 'var(--teal-light)' : 'var(--brand-light)';
         const cor = s.tipo === 'Online' ? 'var(--teal)' : 'var(--brand)';
         inner += '<div style="background:' + bg + ';border-radius:5px;padding:2px 5px;font-size:10px;font-weight:500;color:' + cor + ';margin-bottom:2px;border-left:2px solid ' + cor + ';cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + nome + '</div>';
@@ -1946,7 +1949,8 @@ function renderProximasSessoes(sessoes) {
   }
   const cores = ['av-purple','av-teal','av-amber','av-coral','av-blue'];
   tbody.innerHTML = futuras.map((s, i) => {
-    const nome = s.pacientes?.nome || '—';
+    const pac = todosPacientes.find(p => p.id === s.paciente_id);
+    const nome = pac?.nome || '—';
     const ini = nome.split(' ').map(n=>n[0]).slice(0,2).join('');
     const cor = cores[i % cores.length];
     const dt = new Date(s.data_hora);
