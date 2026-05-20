@@ -2082,13 +2082,21 @@ const ZAPI_URL = 'https://api.z-api.io/instances/' + ZAPI_ID + '/token/' + ZAPI_
 
 async function enviarWhatsApp(telefone, mensagem) {
   if (!telefone) return { ok: false, erro: 'Sem telefone' };
-  const tel = '55' + telefone.replace(/\D/g, '');
   try {
-    const res = await fetch(ZAPI_URL + '/send-text', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Client-Token': ZAPI_TOKEN },
-      body: JSON.stringify({ phone: tel, message: mensagem })
-    });
+    const { data: { session } } = await sb.auth.getSession();
+    const token = session?.access_token || '';
+    const res = await fetch(
+      'https://pbqvfokpounurzmmlcor.supabase.co/functions/v1/enviar-whatsapp',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+          'apikey': 'sb_publishable_ERIUNIAjp2FJyXNF6IS_dw_RNopwplO'
+        },
+        body: JSON.stringify({ telefone, mensagem })
+      }
+    );
     const data = await res.json();
     return { ok: res.ok, data };
   } catch (e) {
