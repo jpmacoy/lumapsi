@@ -1346,8 +1346,9 @@ async function renderGraficosDash() {
     const mesStr = d.toISOString().substring(0, 7);
     const lbl = d.toLocaleDateString('pt-BR', {month:'short'}).replace('.','');
     meses.push(lbl);
-    const { data } = await sb.from('sessoes').select('valor').eq('status_pagamento','Pago').gte('data_hora', mesStr + '-01T00:00:00').lte('data_hora', mesStr + '-31T23:59:59');
-    fats.push((data || []).reduce((a, s) => a + (s.valor || 0), 0));
+    const { data: dadosMes } = await sb.from('sessoes').select('valor, status_pagamento').gte('data_hora', mesStr + '-01T00:00:00').lte('data_hora', mesStr + '-31T23:59:59');
+    const pagos = (dadosMes || []).filter(s => s.status_pagamento === 'Pago');
+    fats.push(pagos.reduce((a, s) => a + (s.valor || 0), 0));
   }
 
   const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
