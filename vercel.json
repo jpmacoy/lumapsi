@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/vendas", "destination": "/vendas.html" },
+    { "source": "/", "destination": "/index.html" }
+  ]
+}
