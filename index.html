@@ -1693,7 +1693,7 @@ function renderProximasSessoes(sessoes) {
       '<td><span class="tag ' + tagTipo + '">' + (s.tipo||'—') + '</span></td>' +
       '<td style="font-weight:500;">R$' + (s.valor||'—') + '</td>' +
       '<td><span class="tag ' + tagSt + '">' + (s.status||'—') + '</span></td>' +
-      '<td><button class="btn btn-ghost btn-sm"><i class="ti ti-edit"></i></button></td>' +
+      '<td><button class="btn btn-ghost btn-sm" onclick="abrirEditarSessaoAgenda(' + s.id + ')"><i class="ti ti-edit" style="font-size:14px;"></i></button></td>' +
     '</tr>';
   }).join('');
 }
@@ -1926,6 +1926,9 @@ async function excluirPaciente() {
 // ════════════════════════════════════
 // EDITAR / EXCLUIR SESSÕES
 // ════════════════════════════════════
+async function abrirEditarSessaoAgenda(id) {
+  await abrirEditarSessao(id);
+}
 let todasSessoes = [];
 
 async function abrirEditarSessao(id) {
