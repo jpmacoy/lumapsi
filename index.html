@@ -449,23 +449,110 @@ tr:hover td{background:#FAFAFB}
 
       <!-- ── DASHBOARD ── -->
       <div class="screen active" id="sc-dashboard">
+
+        <!-- TABS -->
         <div class="tabs mb20">
           <div class="tab active" onclick="tabDash(this,'consultorio')">Consultório</div>
           <div class="tab" onclick="tabDash(this,'pessoal')">Pessoal</div>
         </div>
-        <div class="g4 mb16" id="dash-metrics">
-          <div class="mc"><div class="mc-lbl"><i class="ti ti-calendar-event"></i> Sessões hoje</div><div class="mc-val" id="dm-sessoes">—</div><div class="mc-sub" id="dm-sessoes-sub">carregando...</div></div>
-          <div class="mc"><div class="mc-lbl"><i class="ti ti-trending-up"></i> Faturamento do mês</div><div class="mc-val" id="dm-fat">—</div><div class="mc-sub" id="dm-fat-sub">carregando...</div></div>
-          <div class="mc"><div class="mc-lbl"><i class="ti ti-clock-dollar"></i> A receber</div><div class="mc-val" id="dm-receber">—</div><div class="mc-sub" id="dm-receber-sub">carregando...</div></div>
-          <div class="mc"><div class="mc-lbl"><i class="ti ti-users"></i> Pacientes ativos</div><div class="mc-val" id="dm-pacs">—</div><div class="mc-sub" id="dm-pacs-sub">carregando...</div></div>
+
+        <!-- PRÓXIMA SESSÃO EM DESTAQUE -->
+        <div id="dash-proxima" style="background:var(--brand);border-radius:var(--r);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+          <div style="width:44px;height:44px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="ti ti-clock" style="color:#fff;font-size:22px;"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-bottom:2px;">PRÓXIMA SESSÃO</div>
+            <div style="font-size:15px;font-weight:500;color:#fff;" id="dash-prox-titulo">Carregando...</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.7);" id="dash-prox-sub"></div>
+          </div>
+          <div id="dash-prox-badge" style="background:rgba(255,255,255,0.15);color:#fff;font-size:12px;font-weight:500;padding:6px 14px;border-radius:20px;white-space:nowrap;"></div>
         </div>
-        <div class="g2 mb16">
+
+        <!-- MÉTRICAS PRINCIPAIS -->
+        <div class="g4 mb16">
+          <div class="mc">
+            <div class="mc-lbl"><i class="ti ti-calendar-event"></i> Sessões hoje</div>
+            <div class="mc-val" id="dm-sessoes">—</div>
+            <div class="mc-sub" id="dm-sessoes-sub">carregando...</div>
+          </div>
+          <div class="mc">
+            <div class="mc-lbl"><i class="ti ti-trending-up"></i> Faturamento do mês</div>
+            <div class="mc-val" id="dm-fat">—</div>
+            <div class="mc-sub" id="dm-fat-sub">carregando...</div>
+          </div>
+          <div class="mc">
+            <div class="mc-lbl"><i class="ti ti-clock-dollar"></i> A receber</div>
+            <div class="mc-val" id="dm-receber" style="color:var(--amber);">—</div>
+            <div class="mc-sub" id="dm-receber-sub">carregando...</div>
+          </div>
+          <div class="mc">
+            <div class="mc-lbl"><i class="ti ti-users"></i> Pacientes ativos</div>
+            <div class="mc-val" id="dm-pacs">—</div>
+            <div class="mc-sub" id="dm-pacs-sub">carregando...</div>
+          </div>
+        </div>
+
+        <!-- PROGRESSO DO MÊS -->
+        <div class="card mb16" style="padding:16px 18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <span style="font-size:13px;font-weight:500;">Progresso financeiro do mês</span>
+            <span style="font-size:12px;color:var(--t3);" id="dash-prog-label">—</span>
+          </div>
+          <div style="background:var(--bg);border-radius:20px;height:8px;overflow:hidden;">
+            <div id="dash-prog-bar" style="height:100%;background:var(--brand);border-radius:20px;width:0%;transition:width 1s ease;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;">
+            <span style="font-size:11px;color:var(--t3);" id="dash-prog-rec">Recebido: R$0</span>
+            <span style="font-size:11px;color:var(--t3);" id="dash-prog-prev">Previsto: R$0</span>
+          </div>
+        </div>
+
+        <!-- ALERTAS -->
+        <div id="dash-alertas" class="mb16"></div>
+
+        <!-- GRÁFICO + SESSÕES -->
+        <div class="g32 mb16">
           <div class="card">
-            <div class="card-head"><span class="card-title">Sessões de hoje</span><span class="card-link" onclick="irPara('sessoes',null)">Ver todas</span></div>
-            <div id="dash-sessoes-hoje"><div class="loading"><i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;"></i> Carregando...</div></div>
+            <div class="card-head">
+              <span class="card-title">Faturamento — últimos 6 meses</span>
+              <span class="card-link" onclick="irPara('relatorios',null)">Ver relatório</span>
+            </div>
+            <div style="padding:14px;position:relative;height:200px;">
+              <canvas id="chart-dash-fat" role="img" aria-label="Gráfico de faturamento mensal"></canvas>
+            </div>
           </div>
           <div class="card">
-            <div class="card-head"><span class="card-title">Recebíveis pendentes</span><span style="font-size:11px;color:var(--amber);font-weight:500;" id="dash-total-pendente">—</span></div>
+            <div class="card-head">
+              <span class="card-title">Tipo de sessões</span>
+              <span style="font-size:11px;color:var(--t3);" id="dash-dist-mes">—</span>
+            </div>
+            <div style="padding:14px 14px 0;">
+              <div style="display:flex;gap:12px;margin-bottom:10px;font-size:11px;color:var(--t3);">
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--brand);display:inline-block;"></span> <span id="dash-pres-pct">Presencial</span></span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#1D9E75;display:inline-block;"></span> <span id="dash-onl-pct">Online</span></span>
+              </div>
+            </div>
+            <div style="padding:0 14px 14px;position:relative;height:160px;">
+              <canvas id="chart-dash-dist" role="img" aria-label="Distribuição presencial vs online"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- SESSÕES DE HOJE + PENDENTES -->
+        <div class="g2">
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div class="card-head" style="padding:12px 16px;">
+              <span class="card-title">Sessões de hoje</span>
+              <span class="card-link" onclick="irPara('agenda',null)">Ver agenda</span>
+            </div>
+            <div id="dash-sessoes-hoje"><div class="loading">Carregando...</div></div>
+          </div>
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div class="card-head" style="padding:12px 16px;">
+              <span class="card-title">Recebíveis pendentes</span>
+              <span style="font-size:11px;color:var(--amber);font-weight:500;" id="dash-total-pendente">—</span>
+            </div>
             <div id="dash-pendentes"><div class="loading">Carregando...</div></div>
             <div style="padding:10px 14px;border-top:1px solid var(--border);">
               <button class="btn btn-sm btn-full" style="background:var(--brand-light);color:var(--brand-dark);border:none;" onclick="cobrarWhatsApp()">
@@ -474,6 +561,7 @@ tr:hover td{background:#FAFAFB}
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- ── PACIENTES ── -->
@@ -1090,49 +1178,206 @@ function popularSelects() {
 // ════════════════════════════════════
 // DASHBOARD
 // ════════════════════════════════════
+let chartDashFat = null;
+let chartDashDist = null;
+
 async function carregarDashboard() {
-  const hoje = new Date().toISOString().split('T')[0];
+  const agora = new Date();
+  const hoje = agora.toISOString().split('T')[0];
   const mesInicio = hoje.substring(0, 7) + '-01';
   const mesFim = hoje.substring(0, 7) + '-31';
+  const mesNome = agora.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
 
-  // Sessões de hoje
-  const { data: sessoesHoje } = await sb.from('sessoes')
-    .select('*, pacientes(nome)')
-    .gte('data_hora', hoje + 'T00:00:00')
-    .lte('data_hora', hoje + 'T23:59:59')
-    .order('data_hora');
-
-  // Sessões do mês
-  const { data: sessoesMes } = await sb.from('sessoes')
-    .select('*')
-    .gte('data_hora', mesInicio + 'T00:00:00')
-    .lte('data_hora', mesFim + 'T23:59:59');
-
-  // Pacientes ativos
-  const { data: pacsAtivos } = await sb.from('pacientes').select('id').eq('status', 'ativo');
+  // Buscar dados em paralelo
+  const [
+    { data: sessoesHoje },
+    { data: sessoesMes },
+    { data: pacsAtivos },
+    { data: todasSessoes }
+  ] = await Promise.all([
+    sb.from('sessoes').select('*, pacientes(nome)').gte('data_hora', hoje + 'T00:00:00').lte('data_hora', hoje + 'T23:59:59').order('data_hora'),
+    sb.from('sessoes').select('*').gte('data_hora', mesInicio + 'T00:00:00').lte('data_hora', mesFim + 'T23:59:59'),
+    sb.from('pacientes').select('id').eq('status', 'ativo'),
+    sb.from('sessoes').select('*').order('data_hora', {ascending: false})
+  ]);
 
   const confirmadas = (sessoesHoje || []).filter(s => s.status === 'Confirmada' || s.status === 'Agendada').length;
-  const pendentes = (sessoesHoje || []).filter(s => s.status_pagamento === 'Pendente').length;
-  const faturamento = (sessoesMes || []).filter(s => s.status_pagamento === 'Pago').reduce((a, s) => a + (s.valor || 0), 0);
+  const recebido = (sessoesMes || []).filter(s => s.status_pagamento === 'Pago').reduce((a, s) => a + (s.valor || 0), 0);
   const aReceber = (sessoesMes || []).filter(s => s.status_pagamento === 'Pendente').reduce((a, s) => a + (s.valor || 0), 0);
+  const previsto = recebido + aReceber;
+  const progPct = previsto > 0 ? Math.round((recebido / previsto) * 100) : 0;
 
+  // Métricas
   document.getElementById('dm-sessoes').textContent = (sessoesHoje || []).length;
   document.getElementById('dm-sessoes-sub').innerHTML = '<span class="dot dot-g"></span> ' + confirmadas + ' confirmadas';
-  document.getElementById('dm-fat').textContent = 'R$\u2009' + faturamento.toLocaleString('pt-BR');
-  document.getElementById('dm-fat-sub').textContent = 'Mês atual';
+  document.getElementById('dm-fat').textContent = 'R$\u2009' + recebido.toLocaleString('pt-BR');
+  document.getElementById('dm-fat-sub').innerHTML = '<span class="trend-up">↑</span> já recebido';
   document.getElementById('dm-receber').textContent = 'R$\u2009' + aReceber.toLocaleString('pt-BR');
-  document.getElementById('dm-receber-sub').innerHTML = '<span class="dot dot-a"></span> ' + pendentes + ' pendentes';
+  document.getElementById('dm-receber-sub').innerHTML = '<span class="dot dot-a"></span> a receber este mês';
   document.getElementById('dm-pacs').textContent = (pacsAtivos || []).length;
   document.getElementById('dm-pacs-sub').textContent = 'pacientes ativos';
 
-  // Atualizar badge
+  // Badge sessões
   document.getElementById('badge-sessoes').textContent = (sessoesHoje || []).length;
 
-  // Sessões de hoje tabela
+  // Progresso do mês
+  document.getElementById('dash-prog-label').textContent = progPct + '% recebido';
+  document.getElementById('dash-prog-rec').textContent = 'Recebido: R$' + recebido.toLocaleString('pt-BR');
+  document.getElementById('dash-prog-prev').textContent = 'Previsto: R$' + previsto.toLocaleString('pt-BR');
+  setTimeout(() => {
+    const bar = document.getElementById('dash-prog-bar');
+    if (bar) bar.style.width = progPct + '%';
+  }, 200);
+
+  // Próxima sessão
+  const proxima = (sessoesHoje || []).find(s => {
+    const dt = new Date(s.data_hora);
+    return dt > agora && (s.status === 'Agendada' || s.status === 'Confirmada');
+  });
+  const divProx = document.getElementById('dash-proxima');
+  if (proxima) {
+    const dt = new Date(proxima.data_hora);
+    const hora = dt.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+    const diffMin = Math.round((dt - agora) / 60000);
+    const diffTxt = diffMin < 60 ? 'em ' + diffMin + ' minutos' : 'em ' + Math.round(diffMin/60) + 'h';
+    const nome = proxima.pacientes?.nome || '—';
+    document.getElementById('dash-prox-titulo').textContent = nome + ' — ' + hora;
+    document.getElementById('dash-prox-sub').textContent = (proxima.tipo || 'Presencial') + ' · ' + diffTxt;
+    document.getElementById('dash-prox-badge').textContent = proxima.status || 'Agendada';
+  } else if ((sessoesHoje || []).length === 0) {
+    divProx.style.background = 'var(--bg)';
+    divProx.style.border = '1px solid var(--border)';
+    document.getElementById('dash-prox-titulo').textContent = 'Nenhuma sessão hoje';
+    document.getElementById('dash-prox-titulo').style.color = 'var(--t2)';
+    document.getElementById('dash-prox-sub').textContent = 'Aproveite para organizar sua semana';
+    document.getElementById('dash-prox-sub').style.color = 'var(--t3)';
+    document.getElementById('dash-prox-badge').style.display = 'none';
+    divProx.querySelector('i').style.color = 'var(--brand)';
+  } else {
+    document.getElementById('dash-prox-titulo').textContent = 'Todas as sessões de hoje já passaram';
+    document.getElementById('dash-prox-sub').textContent = 'Bom trabalho!';
+    document.getElementById('dash-prox-badge').textContent = '✓ Concluído';
+  }
+
+  // Alertas
+  renderAlertas(sessoesMes || [], todasSessoes || []);
+
+  // Sessões de hoje
   renderSessoesHoje(sessoesHoje || []);
 
   // Pendentes
   renderPendentes(sessoesMes || []);
+
+  // Distribuição presencial/online
+  const pres = (sessoesMes || []).filter(s => s.tipo === 'Presencial').length;
+  const onl = (sessoesMes || []).filter(s => s.tipo === 'Online').length;
+  const total = pres + onl;
+  const presPct = total > 0 ? Math.round((pres/total)*100) : 0;
+  const onlPct = total > 0 ? 100 - presPct : 0;
+  document.getElementById('dash-pres-pct').textContent = 'Presencial ' + presPct + '%';
+  document.getElementById('dash-onl-pct').textContent = 'Online ' + onlPct + '%';
+  document.getElementById('dash-dist-mes').textContent = mesNome;
+
+  // Gráficos
+  await renderGraficosDash();
+}
+
+function renderAlertas(sessoesMes, todasSessoes) {
+  const alertas = [];
+  const agora = new Date();
+  const hoje = agora.toISOString().split('T')[0];
+
+  // Sessões pendentes de pagamento há mais de 7 dias
+  const atrasadas = todasSessoes.filter(s => {
+    if (s.status_pagamento !== 'Pendente' || !s.data_hora) return false;
+    const dt = new Date(s.data_hora);
+    const diff = (agora - dt) / (1000 * 60 * 60 * 24);
+    return diff > 7 && s.status === 'Realizada';
+  });
+  if (atrasadas.length > 0) {
+    alertas.push({ icon: 'ti-alert-circle', cor: 'var(--red)', bg: 'var(--red-light)', msg: atrasadas.length + ' sessão(ões) realizada(s) com pagamento em atraso há mais de 7 dias.', acao: 'Ver sessões', fn: "irPara('sessoes',null)" });
+  }
+
+  // Sessões de hoje sem confirmação
+  const semConfirm = sessoesMes.filter(s => {
+    if (!s.data_hora) return false;
+    const dt = s.data_hora.split('T')[0];
+    return dt === hoje && s.status === 'Agendada';
+  });
+  if (semConfirm.length > 0) {
+    alertas.push({ icon: 'ti-bell', cor: 'var(--amber)', bg: 'var(--amber-light)', msg: semConfirm.length + ' sessão(ões) de hoje ainda sem confirmação.', acao: 'Ver agenda', fn: "irPara('agenda',null)" });
+  }
+
+  const el = document.getElementById('dash-alertas');
+  if (!alertas.length) { el.innerHTML = ''; return; }
+
+  el.innerHTML = alertas.map(a =>
+    '<div style="background:' + a.bg + ';border-radius:var(--rs);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
+      '<i class="ti ' + a.icon + '" style="font-size:16px;color:' + a.cor + ';flex-shrink:0;"></i>' +
+      '<span style="font-size:12px;flex:1;">' + a.msg + '</span>' +
+      '<button class="btn btn-sm" style="background:' + a.cor + ';color:#fff;border:none;white-space:nowrap;" onclick="' + a.fn + '">' + a.acao + '</button>' +
+    '</div>'
+  ).join('');
+}
+
+async function renderGraficosDash() {
+  const agora = new Date();
+  const meses = [];
+  const fats = [];
+
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
+    const mesStr = d.toISOString().substring(0, 7);
+    const lbl = d.toLocaleDateString('pt-BR', {month:'short'}).replace('.','');
+    meses.push(lbl);
+    const { data } = await sb.from('sessoes').select('valor').eq('status_pagamento','Pago').gte('data_hora', mesStr + '-01T00:00:00').lte('data_hora', mesStr + '-31T23:59:59');
+    fats.push((data || []).reduce((a, s) => a + (s.valor || 0), 0));
+  }
+
+  const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
+  const grid = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
+  const tick = isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)';
+
+  if (chartDashFat) chartDashFat.destroy();
+  chartDashFat = new Chart(document.getElementById('chart-dash-fat'), {
+    type: 'bar',
+    data: {
+      labels: meses,
+      datasets: [{
+        data: fats,
+        backgroundColor: fats.map((_, i) => i === fats.length - 1 ? '#5046E5' : '#C5C2F5'),
+        borderRadius: 5,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' R$' + c.raw.toLocaleString('pt-BR') } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: tick, font: { size: 10 } } },
+        y: { grid: { color: grid }, border: { display: false }, ticks: { color: tick, font: { size: 10 }, callback: v => 'R$' + (v/1000).toFixed(0) + 'k' } }
+      }
+    }
+  });
+
+  // Gráfico distribuição
+  const mesAtual = agora.toISOString().substring(0, 7);
+  const { data: sessMes } = await sb.from('sessoes').select('tipo').gte('data_hora', mesAtual + '-01T00:00:00').lte('data_hora', mesAtual + '-31T23:59:59');
+  const pres = (sessMes || []).filter(s => s.tipo === 'Presencial').length;
+  const onl = (sessMes || []).filter(s => s.tipo === 'Online').length;
+
+  if (chartDashDist) chartDashDist.destroy();
+  chartDashDist = new Chart(document.getElementById('chart-dash-dist'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Presencial', 'Online'],
+      datasets: [{ data: [pres || 1, onl || 1], backgroundColor: ['#5046E5', '#1D9E75'], borderWidth: 0, hoverOffset: 4 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '68%',
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' ' + c.label + ': ' + c.raw } } }
+    }
+  });
 }
 
 function renderSessoesHoje(sessoes) {
