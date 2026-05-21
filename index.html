@@ -540,6 +540,17 @@ tr:hover td{background:#FAFAFB}
           </div>
         </div>
 
+        <!-- SOLICITAÇÕES DE AGENDAMENTO -->
+        <div id="dash-solicitacoes-wrap" class="mb16" style="display:none;">
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div class="card-head" style="padding:12px 16px;background:#FAEEDA;">
+              <span class="card-title" style="color:#633806;"><i class="ti ti-calendar-plus" style="font-size:15px;"></i> Novos pedidos de agendamento</span>
+              <span style="font-size:11px;font-weight:500;color:#633806;" id="dash-sol-count">—</span>
+            </div>
+            <div id="dash-solicitacoes"></div>
+          </div>
+        </div>
+
         <!-- SESSÕES DE HOJE + PENDENTES -->
         <div class="g2">
           <div class="card" style="padding:0;overflow:hidden;">
@@ -555,7 +566,7 @@ tr:hover td{background:#FAFAFB}
               <span style="font-size:11px;color:var(--amber);font-weight:500;" id="dash-total-pendente">—</span>
             </div>
             <div id="dash-pendentes"><div class="loading">Carregando...</div></div>
-            <div style="padding:10px 14px;border-top:1px solid var(--border);">
+            <div style="padding:10px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;">
               <button class="btn btn-sm btn-full" style="background:var(--brand-light);color:var(--brand-dark);border:none;" onclick="cobrarWhatsApp()">
                 <i class="ti ti-brand-whatsapp"></i> Cobrar todos via WhatsApp
               </button>
@@ -736,6 +747,30 @@ tr:hover td{background:#FAFAFB}
             </div>
           </div>
           <div>
+            <div class="card mb16">
+              <div class="card-head"><span class="card-title">Link de autoagendamento</span></div>
+              <div style="padding:16px;">
+                <div class="form-group">
+                  <label class="form-label">Seu link personalizado</label>
+                  <div style="display:flex;gap:8px;">
+                    <div style="flex:1;background:var(--bg);border:1px solid var(--border-s);border-radius:var(--rs);padding:9px 12px;font-size:12px;color:var(--t3);">lumapsi.com.br/agendar/<span id="cfg-slug-preview" style="color:var(--brand);font-weight:500;">—</span></div>
+                    <button class="btn btn-ghost btn-sm" onclick="copiarLink()"><i class="ti ti-copy"></i></button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Seu slug (identificador único)</label>
+                  <input class="form-input" id="cfg-slug" placeholder="ex: joao, dra-maria..." oninput="atualizarSlugPreview(this.value)">
+                  <div style="font-size:11px;color:var(--t3);margin-top:4px;">Use apenas letras minúsculas, números e hífens. Sem espaços.</div>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="salvarSlug()"><i class="ti ti-check"></i> Salvar link</button>
+              </div>
+            </div>
+
+            <div class="card mb16">
+              <div class="card-head"><span class="card-title">Horários de atendimento</span><button class="btn btn-primary btn-sm" onclick="adicionarHorario()"><i class="ti ti-plus"></i> Adicionar</button></div>
+              <div id="lista-horarios" style="padding:0 16px;"><div class="loading">Carregando...</div></div>
+            </div>
+
             <div class="card mb16">
               <div class="card-head"><span class="card-title">Segurança</span></div>
               <div style="padding:16px;">
@@ -1170,6 +1205,7 @@ function irPara(pag, el) {
   if (pag === 'pessoal') carregarPessoal();
   if (pag === 'relatorios') carregarRelatorios();
   if (pag === 'agenda') carregarAgenda();
+  if (pag === 'config') { carregarHorarios(); carregarSlug(); }
 }
 
 function acaoPrincipal() {
@@ -1299,6 +1335,33 @@ async function carregarDashboard() {
 
   // Pendentes
   renderPendentes(sessoesMes || []);
+
+  // Solicitações de agendamento
+  window._solicitacoes = await carregarSolicitacoes();
+  const solicitacoes = window._solicitacoes;
+  const wrapSol = document.getElementById('dash-solicitacoes-wrap');
+  if (solicitacoes.length > 0) {
+    wrapSol.style.display = 'block';
+    document.getElementById('dash-sol-count').textContent = solicitacoes.length + ' pendente(s)';
+    const itens = solicitacoes.map(function(s) {
+      const dt = new Date(s.data_hora);
+      const dtStr = dt.toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'2-digit'}) + ' às ' + dt.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+      let html = '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);">';
+      html += '<div style="flex:1;">';
+      html += '<div style="font-size:13px;font-weight:500;">' + s.nome + '</div>';
+      html += '<div style="font-size:11px;color:var(--t3);">' + dtStr + ' · ' + s.tipo + '</div>';
+      if (s.queixa) html += '<div style="font-size:11px;color:var(--t2);margin-top:2px;">' + s.queixa.substring(0,60) + '</div>';
+      html += '</div>';
+      html += '<div style="display:flex;gap:6px;">';
+      html += '<button class="btn btn-sm" style="background:var(--green-light);color:var(--green);border:none;" onclick="aprovarSolicitacao(' + s.id + ')"><i class="ti ti-check"></i> Aceitar</button>';
+      html += '<button class="btn btn-sm" style="background:var(--red-light);color:var(--red);border:none;" onclick="recusarSolicitacao(' + s.id + ')"><i class="ti ti-x"></i></button>';
+      html += '</div></div>';
+      return html;
+    });
+    document.getElementById('dash-solicitacoes').innerHTML = itens.join('');
+  } else {
+    wrapSol.style.display = 'none';
+  }
 
   // Distribuição presencial/online
   const pres = (sessoesMes || []).filter(s => s.tipo === 'Presencial').length;
@@ -2170,6 +2233,16 @@ async function salvarConfig() {
   toast('Configurações salvas!', 'success');
 }
 
+async function carregarSlug() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+  const { data } = await sb.from('configuracoes').select('slug').eq('user_id', user.id).single();
+  if (data?.slug) {
+    document.getElementById('cfg-slug').value = data.slug;
+    document.getElementById('cfg-slug-preview').textContent = data.slug;
+  }
+}
+
 async function carregarConfig() {
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return;
@@ -2943,6 +3016,165 @@ Use linguagem clínica profissional em português brasileiro.`;
   } catch (e) {
     toast('Erro ao gerar resumo: ' + e.message, 'error');
   }
+}
+
+
+// ════════════════════════════════════
+// AUTOAGENDAMENTO — CONFIGURAÇÃO
+// ════════════════════════════════════
+const DIAS_SEMANA = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+
+function atualizarSlugPreview(val) {
+  const slug = val.toLowerCase().replace(/[^a-z0-9-]/g, '');
+  document.getElementById('cfg-slug').value = slug;
+  document.getElementById('cfg-slug-preview').textContent = slug || '—';
+}
+
+async function salvarSlug() {
+  const slug = document.getElementById('cfg-slug').value.trim();
+  if (!slug) { toast('Digite um slug válido', 'error'); return; }
+  const { data: { user } } = await sb.auth.getUser();
+  const { error } = await sb.from('configuracoes').upsert({
+    user_id: user.id, slug
+  }, { onConflict: 'user_id' });
+  if (error) {
+    if (error.message.includes('unique')) {
+      toast('Este slug já está em uso. Escolha outro.', 'error');
+    } else {
+      toast('Erro ao salvar: ' + error.message, 'error');
+    }
+    return;
+  }
+  toast('Link salvo! lumapsi.com.br/agendar/' + slug, 'success');
+}
+
+function copiarLink() {
+  const slug = document.getElementById('cfg-slug').value.trim();
+  if (!slug) { toast('Configure seu slug primeiro', 'error'); return; }
+  navigator.clipboard.writeText('https://lumapsi.com.br/agendar/' + slug);
+  toast('Link copiado!', 'success');
+}
+
+async function carregarHorarios() {
+  const { data: { user } } = await sb.auth.getUser();
+  const { data } = await sb.from('horarios_atendimento').select('*').eq('user_id', user.id).order('dia_semana').order('hora_inicio');
+  const el = document.getElementById('lista-horarios');
+  if (!data || !data.length) {
+    el.innerHTML = '<div style="padding:12px 0;font-size:12px;color:var(--t3);">Nenhum horário configurado. Clique em Adicionar.</div>';
+    return;
+  }
+  el.innerHTML = data.map(h =>
+    '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">' +
+      '<div style="width:80px;font-size:12px;font-weight:500;">' + DIAS_SEMANA[h.dia_semana] + '</div>' +
+      '<div style="flex:1;font-size:12px;color:var(--t2);">' + h.hora_inicio.substring(0,5) + ' às ' + h.hora_fim.substring(0,5) + ' · ' + h.duracao_sessao + 'min</div>' +
+      '<button class="btn btn-ghost btn-sm" onclick="excluirHorario(' + h.id + ')"><i class="ti ti-trash" style="color:var(--red);"></i></button>' +
+    '</div>'
+  ).join('') + '<div style="padding:8px 0;"></div>';
+}
+
+async function adicionarHorario() {
+  const dia = prompt('Dia da semana (0=Dom, 1=Seg, 2=Ter, 3=Qua, 4=Qui, 5=Sex, 6=Sáb):');
+  if (dia === null) return;
+  const inicio = prompt('Horário de início (ex: 08:00):');
+  if (!inicio) return;
+  const fim = prompt('Horário de fim (ex: 18:00):');
+  if (!fim) return;
+  const dur = prompt('Duração de cada sessão em minutos (ex: 50):') || '50';
+
+  const { data: { user } } = await sb.auth.getUser();
+  const { error } = await sb.from('horarios_atendimento').insert([{
+    user_id: user.id,
+    dia_semana: parseInt(dia),
+    hora_inicio: inicio,
+    hora_fim: fim,
+    duracao_sessao: parseInt(dur),
+    ativo: true,
+  }]);
+
+  if (error) { toast('Erro ao salvar: ' + error.message, 'error'); return; }
+  toast('Horário adicionado!', 'success');
+  carregarHorarios();
+}
+
+async function excluirHorario(id) {
+  if (!confirm('Excluir este horário?')) return;
+  const { error } = await sb.from('horarios_atendimento').delete().eq('id', id);
+  if (error) { toast('Erro ao excluir', 'error'); return; }
+  toast('Horário excluído', 'success');
+  carregarHorarios();
+}
+
+async function carregarSolicitacoes() {
+  const { data: { user } } = await sb.auth.getUser();
+  const { data } = await sb.from('agendamentos_solicitados')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('status', 'Pendente')
+    .order('data_hora');
+  return data || [];
+}
+
+async function aprovarSolicitacao(id) {
+  const s = (window._solicitacoes || []).find(x => x.id === id);
+  if (!s) { toast('Solicitação não encontrada', 'error'); return; }
+  const pacNome = s.nome;
+  const pacTel = s.telefone;
+  const dataHora = s.data_hora;
+  const tipo = s.tipo;
+  const { data: { user } } = await sb.auth.getUser();
+  
+  // Criar paciente se não existir
+  let pacId = null;
+  const { data: pacExiste } = await sb.from('pacientes').select('id').eq('user_id', user.id).eq('telefone', pacTel).single();
+  if (pacExiste) {
+    pacId = pacExiste.id;
+  } else {
+    const { data: novoPac } = await sb.from('pacientes').insert([{
+      user_id: user.id,
+      nome: pacNome,
+      telefone: pacTel,
+      status: 'avaliacao',
+    }]).select().single();
+    pacId = novoPac?.id;
+  }
+
+  // Criar sessão
+  const pac = todosPacientes.find(p => p.id === pacId);
+  const valor = tipo === 'Online' ? 
+    (await sb.from('configuracoes').select('valor_online').eq('user_id', user.id).single()).data?.valor_online :
+    (await sb.from('configuracoes').select('valor_presencial').eq('user_id', user.id).single()).data?.valor_presencial;
+
+  await sb.from('sessoes').insert([{
+    user_id: user.id,
+    paciente_id: pacId,
+    data_hora: dataHora,
+    tipo,
+    status: 'Confirmada',
+    valor: valor || null,
+    status_pagamento: 'Pendente',
+  }]);
+
+  // Marcar solicitação como aprovada
+  await sb.from('agendamentos_solicitados').update({ status: 'Aprovado' }).eq('id', id);
+
+  // Enviar WhatsApp de confirmação
+  await enviarWhatsApp(pacTel,
+    'Olá ' + pacNome.split(' ')[0] + '! 🎉\n\nSeu agendamento foi *confirmado*!\n\n📅 ' +
+    new Date(dataHora).toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'}) +
+    ' às ' + new Date(dataHora).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) +
+    '\n📍 ' + tipo + '\n\nAté lá! 😊'
+  );
+
+  toast('Sessão confirmada e paciente notificado!', 'success');
+  await carregarPacientes();
+  await carregarDashboard();
+}
+
+async function recusarSolicitacao(id) {
+  if (!confirm('Recusar este agendamento?')) return;
+  await sb.from('agendamentos_solicitados').update({ status: 'Recusado' }).eq('id', id);
+  toast('Agendamento recusado', 'success');
+  carregarDashboard();
 }
 
 // ════════════════════════════════════
