@@ -2266,13 +2266,13 @@ async function carregarRelatorios() {
       const pendente = porPacPendente[id] || 0;
       const qtd = porPacQtd[id] || 0;
       const ticket = qtd ? Math.round(recebido / qtd) : 0;
-      return \`<tr style="border-bottom:0.5px solid var(--border);">
-        <td style="padding:10px 0;font-size:13px;">\${nome}</td>
-        <td style="text-align:center;padding:10px 0;font-size:13px;color:var(--t2);">\${qtd}</td>
-        <td style="text-align:center;padding:10px 0;font-size:13px;color:var(--green-dark,#065F46);font-weight:500;">R\$\${recebido.toLocaleString('pt-BR')}</td>
-        <td style="text-align:center;padding:10px 0;font-size:13px;color:\${pendente>0?'var(--amber)':'var(--t3)'};">R\$\${pendente.toLocaleString('pt-BR')}</td>
-        <td style="text-align:center;padding:10px 0;font-size:13px;color:var(--t2);">R\$\${ticket.toLocaleString('pt-BR')}</td>
-      </tr>\`;
+      return `<tr style="border-bottom:0.5px solid var(--border);">
+        <td style="padding:10px 0;font-size:13px;">${nome}</td>
+        <td style="text-align:center;padding:10px 0;font-size:13px;color:var(--t2);">${qtd}</td>
+        <td style="text-align:center;padding:10px 0;font-size:13px;color:var(--green-dark,#065F46);font-weight:500;">R\$${recebido.toLocaleString('pt-BR')}</td>
+        <td style="text-align:center;padding:10px 0;font-size:13px;color:${pendente>0?'var(--amber)':'var(--t3)'};">R\$${pendente.toLocaleString('pt-BR')}</td>
+        <td style="text-align:center;padding:10px 0;font-size:13px;color:var(--t2);">R\$${ticket.toLocaleString('pt-BR')}</td>
+      </tr>`;
     }).join('');
   }
 
@@ -2281,24 +2281,24 @@ async function carregarRelatorios() {
   const online = sessoes.filter(s => s.tipo === 'Online' && s.status === 'Realizada').length;
   const totalTipo = presencial + online;
   if (el('rel-tipo-legenda')) {
-    el('rel-tipo-legenda').innerHTML = \`
+    el('rel-tipo-legenda').innerHTML = `
       <div style="margin-bottom:12px;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
           <div style="width:12px;height:12px;border-radius:2px;background:#818CF8;flex-shrink:0;"></div>
           <span style="font-size:13px;font-weight:500;">Presencial</span>
-          <span style="font-size:13px;color:var(--t2);margin-left:auto;">\${presencial} sessões</span>
+          <span style="font-size:13px;color:var(--t2);margin-left:auto;">${presencial} sessões</span>
         </div>
-        <div style="font-size:12px;color:var(--t3);">\${totalTipo ? Math.round(presencial/totalTipo*100) : 0}% do total</div>
+        <div style="font-size:12px;color:var(--t3);">${totalTipo ? Math.round(presencial/totalTipo*100) : 0}% do total</div>
       </div>
       <div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
           <div style="width:12px;height:12px;border-radius:2px;background:#34D399;flex-shrink:0;"></div>
           <span style="font-size:13px;font-weight:500;">Online</span>
-          <span style="font-size:13px;color:var(--t2);margin-left:auto;">\${online} sessões</span>
+          <span style="font-size:13px;color:var(--t2);margin-left:auto;">${online} sessões</span>
         </div>
-        <div style="font-size:12px;color:var(--t3);">\${totalTipo ? Math.round(online/totalTipo*100) : 0}% do total</div>
+        <div style="font-size:12px;color:var(--t3);">${totalTipo ? Math.round(online/totalTipo*100) : 0}% do total</div>
       </div>
-    \`;
+    `;
   }
 
   // ── Gráficos ──
