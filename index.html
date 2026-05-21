@@ -714,6 +714,33 @@ tr:hover td{background:#FAFAFF}
                 <div style="font-size:11px;color:var(--t3);margin-top:4px;">Os lembretes são enviados automaticamente para os pacientes. As cobranças são agrupadas por paciente.</div>
               </div>
             </div>
+
+            <div class="card mb16">
+              <div class="card-head">
+                <span class="card-title" style="display:flex;align-items:center;gap:8px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                  Google Calendar
+                </span>
+                <span id="gcal-badge" style="font-size:11px;padding:3px 10px;border-radius:20px;background:var(--bg);color:var(--t3);border:1px solid var(--border-s);">Desconectado</span>
+              </div>
+              <div style="padding:16px;">
+                <div id="gcal-status" style="font-size:12px;color:var(--t3);margin-bottom:12px;">Conecte sua conta Google para sincronizar as sessões automaticamente com seu Google Calendar.</div>
+                <div style="display:flex;gap:8px;">
+                  <button id="gcal-connect-btn" class="btn btn-primary btn-sm" onclick="conectarGoogleCalendar()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                    Conectar Google Calendar
+                  </button>
+                  <button id="gcal-disconnect-btn" class="btn btn-ghost btn-sm" onclick="desconectarGoogleCalendar()" style="display:none;">
+                    Desconectar
+                  </button>
+                </div>
+              </div>
+            </div>
             <div class="card">
               <div class="card-head"><span class="card-title">Conta</span></div>
               <div style="padding:16px;">
@@ -1083,6 +1110,7 @@ function iniciarApp(user) {
   if (finMes) finMes.value = mes;
   carregarTudo();
   carregarConfig();
+  verificarStatusGoogleCalendar();
 }
 
 // Verificar sessão existente
@@ -1135,7 +1163,7 @@ function irPara(pag, el) {
   if (pag === 'pessoal') carregarPessoal();
   if (pag === 'relatorios') carregarRelatorios();
   if (pag === 'agenda') carregarAgenda();
-  if (pag === 'config') { carregarHorarios(); carregarSlug(); }
+  if (pag === 'config') { carregarHorarios(); carregarSlug(); verificarStatusGoogleCalendar(); }
 }
 
 function acaoPrincipal() {
@@ -1758,6 +1786,16 @@ async function salvarSessao() {
     if (error) { toast('Erro ao agendar: ' + error.message, 'error'); return; }
     fecharModal();
     toast('Sessão agendada!', 'success');
+    // Sincronizar com Google Calendar
+    if (googleCalendarConectado) {
+      setTimeout(async () => {
+        const { data: novaSessao } = await sb.from('sessoes').select('id').eq('user_id', usuarioAtual.id).eq('data_hora', dataHora).eq('paciente_id', parseInt(pacId)).order('id', {ascending: false}).limit(1).single();
+        if (novaSessao) {
+          const pacSync = todosPacientes.find(p => p.id == pacId);
+          sincronizarSessaoGcal('create', novaSessao.id, { data_hora: dataHora, tipo: tipoSess, valor, observacoes: document.getElementById('ns-obs').value, link_sala: linkSala, paciente_nome: pacSync?.nome });
+        }
+      }, 1000);
+    }
   }
   // Enviar confirmação automática via WhatsApp
   const pacIdWpp = document.getElementById('ns-pac').value;
@@ -2519,6 +2557,11 @@ async function atualizarSessao() {
 
   fecharModal();
   toast('Sessão atualizada!', 'success');
+  // Sincronizar atualização com Google Calendar
+  if (googleCalendarConectado) {
+    const pac = todosPacientes.find(p => p.id === pacId);
+    sincronizarSessaoGcal('update', parseInt(id), { data_hora: dataSess + 'T' + hora + ':00', tipo: tipoEditar, valor: parseFloat(document.getElementById('es-valor').value) || null, observacoes: document.getElementById('es-obs').value, link_sala: linkEditar, paciente_nome: pac?.nome });
+  }
   carregarSessoes();
   carregarDashboard();
 }
@@ -2528,6 +2571,10 @@ async function excluirSessao() {
   if (!confirm('Excluir esta sessão? Esta ação não pode ser desfeita.')) return;
   const { error } = await sb.from('sessoes').delete().eq('id', id);
   if (error) { toast('Erro ao excluir: ' + error.message, 'error'); return; }
+  // Sincronizar exclusão com Google Calendar
+  if (googleCalendarConectado) {
+    sincronizarSessaoGcal('delete', parseInt(id), {});
+  }
   fecharModal();
   toast('Sessão excluída', 'success');
   carregarSessoes();
@@ -3128,6 +3175,157 @@ function exportarAtual() {
     toast('Use Ctrl+P para imprimir / exportar esta página', 'success');
   } else {
     toast('Selecione Prontuário para exportar o PDF do paciente', 'success');
+  }
+}
+
+// ════════════════════════════════════
+// GOOGLE CALENDAR
+// ════════════════════════════════════
+const GCAL_URL = 'https://pbqvfokpounurzmmlcor.supabase.co/functions/v1/google-calendar';
+
+let googleCalendarConectado = false;
+
+async function verificarStatusGoogleCalendar() {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const res = await fetch(GCAL_URL + '/status', {
+      headers: {
+        'Authorization': 'Bearer ' + session.access_token,
+        'apikey': SUPA_KEY,
+      }
+    });
+    const data = await res.json();
+    googleCalendarConectado = data.connected;
+    atualizarUIGoogleCalendar(data);
+  } catch (e) {
+    console.log('Google Calendar status error:', e);
+  }
+}
+
+function atualizarUIGoogleCalendar(data) {
+  const badge = document.getElementById('gcal-badge');
+  const status = document.getElementById('gcal-status');
+  const connectBtn = document.getElementById('gcal-connect-btn');
+  const disconnectBtn = document.getElementById('gcal-disconnect-btn');
+  if (!badge) return;
+
+  if (data.connected) {
+    badge.textContent = 'Conectado';
+    badge.style.background = 'var(--green-light)';
+    badge.style.color = 'var(--green-dark, #065F46)';
+    badge.style.border = '1px solid var(--green-light)';
+    status.textContent = 'Sincronizando com ' + (data.email || 'sua conta Google') + '. As sessões são criadas automaticamente no seu calendário.';
+    if (connectBtn) connectBtn.style.display = 'none';
+    if (disconnectBtn) disconnectBtn.style.display = 'flex';
+  } else {
+    badge.textContent = 'Desconectado';
+    badge.style.background = 'var(--bg)';
+    badge.style.color = 'var(--t3)';
+    badge.style.border = '1px solid var(--border-s)';
+    status.textContent = 'Conecte sua conta Google para sincronizar as sessões automaticamente com seu Google Calendar.';
+    if (connectBtn) connectBtn.style.display = 'flex';
+    if (disconnectBtn) disconnectBtn.style.display = 'none';
+  }
+}
+
+async function conectarGoogleCalendar() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { toast('Faça login primeiro', 'error'); return; }
+
+  const btn = document.getElementById('gcal-connect-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Aguarde...'; }
+
+  try {
+    const res = await fetch(GCAL_URL + '/auth', {
+      headers: {
+        'Authorization': 'Bearer ' + session.access_token,
+        'apikey': SUPA_KEY,
+      }
+    });
+    const data = await res.json();
+    if (data.url) {
+      // Abrir popup do Google OAuth
+      window.open(data.url, '_blank', 'width=600,height=700,scrollbars=yes');
+      toast('Complete a autorização na janela do Google que abriu.', 'success');
+      // Verificar status a cada 3 segundos por 2 minutos
+      let tentativas = 0;
+      const intervalo = setInterval(async () => {
+        tentativas++;
+        await verificarStatusGoogleCalendar();
+        if (googleCalendarConectado || tentativas > 40) clearInterval(intervalo);
+      }, 3000);
+    } else {
+      toast('Erro ao iniciar conexão com Google', 'error');
+    }
+  } catch (e) {
+    toast('Erro: ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/></svg> Conectar Google Calendar'; }
+  }
+}
+
+async function desconectarGoogleCalendar() {
+  if (!confirm('Desconectar o Google Calendar? As sessões não serão mais sincronizadas.')) return;
+  const { data: { session } } = await sb.auth.getSession();
+  await fetch(GCAL_URL + '/disconnect', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPA_KEY }
+  });
+  googleCalendarConectado = false;
+  atualizarUIGoogleCalendar({ connected: false });
+  toast('Google Calendar desconectado.', 'success');
+}
+
+// Verificar se veio do redirect OAuth do Google (URL com ?google_connected=true)
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('google_connected') === 'true') {
+    toast('Google Calendar conectado com sucesso!', 'success');
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+  if (params.get('google_error')) {
+    toast('Erro ao conectar Google Calendar: ' + params.get('google_error'), 'error');
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+});
+
+// ── Sincronizar sessão com Google Calendar ─────────────
+async function sincronizarSessaoGcal(action, sessaoId, sessaoData) {
+  if (!googleCalendarConectado) return;
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+
+    // Buscar google_event_id atual se for update/delete
+    let googleEventId = null;
+    if (action !== 'create' && sessaoId) {
+      const { data: sessDb } = await sb.from('sessoes').select('google_event_id').eq('id', sessaoId).single();
+      googleEventId = sessDb?.google_event_id;
+    }
+
+    const res = await fetch(GCAL_URL + '/event', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + session.access_token,
+        'apikey': SUPA_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action,
+        event_id: googleEventId,
+        sessao: sessaoData,
+      })
+    });
+
+    const result = await res.json();
+
+    // Salvar google_event_id na sessão se foi create ou update
+    if (result.google_event_id && sessaoId) {
+      await sb.from('sessoes').update({ google_event_id: result.google_event_id }).eq('id', sessaoId);
+    }
+  } catch (e) {
+    console.log('Erro sync Google Calendar:', e);
   }
 }
 
