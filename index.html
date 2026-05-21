@@ -1632,9 +1632,6 @@ async function salvarEvolucao() {
   if (document.getElementById('sel-pac-pront').value == pacId) carregarProntuario();
 }
 
-function exportarPDF() {
-  toast('Exportação PDF em breve!', 'success');
-}
 
 // ════════════════════════════════════
 // SESSÕES
@@ -3013,7 +3010,7 @@ async function adicionarHorario() {
   }]);
 
   if (error) { toast('Erro ao salvar: ' + error.message, 'error'); return; }
-  toast('Horário adicionado!', 'success');a
+  toast('Horário adicionado!', 'success');
   carregarHorarios();
 }
 
@@ -3113,5 +3110,3 @@ function fecharMenu() {
 </script>
 </body>
 </html>
-HTMLEOF
-echo "Arquivo criado: $(wc -l < /mnt/user-data/outputs/index.html) linhas"
