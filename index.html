@@ -1792,7 +1792,7 @@ async function salvarSessao() {
         const { data: novaSessao } = await sb.from('sessoes').select('id').eq('user_id', usuarioAtual.id).eq('data_hora', dataHora).eq('paciente_id', parseInt(pacId)).order('id', {ascending: false}).limit(1).single();
         if (novaSessao) {
           const pacSync = todosPacientes.find(p => p.id == pacId);
-          sincronizarSessaoGcal('create', novaSessao.id, { data_hora: dataHora, tipo: tipoSess, valor, observacoes: document.getElementById('ns-obs').value, link_sala: linkSala, paciente_nome: pacSync?.nome });
+          sincronizarSessaoGcal('create', novaSessao.id, { data_hora: dataHora + '-03:00', tipo: tipoSess, valor, observacoes: document.getElementById('ns-obs').value, link_sala: linkSala, paciente_nome: pacSync?.nome });
         }
       }, 1000);
     }
@@ -2008,11 +2008,12 @@ function renderAgendaGrid(dias, sessoes) {
   horas.forEach(h => {
     html += '<div style="height:56px;padding:4px 8px;font-size:10px;color:var(--t3);border-bottom:1px solid var(--border);">' + h + '</div>';
     dias.forEach((d, di) => {
-      const dStr = d.toISOString().split('T')[0];
+      const dStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
       const sessDia = sessoes.filter(s => {
         if (!s.data_hora) return false;
         const sh = new Date(s.data_hora);
-        return sh.toISOString().split('T')[0] === dStr && sh.getHours() === parseInt(h.split(':')[0]);
+        const shDate = sh.getFullYear() + '-' + String(sh.getMonth()+1).padStart(2,'0') + '-' + String(sh.getDate()).padStart(2,'0');
+        return shDate === dStr && sh.getHours() === parseInt(h.split(':')[0]);
       });
       let inner = '';
       sessDia.forEach(s => {
@@ -2560,7 +2561,7 @@ async function atualizarSessao() {
   // Sincronizar atualização com Google Calendar
   if (googleCalendarConectado) {
     const pac = todosPacientes.find(p => p.id === pacId);
-    sincronizarSessaoGcal('update', parseInt(id), { data_hora: dataSess + 'T' + hora + ':00', tipo: tipoEditar, valor: parseFloat(document.getElementById('es-valor').value) || null, observacoes: document.getElementById('es-obs').value, link_sala: linkEditar, paciente_nome: pac?.nome });
+    sincronizarSessaoGcal('update', parseInt(id), { data_hora: dataSess + 'T' + hora + ':00-03:00', tipo: tipoEditar, valor: parseFloat(document.getElementById('es-valor').value) || null, observacoes: document.getElementById('es-obs').value, link_sala: linkEditar, paciente_nome: pac?.nome });
   }
   carregarSessoes();
   carregarDashboard();
@@ -2793,7 +2794,7 @@ async function renderAgendaMes(sessoes) {
 
   for (let d = 1; d <= ultimoDia.getDate(); d++) {
     const data = new Date(ano, mes, d);
-    const dataStr = data.toISOString().split('T')[0];
+    const dataStr = data.getFullYear() + '-' + String(data.getMonth()+1).padStart(2,'0') + '-' + String(data.getDate()).padStart(2,'0');
     const isHoje = data.toDateString() === hoje;
     const sessDia = (sessoes || []).filter(s => s.data_hora && s.data_hora.startsWith(dataStr));
 
