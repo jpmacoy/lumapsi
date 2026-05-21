@@ -2266,13 +2266,13 @@ async function carregarRelatorios() {
       const pendente = porPacPendente[id] || 0;
       const qtd = porPacQtd[id] || 0;
       const ticket = qtd ? Math.round(recebido / qtd) : 0;
-      return `<tr style="border-bottom:0.5px solid var(--border);">
-        <td style="padding:10px 0;font-size:13px;">${nome}</td>
-        <td style="text-align:center;padding:10px 0;font-size:13px;color:var(--t2);">${qtd}</td>
-        <td style="text-align:center;padding:10px 0;font-size:13px;color:var(--green-dark,#065F46);font-weight:500;">R\$${recebido.toLocaleString('pt-BR')}</td>
-        <td style="text-align:center;padding:10px 0;font-size:13px;color:${pendente>0?'var(--amber)':'var(--t3)'};">R\$${pendente.toLocaleString('pt-BR')}</td>
-        <td style="text-align:center;padding:10px 0;font-size:13px;color:var(--t2);">R\$${ticket.toLocaleString('pt-BR')}</td>
-      </tr>`;
+      return '<tr style="border-bottom:0.5px solid var(--border);">' +
+        '<td style="padding:10px 0;font-size:13px;">' + nome + '</td>' +
+        '<td style="text-align:center;padding:10px 0;font-size:13px;color:var(--t2);">' + qtd + '</td>' +
+        '<td style="text-align:center;padding:10px 0;font-size:13px;color:var(--green-dark,#065F46);font-weight:500;">R$' + recebido.toLocaleString('pt-BR') + '</td>' +
+        '<td style="text-align:center;padding:10px 0;font-size:13px;color:' + (pendente>0?'var(--amber)':'var(--t3)') + ';">R$' + pendente.toLocaleString('pt-BR') + '</td>' +
+        '<td style="text-align:center;padding:10px 0;font-size:13px;color:var(--t2);">R$' + ticket.toLocaleString('pt-BR') + '</td>' +
+        '</tr>';
     }).join('');
   }
 
@@ -2281,24 +2281,23 @@ async function carregarRelatorios() {
   const online = sessoes.filter(s => s.tipo === 'Online' && s.status === 'Realizada').length;
   const totalTipo = presencial + online;
   if (el('rel-tipo-legenda')) {
-    el('rel-tipo-legenda').innerHTML = `
-      <div style="margin-bottom:12px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <div style="width:12px;height:12px;border-radius:2px;background:#818CF8;flex-shrink:0;"></div>
-          <span style="font-size:13px;font-weight:500;">Presencial</span>
-          <span style="font-size:13px;color:var(--t2);margin-left:auto;">${presencial} sessões</span>
-        </div>
-        <div style="font-size:12px;color:var(--t3);">${totalTipo ? Math.round(presencial/totalTipo*100) : 0}% do total</div>
-      </div>
-      <div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <div style="width:12px;height:12px;border-radius:2px;background:#34D399;flex-shrink:0;"></div>
-          <span style="font-size:13px;font-weight:500;">Online</span>
-          <span style="font-size:13px;color:var(--t2);margin-left:auto;">${online} sessões</span>
-        </div>
-        <div style="font-size:12px;color:var(--t3);">${totalTipo ? Math.round(online/totalTipo*100) : 0}% do total</div>
-      </div>
-    `;
+    el('rel-tipo-legenda').innerHTML = 
+      '<div style="margin-bottom:12px;">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
+          '<div style="width:12px;height:12px;border-radius:2px;background:#818CF8;flex-shrink:0;"></div>' +
+          '<span style="font-size:13px;font-weight:500;">Presencial</span>' +
+          '<span style="font-size:13px;color:var(--t2);margin-left:auto;">' + presencial + ' sessões</span>' +
+        '</div>' +
+        '<div style="font-size:12px;color:var(--t3);">' + (totalTipo ? Math.round(presencial/totalTipo*100) : 0) + '% do total</div>' +
+      '</div>' +
+      '<div>' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
+          '<div style="width:12px;height:12px;border-radius:2px;background:#34D399;flex-shrink:0;"></div>' +
+          '<span style="font-size:13px;font-weight:500;">Online</span>' +
+          '<span style="font-size:13px;color:var(--t2);margin-left:auto;">' + online + ' sessões</span>' +
+        '</div>' +
+        '<div style="font-size:12px;color:var(--t3);">' + (totalTipo ? Math.round(online/totalTipo*100) : 0) + '% do total</div>' +
+      '</div>';
   }
 
   // ── Gráficos ──
@@ -3581,16 +3580,16 @@ async function carregarDashPessoal() {
     el('dp-lista').innerHTML = todos.slice(0,5).map(l => {
       const valor = l.valor || 0;
       const isReceita = l.categoria === 'receita' || valor > 0;
-      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);">
-        <div style="width:32px;height:32px;border-radius:8px;background:${isReceita ? 'var(--green-light,#D1FAE5)' : 'var(--red-light,#FEE2E2)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <i class="ti ti-${isReceita ? 'arrow-up' : 'arrow-down'}" style="font-size:14px;color:${isReceita ? 'var(--green-dark,#065F46)' : 'var(--red)'};"></i>
-        </div>
-        <div style="flex:1;">
-          <div style="font-size:13px;font-weight:500;">${l.descricao || '—'}</div>
-          <div style="font-size:11px;color:var(--t3);">${l.data ? new Date(l.data+'T12:00:00').toLocaleDateString('pt-BR') : ''}</div>
-        </div>
-        <div style="font-size:13px;font-weight:500;color:${isReceita ? 'var(--green-dark,#065F46)' : 'var(--red)'};">${isReceita ? '+' : '-'}R$${Math.abs(valor).toLocaleString('pt-BR')}</div>
-      </div>`;
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);">' +
+        '<div style="width:32px;height:32px;border-radius:8px;background:' + (isReceita ? 'var(--green-light,#D1FAE5)' : 'var(--red-light,#FEE2E2)') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+          '<i class="ti ti-' + (isReceita ? 'arrow-up' : 'arrow-down') + '" style="font-size:14px;color:' + (isReceita ? 'var(--green-dark,#065F46)' : 'var(--red)') + ';"></i>' +
+        '</div>' +
+        '<div style="flex:1;">' +
+          '<div style="font-size:13px;font-weight:500;">' + (l.descricao || '—') + '</div>' +
+          '<div style="font-size:11px;color:var(--t3);">' + (l.data ? new Date(l.data+'T12:00:00').toLocaleDateString('pt-BR') : '') + '</div>' +
+        '</div>' +
+        '<div style="font-size:13px;font-weight:500;color:' + (isReceita ? 'var(--green-dark,#065F46)' : 'var(--red)') + ';">' + (isReceita ? '+' : '-') + 'R$' + Math.abs(valor).toLocaleString('pt-BR') + '</div>' +
+      '</div>';
     }).join('');
   }
 }
