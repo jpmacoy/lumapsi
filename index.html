@@ -361,7 +361,7 @@ tr:hover td{background:#FAFAFF}
       <div><div class="tb-title" id="tb-title">Dashboard</div><div class="tb-sub" id="tb-sub"></div></div>
       <div style="flex:1;"></div>
       <button class="icon-btn" title="Enviar lembretes de amanhã" onclick="verificarLembretes()" style="color:#25D366;"><i class="ti ti-brand-whatsapp"></i></button>
-      <button class="icon-btn" title="Exportar"><i class="ti ti-download"></i></button>
+      <button class="icon-btn" title="Exportar" onclick="exportarAtual()"><i class="ti ti-download"></i></button>
       <button class="btn btn-primary" style="font-size:12px;padding:6px 14px;" id="btn-acao" onclick="acaoPrincipal()">
         <i class="ti ti-plus"></i> <span id="btn-acao-txt">Nova sessão</span>
       </button>
@@ -953,6 +953,15 @@ tr:hover td{background:#FAFAFF}
         <div class="form-group"><label class="form-label">Status pagamento</label><select class="form-input" id="es-pagst"><option>Pendente</option><option>Pago</option></select></div>
       </div>
       <div class="form-group"><label class="form-label">Observações</label><textarea class="form-input" id="es-obs" placeholder="Observações..."></textarea></div>
+      <div id="es-link-wrap" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Link da sala online</label>
+          <div style="display:flex;gap:8px;">
+            <input class="form-input" id="es-link" placeholder="https://meet.jit.si/..." style="flex:1;">
+            <button class="btn btn-ghost btn-sm" onclick="gerarLinkJitsiEditar()" type="button"><i class="ti ti-refresh"></i></button>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="modal-ft">
       <button class="btn btn-red btn-sm" onclick="excluirSessao()"><i class="ti ti-trash"></i> Excluir</button>
@@ -2459,7 +2468,8 @@ async function abrirEditarSessao(id) {
   document.getElementById('es-pac').value = data.paciente_id || '';
   document.getElementById('es-tipo').value = data.tipo || 'Presencial';
   toggleLinkEs(data.tipo || 'Presencial');
-  if (data.link_sala) document.getElementById('es-link').value = data.link_sala;
+  const esLinkEl = document.getElementById('es-link');
+  if (data.link_sala && esLinkEl) esLinkEl.value = data.link_sala;
   if (data.data_hora) {
     const dt = new Date(data.data_hora);
     document.getElementById('es-data').value = dt.toISOString().split('T')[0];
@@ -2623,7 +2633,8 @@ function gerarLinkJitsi() {
 
 function gerarLinkJitsiEditar() {
   const url = gerarUrlJitsi();
-  document.getElementById('es-link').value = url;
+  const el = document.getElementById('es-link');
+  if (el) el.value = url;
 }
 
 function toggleLinkNs(tipo) {
@@ -2640,7 +2651,7 @@ function toggleLinkNs(tipo) {
 
 function toggleLinkEs(tipo) {
   const wrap = document.getElementById('es-link-wrap');
-  wrap.style.display = tipo === 'Online' ? 'block' : 'none';
+  if (wrap) wrap.style.display = tipo === 'Online' ? 'block' : 'none';
 }
 
 async function enviarLinkSalaWhatsApp(pacienteId, linkSala, dataHora) {
@@ -3105,6 +3116,19 @@ function toggleMenu() {
 function fecharMenu() {
   document.querySelector('.sidebar').classList.remove('open');
   document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+// ════════════════════════════════════
+// EXPORTAR — botão topbar
+// ════════════════════════════════════
+function exportarAtual() {
+  if (paginaAtual === 'prontuario') {
+    exportarPDF();
+  } else if (paginaAtual === 'sessoes' || paginaAtual === 'financeiro') {
+    toast('Use Ctrl+P para imprimir / exportar esta página', 'success');
+  } else {
+    toast('Selecione Prontuário para exportar o PDF do paciente', 'success');
+  }
 }
 
 </script>
