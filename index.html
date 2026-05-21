@@ -1743,7 +1743,7 @@ async function salvarSessao() {
   const hora = document.getElementById('ns-hora').value;
   if (!pacId) { toast('Selecione um paciente', 'error'); return; }
   if (!data || !hora) { toast('Preencha data e horário', 'error'); return; }
-  const dataHora = data + 'T' + hora + ':00';
+  const dataHora = data + 'T' + hora + ':00-03:00';
   const pac = todosPacientes.find(p => p.id == pacId);
   const valorInput = document.getElementById('ns-valor').value;
   const valor = valorInput ? parseFloat(valorInput) : (pac?.valor_sessao || null);
@@ -1792,7 +1792,7 @@ async function salvarSessao() {
         const { data: novaSessao } = await sb.from('sessoes').select('id').eq('user_id', usuarioAtual.id).eq('data_hora', dataHora).eq('paciente_id', parseInt(pacId)).order('id', {ascending: false}).limit(1).single();
         if (novaSessao) {
           const pacSync = todosPacientes.find(p => p.id == pacId);
-          sincronizarSessaoGcal('create', novaSessao.id, { data_hora: dataHora + '-03:00', tipo: tipoSess, valor, observacoes: document.getElementById('ns-obs').value, link_sala: linkSala, paciente_nome: pacSync?.nome });
+          sincronizarSessaoGcal('create', novaSessao.id, { data_hora: dataHora, tipo: tipoSess, valor, observacoes: document.getElementById('ns-obs').value, link_sala: linkSala, paciente_nome: pacSync?.nome });
         }
       }, 1000);
     }
@@ -2535,7 +2535,7 @@ async function atualizarSessao() {
   const { error } = await sb.from('sessoes').update({
     paciente_id: pacId,
     tipo: tipoEditar,
-    data_hora: dataSess + 'T' + hora + ':00',
+    data_hora: dataSess + 'T' + hora + ':00-03:00',
     valor: parseFloat(document.getElementById('es-valor').value) || null,
     status: novoStatus,
     pagamento: document.getElementById('es-pag').value || null,
