@@ -378,6 +378,7 @@ tr:hover td{background:#FAFAFF}
           <div class="tab" onclick="tabDash(this,'pessoal')">Pessoal</div>
         </div>
 
+        <div id="dash-tab-consultorio">
         <!-- PRÓXIMA SESSÃO EM DESTAQUE -->
         <div id="dash-proxima" style="background:var(--brand);border-radius:var(--r);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
           <div style="width:44px;height:44px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -492,6 +493,37 @@ tr:hover td{background:#FAFAFF}
                 <i class="ti ti-brand-whatsapp"></i> Cobrar todos via WhatsApp
               </button>
             </div>
+          </div>
+        </div>
+
+        </div>
+
+        <!-- ABA PESSOAL -->
+        <div id="dash-tab-pessoal" style="display:none;">
+          <div class="g4 mb16">
+            <div class="mc">
+              <div class="mc-lbl">Receita pessoal do mês</div>
+              <div class="mc-val" id="dp-receita" style="color:var(--purple)">—</div>
+            </div>
+            <div class="mc">
+              <div class="mc-lbl">Gastos do mês</div>
+              <div class="mc-val" id="dp-gastos" style="color:var(--red)">—</div>
+            </div>
+            <div class="mc">
+              <div class="mc-lbl">Saldo do mês</div>
+              <div class="mc-val" id="dp-saldo">—</div>
+            </div>
+            <div class="mc">
+              <div class="mc-lbl">Total acumulado</div>
+              <div class="mc-val" id="dp-total">—</div>
+            </div>
+          </div>
+          <div class="card mb16">
+            <div class="card-head">
+              <span class="card-title">Lançamentos pessoais</span>
+              <button class="btn btn-primary btn-sm" onclick="irPara('pessoal',null)"><i class="ti ti-external-link"></i> Ver tudo</button>
+            </div>
+            <div id="dp-lista" style="padding:0 16px 16px;"></div>
           </div>
         </div>
 
@@ -621,20 +653,94 @@ tr:hover td{background:#FAFAFF}
 
       <!-- ── RELATÓRIOS ── -->
       <div class="screen" id="sc-relatorios">
-        <div class="g2 mb16">
-          <div class="card">
-            <div class="card-head"><span class="card-title">Faturamento — últimos 6 meses</span></div>
-            <div style="padding:14px;position:relative;height:220px;"><canvas id="chart-fat"></canvas></div>
+
+        <!-- Cards de métricas principais -->
+        <div class="g4 mb16">
+          <div class="mc">
+            <div class="mc-lbl">Faturamento do mês</div>
+            <div class="mc-val" id="rel-fat-mes" style="color:var(--purple)">—</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px;" id="rel-fat-mes-sub"></div>
           </div>
-          <div class="card">
-            <div class="card-head"><span class="card-title">Receita por paciente</span></div>
-            <div style="padding:14px;position:relative;height:220px;"><canvas id="chart-pac"></canvas></div>
+          <div class="mc">
+            <div class="mc-lbl">A receber</div>
+            <div class="mc-val" id="rel-a-receber" style="color:var(--amber)">—</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px;">pendente de pagamento</div>
+          </div>
+          <div class="mc">
+            <div class="mc-lbl">Sessões realizadas</div>
+            <div class="mc-val" id="rel-sessoes-mes">—</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px;" id="rel-sessoes-sub"></div>
+          </div>
+          <div class="mc">
+            <div class="mc-lbl">Taxa de presença</div>
+            <div class="mc-val" id="rel-presenca">—</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px;">realizadas vs agendadas</div>
           </div>
         </div>
+
+        <!-- Gráficos principais -->
+        <div class="g2 mb16">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">Faturamento — últimos 6 meses</span>
+              <span id="rel-melhor-badge" style="font-size:11px;color:var(--t3);"></span>
+            </div>
+            <div style="padding:14px;position:relative;height:240px;"><canvas id="chart-fat"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">Sessões por mês</span></div>
+            <div style="padding:14px;position:relative;height:240px;"><canvas id="chart-sessoes"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Receita por paciente com legenda -->
+        <div class="g2 mb16">
+          <div class="card">
+            <div class="card-head"><span class="card-title">Receita por paciente</span></div>
+            <div style="padding:14px;position:relative;height:260px;"><canvas id="chart-pac"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">Tipo de sessão</span></div>
+            <div style="padding:14px;display:flex;align-items:center;gap:24px;height:260px;">
+              <div style="position:relative;height:200px;width:200px;flex-shrink:0;"><canvas id="chart-tipo"></canvas></div>
+              <div id="rel-tipo-legenda" style="flex:1;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabela de receita por paciente -->
+        <div class="card mb16">
+          <div class="card-head"><span class="card-title">Detalhamento por paciente</span></div>
+          <div style="padding:0 16px 16px;">
+            <table style="width:100%;border-collapse:collapse;">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <th style="text-align:left;padding:10px 0;font-size:12px;font-weight:500;color:var(--t2);">Paciente</th>
+                  <th style="text-align:center;padding:10px 0;font-size:12px;font-weight:500;color:var(--t2);">Sessões</th>
+                  <th style="text-align:center;padding:10px 0;font-size:12px;font-weight:500;color:var(--t2);">Recebido</th>
+                  <th style="text-align:center;padding:10px 0;font-size:12px;font-weight:500;color:var(--t2);">Pendente</th>
+                  <th style="text-align:center;padding:10px 0;font-size:12px;font-weight:500;color:var(--t2);">Ticket médio</th>
+                </tr>
+              </thead>
+              <tbody id="rel-tabela-pac"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Métricas secundárias -->
         <div class="g3">
-          <div class="mc"><div class="mc-lbl">Melhor mês</div><div class="mc-val" id="rel-melhor">—</div></div>
-          <div class="mc"><div class="mc-lbl">Média mensal</div><div class="mc-val" id="rel-media">—</div></div>
-          <div class="mc"><div class="mc-lbl">Taxa cancelamento</div><div class="mc-val" id="rel-cancel">—</div></div>
+          <div class="mc">
+            <div class="mc-lbl">Melhor mês</div>
+            <div class="mc-val" id="rel-melhor">—</div>
+          </div>
+          <div class="mc">
+            <div class="mc-lbl">Média mensal</div>
+            <div class="mc-val" id="rel-media">—</div>
+          </div>
+          <div class="mc">
+            <div class="mc-lbl">Taxa cancelamento</div>
+            <div class="mc-val" id="rel-cancel">—</div>
+          </div>
         </div>
       </div>
 
@@ -2085,92 +2191,192 @@ let chartFat = null;
 let chartPac = null;
 
 async function carregarRelatorios() {
-  const { data: sessoes } = await sb.from('sessoes').select('*').eq('status_pagamento', 'Pago');
-  const { data: todos } = await sb.from('sessoes').select('*');
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
 
   const agora = new Date();
-  const meses = [];
-  const fats = [];
+  const mesAtual = agora.getFullYear() + '-' + String(agora.getMonth()+1).padStart(2,'0');
+
+  // Buscar todas as sessões
+  const { data: todasSessoes } = await sb.from('sessoes').select('*').eq('user_id', user.id);
+  const sessoes = todasSessoes || [];
+
+  // Sessões do mês atual
+  const sessoesMes = sessoes.filter(s => s.data_hora && s.data_hora.startsWith(mesAtual));
+  const realizadasMes = sessoesMes.filter(s => s.status === 'Realizada');
+  const agendadasMes = sessoesMes.filter(s => ['Agendada','Confirmada','Realizada'].includes(s.status));
+
+  // Faturamento do mês (pagas)
+  const fatMes = sessoesMes.filter(s => s.status_pagamento === 'Pago').reduce((a,s) => a + (s.valor||0), 0);
+  const aReceber = sessoes.filter(s => s.status_pagamento === 'Pendente' && s.status !== 'Cancelada').reduce((a,s) => a + (s.valor||0), 0);
+  const taxaPresenca = agendadasMes.length ? Math.round(realizadasMes.length / agendadasMes.length * 100) : 0;
+
+  // Atualizar cards
+  const el = id => document.getElementById(id);
+  if (el('rel-fat-mes')) el('rel-fat-mes').textContent = 'R$' + fatMes.toLocaleString('pt-BR');
+  if (el('rel-fat-mes-sub')) el('rel-fat-mes-sub').textContent = 'recebido em ' + agora.toLocaleDateString('pt-BR',{month:'long'});
+  if (el('rel-a-receber')) el('rel-a-receber').textContent = 'R$' + aReceber.toLocaleString('pt-BR');
+  if (el('rel-sessoes-mes')) el('rel-sessoes-mes').textContent = realizadasMes.length;
+  if (el('rel-sessoes-sub')) el('rel-sessoes-sub').textContent = sessoesMes.length + ' no total este mês';
+  if (el('rel-presenca')) el('rel-presenca').textContent = taxaPresenca + '%';
+
+  // ── Últimos 6 meses ──
+  const meses = [], fats = [], qtdSessoes = [];
   for (let i = 5; i >= 0; i--) {
     const d = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
-    const mesStr = d.toISOString().substring(0, 7);
-    const lbl = d.toLocaleDateString('pt-BR', {month:'short'}).replace('.', '');
+    const mesStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    const lbl = d.toLocaleDateString('pt-BR', {month:'short'}).replace('.','');
     meses.push(lbl);
-    const fat = (sessoes || []).filter(s => s.data_hora && s.data_hora.startsWith(mesStr)).reduce((a, s) => a + (s.valor || 0), 0);
-    fats.push(fat);
+    const sSessoes = sessoes.filter(s => s.data_hora && s.data_hora.startsWith(mesStr));
+    fats.push(sSessoes.filter(s => s.status_pagamento === 'Pago').reduce((a,s) => a + (s.valor||0), 0));
+    qtdSessoes.push(sSessoes.filter(s => s.status === 'Realizada').length);
   }
 
-  // Por paciente
+  // Melhor mês
+  const melhorIdx = fats.indexOf(Math.max(...fats));
+  if (el('rel-melhor')) el('rel-melhor').textContent = meses[melhorIdx] || '—';
+  if (el('rel-melhor-badge')) el('rel-melhor-badge').textContent = 'Melhor: ' + meses[melhorIdx] + ' (R$' + fats[melhorIdx]?.toLocaleString('pt-BR') + ')';
+  const mediaMeses = fats.filter(v => v > 0);
+  if (el('rel-media')) el('rel-media').textContent = 'R$' + (mediaMeses.length ? Math.round(mediaMeses.reduce((a,v)=>a+v,0)/mediaMeses.length).toLocaleString('pt-BR') : 0);
+  const canceladas = sessoes.filter(s => s.status === 'Cancelada').length;
+  const totalNaoCanceladas = sessoes.filter(s => s.status !== 'Cancelada').length;
+  if (el('rel-cancel')) el('rel-cancel').textContent = (totalNaoCanceladas ? Math.round(canceladas/(canceladas+totalNaoCanceladas)*100) : 0) + '%';
+
+  // ── Por paciente ──
   const porPac = {};
-  (sessoes || []).forEach(s => {
-    if (!porPac[s.paciente_id]) porPac[s.paciente_id] = 0;
-    porPac[s.paciente_id] += s.valor || 0;
+  const porPacPendente = {};
+  const porPacQtd = {};
+  sessoes.forEach(s => {
+    if (!porPac[s.paciente_id]) { porPac[s.paciente_id] = 0; porPacPendente[s.paciente_id] = 0; porPacQtd[s.paciente_id] = 0; }
+    if (s.status_pagamento === 'Pago') porPac[s.paciente_id] += s.valor || 0;
+    if (s.status_pagamento === 'Pendente' && s.status !== 'Cancelada') porPacPendente[s.paciente_id] += s.valor || 0;
+    if (s.status === 'Realizada') porPacQtd[s.paciente_id]++;
   });
 
-  const pacNomes = todosPacientes.reduce((acc, p) => { acc[p.id] = p.nome?.split(' ')[0] || '—'; return acc; }, {});
-  const pacIds = Object.keys(porPac).sort((a,b) => porPac[b] - porPac[a]).slice(0, 6);
-  const pacLabels = pacIds.map(id => pacNomes[id] || '—');
+  const pacNomes = todosPacientes.reduce((acc,p) => { acc[p.id] = p.nome || '—'; return acc; }, {});
+  const pacIds = Object.keys(porPac).sort((a,b) => porPac[b] - porPac[a]);
+  const pacLabels = pacIds.map(id => (pacNomes[id] || '—').split(' ')[0]);
   const pacVals = pacIds.map(id => porPac[id]);
 
-  // Métricas
-  const melhorIdx = fats.indexOf(Math.max(...fats));
-  document.getElementById('rel-melhor').textContent = meses[melhorIdx] || '—';
-  const media = fats.length ? Math.round(fats.reduce((a,v) => a+v, 0) / fats.filter(v => v > 0).length) : 0;
-  document.getElementById('rel-media').textContent = 'R$' + (media || 0).toLocaleString('pt-BR');
-  const cancel = (todos || []).filter(s => s.status === 'Cancelada').length;
-  const cancelTax = todos?.length ? Math.round((cancel / todos.length) * 100) : 0;
-  document.getElementById('rel-cancel').textContent = cancelTax + '%';
+  // Tabela por paciente
+  if (el('rel-tabela-pac')) {
+    el('rel-tabela-pac').innerHTML = pacIds.map(id => {
+      const nome = pacNomes[id] || '—';
+      const recebido = porPac[id] || 0;
+      const pendente = porPacPendente[id] || 0;
+      const qtd = porPacQtd[id] || 0;
+      const ticket = qtd ? Math.round(recebido / qtd) : 0;
+      return \`<tr style="border-bottom:0.5px solid var(--border);">
+        <td style="padding:10px 0;font-size:13px;">\${nome}</td>
+        <td style="text-align:center;padding:10px 0;font-size:13px;color:var(--t2);">\${qtd}</td>
+        <td style="text-align:center;padding:10px 0;font-size:13px;color:var(--green-dark,#065F46);font-weight:500;">R\$\${recebido.toLocaleString('pt-BR')}</td>
+        <td style="text-align:center;padding:10px 0;font-size:13px;color:\${pendente>0?'var(--amber)':'var(--t3)'};">R\$\${pendente.toLocaleString('pt-BR')}</td>
+        <td style="text-align:center;padding:10px 0;font-size:13px;color:var(--t2);">R\$\${ticket.toLocaleString('pt-BR')}</td>
+      </tr>\`;
+    }).join('');
+  }
 
-  // Charts
-  const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
-  const grid = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
-  const tick = isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)';
+  // Tipo de sessão
+  const presencial = sessoes.filter(s => s.tipo === 'Presencial' && s.status === 'Realizada').length;
+  const online = sessoes.filter(s => s.tipo === 'Online' && s.status === 'Realizada').length;
+  const totalTipo = presencial + online;
+  if (el('rel-tipo-legenda')) {
+    el('rel-tipo-legenda').innerHTML = \`
+      <div style="margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <div style="width:12px;height:12px;border-radius:2px;background:#818CF8;flex-shrink:0;"></div>
+          <span style="font-size:13px;font-weight:500;">Presencial</span>
+          <span style="font-size:13px;color:var(--t2);margin-left:auto;">\${presencial} sessões</span>
+        </div>
+        <div style="font-size:12px;color:var(--t3);">\${totalTipo ? Math.round(presencial/totalTipo*100) : 0}% do total</div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <div style="width:12px;height:12px;border-radius:2px;background:#34D399;flex-shrink:0;"></div>
+          <span style="font-size:13px;font-weight:500;">Online</span>
+          <span style="font-size:13px;color:var(--t2);margin-left:auto;">\${online} sessões</span>
+        </div>
+        <div style="font-size:12px;color:var(--t3);">\${totalTipo ? Math.round(online/totalTipo*100) : 0}% do total</div>
+      </div>
+    \`;
+  }
 
-  if (chartFat) chartFat.destroy();
-  if (chartPac) chartPac.destroy();
+  // ── Gráficos ──
+  const purple = '#818CF8', purpleLight = 'rgba(129,140,248,0.15)';
+  const green = '#34D399', greenLight = 'rgba(52,211,153,0.15)';
 
-  chartFat = new Chart(document.getElementById('chart-fat'), {
-    type: 'bar',
-    data: {
-      labels: meses,
-      datasets: [{
-        label: 'Faturamento',
-        data: fats,
-        backgroundColor: fats.map((_, i) => i === fats.length - 1 ? '#5046E5' : '#AFA9EC'),
-        borderRadius: 5,
-        borderSkipped: false,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' R$' + c.raw.toLocaleString('pt-BR') } } },
-      scales: {
-        x: { grid: { display: false }, ticks: { color: tick, font: { size: 10 } } },
-        y: { grid: { color: grid }, border: { display: false }, ticks: { color: tick, font: { size: 10 }, callback: v => 'R$' + (v/1000).toFixed(0) + 'k' } }
+  const makeChart = (id, type, labels, datasets, opts={}) => {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    if (canvas._chart) canvas._chart.destroy();
+    canvas._chart = new Chart(canvas.getContext('2d'), {
+      type, data: { labels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: opts.legend ?? false, position: 'bottom', labels: { font: { size: 12 }, padding: 16 } },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                if (opts.currency) return ' R$' + (ctx.parsed.y ?? ctx.parsed).toLocaleString('pt-BR');
+                return ' ' + (ctx.parsed.y ?? ctx.parsed);
+              }
+            }
+          }
+        },
+        scales: type === 'doughnut' ? {} : {
+          x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+          y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, callback: v => opts.currency ? 'R$' + v.toLocaleString('pt-BR') : v } }
+        }
       }
-    }
-  });
+    });
+  };
 
-  chartPac = new Chart(document.getElementById('chart-pac'), {
-    type: 'bar',
-    data: {
-      labels: pacLabels,
-      datasets: [{ label: 'Receita', data: pacVals, backgroundColor: '#5046E5', borderRadius: 5, borderSkipped: false }]
-    },
-    options: {
-      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' R$' + c.raw.toLocaleString('pt-BR') } } },
-      scales: {
-        x: { grid: { color: grid }, border: { display: false }, ticks: { color: tick, font: { size: 10 }, callback: v => 'R$' + v } },
-        y: { grid: { display: false }, ticks: { color: tick, font: { size: 10 } } }
+  makeChart('chart-fat', 'bar', meses, [{
+    label: 'Faturamento', data: fats,
+    backgroundColor: purple, borderRadius: 6, borderSkipped: false,
+  }], { currency: true });
+
+  makeChart('chart-sessoes', 'bar', meses, [{
+    label: 'Sessões realizadas', data: qtdSessoes,
+    backgroundColor: green, borderRadius: 6, borderSkipped: false,
+  }]);
+
+  makeChart('chart-pac', 'bar', pacLabels, [{
+    label: 'Receita', data: pacVals,
+    backgroundColor: pacIds.map((_,i) => ['#818CF8','#34D399','#F59E0B','#F87171','#A78BFA','#60A5FA'][i % 6]),
+    borderRadius: 6, borderSkipped: false,
+  }], { currency: true, indexAxis: 'y' });
+
+  makeChart('chart-tipo', 'doughnut', ['Presencial', 'Online'], [{
+    data: [presencial, online],
+    backgroundColor: [purple, green],
+    borderWidth: 0,
+  }], { legend: true });
+
+  // Fix: indexAxis para gráfico de pacientes (horizontal)
+  const canvasPac = document.getElementById('chart-pac');
+  if (canvasPac && canvasPac._chart) {
+    canvasPac._chart.destroy();
+    canvasPac._chart = new Chart(canvasPac.getContext('2d'), {
+      type: 'bar',
+      data: { labels: pacLabels, datasets: [{ label: 'Receita', data: pacVals, backgroundColor: pacIds.map((_,i) => ['#818CF8','#34D399','#F59E0B','#F87171','#A78BFA','#60A5FA'][i % 6]), borderRadius: 4 }] },
+      options: {
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ' R$' + ctx.parsed.x.toLocaleString('pt-BR') } }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, callback: v => 'R$' + v.toLocaleString('pt-BR') } },
+          y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+        }
       }
-    }
-  });
+    });
+  }
 }
 
-// ════════════════════════════════════
-// CONFIG
-// ════════════════════════════════════
+
 async function salvarConfig() {
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return;
@@ -2415,6 +2621,12 @@ function toast(msg, tipo = 'success') {
 function tabDash(el, aba) {
   document.querySelectorAll('#sc-dashboard .tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
+  // Mostrar/esconder conteúdo das abas
+  const consultorio = document.getElementById('dash-tab-consultorio');
+  const pessoal = document.getElementById('dash-tab-pessoal');
+  if (consultorio) consultorio.style.display = aba === 'consultorio' ? '' : 'none';
+  if (pessoal) pessoal.style.display = aba === 'pessoal' ? '' : 'none';
+  if (aba === 'pessoal') carregarDashPessoal();
 }
 
 // ════════════════════════════════════
@@ -3327,6 +3539,59 @@ async function sincronizarSessaoGcal(action, sessaoId, sessaoData) {
     }
   } catch (e) {
     console.log('Erro sync Google Calendar:', e);
+  }
+}
+
+// ════════════════════════════════════
+// DASHBOARD ABA PESSOAL
+// ════════════════════════════════════
+async function carregarDashPessoal() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+
+  const agora = new Date();
+  const mesAtual = agora.getFullYear() + '-' + String(agora.getMonth()+1).padStart(2,'0');
+
+  const { data: lancamentos } = await sb.from('financeiro').select('*').eq('user_id', user.id).eq('tipo', 'pessoal').order('data', {ascending: false});
+  const todos = lancamentos || [];
+
+  const mes = todos.filter(l => l.data && l.data.startsWith(mesAtual));
+  const receita = mes.filter(l => l.categoria === 'receita' || l.valor > 0).reduce((a,l) => a + Math.abs(l.valor||0), 0);
+  const gastos = mes.filter(l => l.categoria === 'gasto' || l.valor < 0).reduce((a,l) => a + Math.abs(l.valor||0), 0);
+  const saldo = receita - gastos;
+  const totalAcum = todos.reduce((a,l) => {
+    if (l.categoria === 'receita' || l.valor > 0) return a + Math.abs(l.valor||0);
+    return a - Math.abs(l.valor||0);
+  }, 0);
+
+  const el = id => document.getElementById(id);
+  if (el('dp-receita')) el('dp-receita').textContent = 'R$' + receita.toLocaleString('pt-BR');
+  if (el('dp-gastos')) el('dp-gastos').textContent = 'R$' + gastos.toLocaleString('pt-BR');
+  if (el('dp-saldo')) {
+    el('dp-saldo').textContent = 'R$' + Math.abs(saldo).toLocaleString('pt-BR');
+    el('dp-saldo').style.color = saldo >= 0 ? 'var(--green-dark,#065F46)' : 'var(--red)';
+  }
+  if (el('dp-total')) el('dp-total').textContent = 'R$' + Math.abs(totalAcum).toLocaleString('pt-BR');
+
+  if (el('dp-lista')) {
+    if (!todos.length) {
+      el('dp-lista').innerHTML = '<div style="padding:16px 0;font-size:13px;color:var(--t3);text-align:center;">Nenhum lançamento pessoal. <span style="color:var(--purple);cursor:pointer;" onclick="irPara('pessoal',null)">Adicionar</span></div>';
+      return;
+    }
+    el('dp-lista').innerHTML = todos.slice(0,5).map(l => {
+      const valor = l.valor || 0;
+      const isReceita = l.categoria === 'receita' || valor > 0;
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);">
+        <div style="width:32px;height:32px;border-radius:8px;background:${isReceita ? 'var(--green-light,#D1FAE5)' : 'var(--red-light,#FEE2E2)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i class="ti ti-${isReceita ? 'arrow-up' : 'arrow-down'}" style="font-size:14px;color:${isReceita ? 'var(--green-dark,#065F46)' : 'var(--red)'};"></i>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;">${l.descricao || '—'}</div>
+          <div style="font-size:11px;color:var(--t3);">${l.data ? new Date(l.data+'T12:00:00').toLocaleDateString('pt-BR') : ''}</div>
+        </div>
+        <div style="font-size:13px;font-weight:500;color:${isReceita ? 'var(--green-dark,#065F46)' : 'var(--red)'};">${isReceita ? '+' : '-'}R$${Math.abs(valor).toLocaleString('pt-BR')}</div>
+      </div>`;
+    }).join('');
   }
 }
 
