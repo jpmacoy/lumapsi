@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agendar sessão</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand:#5046E5;--brand-dark:#3C3489;--brand-light:#EEEDFE;
+  --green:#16A34A;--green-light:#EAF3DE;
+  --red:#DC2626;--red-light:#FCEBEB;
+  --border:rgba(0,0,0,0.08);--border-s:rgba(0,0,0,0.14);
+  --t1:#111110;--t2:#555452;--t3:#8C8A85;
+  --bg:#F7F7F8;--r:10px;--rs:7px;
+}
+body{font-family:'DM Sans',sans-serif;color:var(--t1);-webkit-font-smoothing:antialiased;background:var(--bg);min-height:100vh}
+.page{max-width:520px;margin:0 auto;padding:24px 16px 48px}
+.logo{display:flex;align-items:center;gap:8px;margin-bottom:28px;justify-content:center}
+.logo-icon{width:32px;height:32px;background:var(--brand);border-radius:9px;display:flex;align-items:center;justify-content:center}
+.logo-icon i{color:#fff;font-size:17px}
+.logo-name{font-size:16px;font-weight:500}
+.prof-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:20px}
+.prof-av{width:56px;height:56px;border-radius:50%;background:var(--brand-light);color:var(--brand-dark);font-size:20px;font-weight:500;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.prof-nome{font-size:17px;font-weight:500;margin-bottom:3px}
+.prof-crp{font-size:12px;color:var(--t3);margin-bottom:6px}
+.prof-abord{display:inline-flex;padding:3px 10px;background:var(--brand-light);color:var(--brand-dark);border-radius:20px;font-size:11px;font-weight:500}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:500;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.card-title i{font-size:17px;color:var(--brand)}
+.step-bar{display:flex;gap:6px;margin-bottom:20px}
+.step-dot{flex:1;height:4px;border-radius:2px;background:var(--border-s);transition:background .3s}
+.step-dot.active{background:var(--brand)}
+.step-dot.done{background:var(--green)}
+.form-group{margin-bottom:13px}
+.form-label{display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px}
+.form-input{width:100%;padding:10px 12px;border:1px solid var(--border-s);border-radius:var(--rs);font-size:13px;color:var(--t1);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s}
+.form-input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(80,70,229,0.1)}
+textarea.form-input{resize:vertical;min-height:80px}
+.btn{width:100%;padding:12px;border:none;border-radius:var(--rs);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s;font-family:inherit}
+.btn:hover{opacity:0.88}
+.btn:disabled{opacity:0.6;cursor:not-allowed}
+.btn-primary{background:var(--brand);color:#fff}
+.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--border-s);margin-bottom:10px}
+.btn i{font-size:16px}
+
+/* CALENDÁRIO */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-mes{font-size:14px;font-weight:500}
+.cal-nav{width:30px;height:30px;border-radius:var(--rs);border:1px solid var(--border-s);display:flex;align-items:center;justify-content:center;cursor:pointer;background:#fff;transition:background .1s}
+.cal-nav:hover{background:var(--bg)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-dia-nome{text-align:center;font-size:10px;color:var(--t3);font-weight:500;padding:4px 0}
+.cal-dia{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:var(--rs);font-size:13px;cursor:pointer;transition:background .1s;border:1px solid transparent}
+.cal-dia:hover:not(.vazio):not(.passado):not(.sem-horario){background:var(--brand-light);color:var(--brand-dark)}
+.cal-dia.hoje{border-color:var(--brand);color:var(--brand);font-weight:500}
+.cal-dia.selecionado{background:var(--brand);color:#fff;font-weight:500}
+.cal-dia.passado{color:var(--border-s);cursor:not-allowed}
+.cal-dia.sem-horario{color:var(--border-s);cursor:not-allowed}
+.cal-dia.vazio{cursor:default}
+.cal-dia.tem-horario{font-weight:500}
+
+/* HORÁRIOS */
+.horarios-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.horario-btn{padding:9px 4px;border:1px solid var(--border-s);border-radius:var(--rs);font-size:12px;font-weight:500;cursor:pointer;text-align:center;background:#fff;transition:all .15s;font-family:inherit}
+.horario-btn:hover{border-color:var(--brand);color:var(--brand)}
+.horario-btn.selecionado{background:var(--brand);color:#fff;border-color:var(--brand)}
+.horario-btn.ocupado{background:var(--bg);color:var(--border-s);cursor:not-allowed;border-color:var(--border)}
+
+/* RESUMO */
+.resumo-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.resumo-item:last-child{border-bottom:none}
+.resumo-icon{width:32px;height:32px;border-radius:8px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.resumo-icon i{font-size:15px;color:var(--brand)}
+.resumo-label{font-size:11px;color:var(--t3)}
+.resumo-val{font-size:13px;font-weight:500}
+
+/* SUCESSO */
+.sucesso{text-align:center;padding:32px 20px}
+.sucesso-icon{width:64px;height:64px;border-radius:50%;background:var(--green-light);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.sucesso-icon i{font-size:30px;color:var(--green)}
+.sucesso-title{font-size:20px;font-weight:500;margin-bottom:8px;color:#166534}
+.sucesso-sub{font-size:13px;color:var(--t2);line-height:1.6}
+
+.err-msg{background:var(--red-light);color:var(--red);font-size:12px;padding:9px 12px;border-radius:var(--rs);margin-bottom:12px;display:none;align-items:center;gap:7px}
+.loading{text-align:center;padding:32px;color:var(--t3);font-size:13px}
+.tag-tipo{display:flex;gap:8px;margin-bottom:14px}
+.tipo-opt{flex:1;padding:10px;border:1.5px solid var(--border-s);border-radius:var(--rs);text-align:center;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.tipo-opt.active{border-color:var(--brand);background:var(--brand-light);color:var(--brand-dark)}
+.tipo-opt i{display:block;font-size:20px;margin-bottom:4px}
+
+@media(max-width:400px){
+  .horarios-grid{grid-template-columns:repeat(3,1fr)}
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-sun"></i></div>
+    <span class="logo-name">LumaPsi</span>
+  </div>
+
+  <!-- Loading inicial -->
+  <div id="loading-inicial" class="loading">
+    <i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;font-size:24px;margin-bottom:8px;display:block;"></i>
+    Carregando...
+  </div>
+
+  <!-- Erro (profissional não encontrado) -->
+  <div id="erro-404" style="display:none;text-align:center;padding:40px 20px;">
+    <i class="ti ti-alert-circle" style="font-size:40px;color:var(--red);display:block;margin-bottom:12px;"></i>
+    <div style="font-size:16px;font-weight:500;margin-bottom:8px;">Link inválido</div>
+    <div style="font-size:13px;color:var(--t3);">Este link de agendamento não existe ou foi desativado.</div>
+  </div>
+
+  <!-- Conteúdo principal -->
+  <div id="conteudo" style="display:none;">
+
+    <!-- Card do profissional -->
+    <div class="prof-card">
+      <div class="prof-av" id="prof-av">PS</div>
+      <div class="prof-nome" id="prof-nome">Carregando...</div>
+      <div class="prof-crp" id="prof-crp"></div>
+      <div id="prof-abord-wrap" style="display:none;"><span class="prof-abord" id="prof-abord"></span></div>
+    </div>
+
+    <!-- Barra de progresso -->
+    <div class="step-bar">
+      <div class="step-dot active" id="dot1"></div>
+      <div class="step-dot" id="dot2"></div>
+      <div class="step-dot" id="dot3"></div>
+    </div>
+
+    <!-- STEP 1 — Dados do paciente -->
+    <div id="step1">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-user"></i> Seus dados</div>
+        <div id="err1" class="err-msg"><i class="ti ti-alert-circle"></i> <span id="err1-txt"></span></div>
+        <div class="form-group">
+          <label class="form-label">Nome completo *</label>
+          <input class="form-input" id="p-nome" placeholder="Seu nome completo" type="text">
+        </div>
+        <div class="form-group">
+          <label class="form-label">WhatsApp *</label>
+          <input class="form-input" id="p-tel" placeholder="(11) 99999-9999" type="tel">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Queixa principal</label>
+          <textarea class="form-input" id="p-queixa" placeholder="Descreva brevemente o que te trouxe à terapia..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Como você me conheceu?</label>
+          <select class="form-input" id="p-origem">
+            <option value="">Selecione...</option>
+            <option>Instagram</option>
+            <option>Indicação de amigo/familiar</option>
+            <option>Google</option>
+            <option>Psicologia Viva / outras plataformas</option>
+            <option>Outro</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="irStep2()">
+        <i class="ti ti-arrow-right"></i> Escolher horário
+      </button>
+    </div>
+
+    <!-- STEP 2 — Escolher data e horário -->
+    <div id="step2" style="display:none;">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-calendar"></i> Tipo de sessão</div>
+        <div class="tag-tipo">
+          <div class="tipo-opt active" id="tipo-pres" onclick="selecionarTipo('Presencial')">
+            <i class="ti ti-building"></i> Presencial
+          </div>
+          <div class="tipo-opt" id="tipo-online" onclick="selecionarTipo('Online')">
+            <i class="ti ti-video"></i> Online
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="mesAnterior()"><i class="ti ti-chevron-left" style="font-size:14px;"></i></button>
+          <div class="cal-mes" id="cal-mes-titulo">—</div>
+          <button class="cal-nav" onclick="proximoMes()"><i class="ti ti-chevron-right" style="font-size:14px;"></i></button>
+        </div>
+        <div class="cal-grid" id="cal-grid">
+          <div class="cal-dia-nome">D</div>
+          <div class="cal-dia-nome">S</div>
+          <div class="cal-dia-nome">T</div>
+          <div class="cal-dia-nome">Q</div>
+          <div class="cal-dia-nome">Q</div>
+          <div class="cal-dia-nome">S</div>
+          <div class="cal-dia-nome">S</div>
+        </div>
+      </div>
+
+      <div class="card" id="card-horarios" style="display:none;">
+        <div class="card-title"><i class="ti ti-clock"></i> Horários disponíveis</div>
+        <div class="horarios-grid" id="horarios-grid"></div>
+      </div>
+
+      <button class="btn btn-ghost" onclick="voltarStep1()"><i class="ti ti-arrow-left"></i> Voltar</button>
+      <button class="btn btn-primary" id="btn-step2" onclick="irStep3()" disabled>
+        <i class="ti ti-arrow-right"></i> Confirmar horário
+      </button>
+    </div>
+
+    <!-- STEP 3 — Confirmar -->
+    <div id="step3" style="display:none;">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-check"></i> Confirme seu agendamento</div>
+        <div class="resumo-item">
+          <div class="resumo-icon"><i class="ti ti-user"></i></div>
+          <div><div class="resumo-label">Paciente</div><div class="resumo-val" id="res-nome">—</div></div>
+        </div>
+        <div class="resumo-item">
+          <div class="resumo-icon"><i class="ti ti-phone"></i></div>
+          <div><div class="resumo-label">WhatsApp</div><div class="resumo-val" id="res-tel">—</div></div>
+        </div>
+        <div class="resumo-item">
+          <div class="resumo-icon"><i class="ti ti-calendar"></i></div>
+          <div><div class="resumo-label">Data e horário</div><div class="resumo-val" id="res-data">—</div></div>
+        </div>
+        <div class="resumo-item">
+          <div class="resumo-icon"><i class="ti ti-map-pin"></i></div>
+          <div><div class="resumo-label">Modalidade</div><div class="resumo-val" id="res-tipo">—</div></div>
+        </div>
+      </div>
+      <div id="err3" class="err-msg"><i class="ti ti-alert-circle"></i> <span id="err3-txt"></span></div>
+      <button class="btn btn-ghost" onclick="voltarStep2()"><i class="ti ti-arrow-left"></i> Voltar</button>
+      <button class="btn btn-primary" id="btn-confirmar" onclick="confirmarAgendamento()">
+        <i class="ti ti-check"></i> Confirmar agendamento
+      </button>
+    </div>
+
+    <!-- SUCESSO -->
+    <div id="step-sucesso" style="display:none;">
+      <div class="card">
+        <div class="sucesso">
+          <div class="sucesso-icon"><i class="ti ti-check"></i></div>
+          <div class="sucesso-title">Agendamento solicitado! 🎉</div>
+          <div class="sucesso-sub">
+            Sua solicitação foi enviada com sucesso.<br><br>
+            <strong id="suc-prof">O profissional</strong> irá confirmar o agendamento em breve pelo WhatsApp.<br><br>
+            Fique atento às mensagens!
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="text-align:center;margin-top:24px;font-size:11px;color:var(--t3);">
+    Agendamento seguro por <strong>LumaPsi</strong> · lumapsi.com.br
+  </div>
+</div>
+
+<script>
+const SUPA_URL = 'https://pbqvfokpounurzmmlcor.supabase.co';
+const SUPA_KEY = 'sb_publishable_ERIUNIAjp2FJyXNF6IS_dw_RNopwplO';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let profissional = null;
+let horarios = [];
+let sessoesMarcadas = [];
+let calAtual = new Date();
+let diaSelecionado = null;
+let horarioSelecionado = null;
+let tipoSessao = 'Presencial';
+
+// Pegar slug da URL
+const slug = window.location.pathname.split('/').pop() || 
+             new URLSearchParams(window.location.search).get('slug') || '';
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!slug) { mostrarErro404(); return; }
+  await carregarProfissional();
+});
+
+async function carregarProfissional() {
+  const { data, error } = await sb
+    .from('configuracoes')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (error || !data) { mostrarErro404(); return; }
+  profissional = data;
+
+  // Preencher card do profissional
+  const nome = data.nome || 'Profissional';
+  const ini = nome.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase();
+  document.getElementById('prof-av').textContent = ini;
+  document.getElementById('prof-nome').textContent = nome;
+  if (data.crp) document.getElementById('prof-crp').textContent = 'CRP: ' + data.crp;
+  if (data.abordagem) {
+    document.getElementById('prof-abord').textContent = data.abordagem;
+    document.getElementById('prof-abord-wrap').style.display = 'block';
+  }
+  document.title = 'Agendar com ' + nome + ' · LumaPsi';
+
+  // Carregar horários
+  const { data: hrs } = await sb
+    .from('horarios_atendimento')
+    .select('*')
+    .eq('user_id', data.user_id)
+    .eq('ativo', true);
+  horarios = hrs || [];
+
+  // Carregar sessões já marcadas (próximos 60 dias)
+  const hoje = new Date().toISOString().split('T')[0];
+  const limite = new Date();
+  limite.setDate(limite.getDate() + 60);
+  const { data: sess } = await sb
+    .from('sessoes')
+    .select('data_hora')
+    .eq('user_id', data.user_id)
+    .gte('data_hora', hoje + 'T00:00:00')
+    .lte('data_hora', limite.toISOString())
+    .in('status', ['Agendada', 'Confirmada']);
+  sessoesMarcadas = (sess || []).map(s => s.data_hora);
+
+  // Carregar solicitações pendentes
+  const { data: sols } = await sb
+    .from('agendamentos_solicitados')
+    .select('data_hora')
+    .eq('user_id', data.user_id)
+    .eq('status', 'Pendente')
+    .gte('data_hora', hoje + 'T00:00:00');
+  sessoesMarcadas = [...sessoesMarcadas, ...(sols || []).map(s => s.data_hora)];
+
+  document.getElementById('loading-inicial').style.display = 'none';
+  document.getElementById('conteudo').style.display = 'block';
+  renderCalendario();
+}
+
+function mostrarErro404() {
+  document.getElementById('loading-inicial').style.display = 'none';
+  document.getElementById('erro-404').style.display = 'block';
+}
+
+// ── STEPS ──
+function atualizarDots(step) {
+  ['dot1','dot2','dot3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = 'step-dot' + (i + 1 < step ? ' done' : i + 1 === step ? ' active' : '');
+  });
+}
+
+function irStep2() {
+  const nome = document.getElementById('p-nome').value.trim();
+  const tel = document.getElementById('p-tel').value.trim();
+  const err = document.getElementById('err1');
+  err.style.display = 'none';
+  if (!nome) { document.getElementById('err1-txt').textContent = 'Nome é obrigatório.'; err.style.display = 'flex'; return; }
+  if (!tel) { document.getElementById('err1-txt').textContent = 'WhatsApp é obrigatório.'; err.style.display = 'flex'; return; }
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('step2').style.display = 'block';
+  atualizarDots(2);
+}
+
+function voltarStep1() {
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step1').style.display = 'block';
+  atualizarDots(1);
+}
+
+function irStep3() {
+  if (!diaSelecionado || !horarioSelecionado) return;
+  const dt = new Date(diaSelecionado + 'T' + horarioSelecionado + ':00');
+  document.getElementById('res-nome').textContent = document.getElementById('p-nome').value;
+  document.getElementById('res-tel').textContent = document.getElementById('p-tel').value;
+  document.getElementById('res-data').textContent = dt.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'}) + ' às ' + horarioSelecionado;
+  document.getElementById('res-tipo').textContent = tipoSessao;
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step3').style.display = 'block';
+  atualizarDots(3);
+}
+
+function voltarStep2() {
+  document.getElementById('step3').style.display = 'none';
+  document.getElementById('step2').style.display = 'block';
+  atualizarDots(2);
+}
+
+function selecionarTipo(tipo) {
+  tipoSessao = tipo;
+  document.getElementById('tipo-pres').className = 'tipo-opt' + (tipo === 'Presencial' ? ' active' : '');
+  document.getElementById('tipo-online').className = 'tipo-opt' + (tipo === 'Online' ? ' active' : '');
+}
+
+// ── CALENDÁRIO ──
+function renderCalendario() {
+  const ano = calAtual.getFullYear();
+  const mes = calAtual.getMonth();
+  const hoje = new Date();
+  hoje.setHours(0,0,0,0);
+
+  document.getElementById('cal-mes-titulo').textContent =
+    calAtual.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+
+  const primeiroDia = new Date(ano, mes, 1).getDay();
+  const ultimoDia = new Date(ano, mes + 1, 0).getDate();
+  const diasComHorario = new Set(horarios.map(h => h.dia_semana));
+
+  const grid = document.getElementById('cal-grid');
+  // Manter cabeçalho
+  const cabecalho = Array.from(grid.children).slice(0, 7);
+  grid.innerHTML = '';
+  cabecalho.forEach(el => grid.appendChild(el));
+
+  // Dias vazios
+  for (let i = 0; i < primeiroDia; i++) {
+    const d = document.createElement('div');
+    d.className = 'cal-dia vazio';
+    grid.appendChild(d);
+  }
+
+  for (let d = 1; d <= ultimoDia; d++) {
+    const data = new Date(ano, mes, d);
+    data.setHours(0,0,0,0);
+    const diaSem = data.getDay();
+    const dataStr = data.toISOString().split('T')[0];
+    const passado = data < hoje;
+    const temHorario = diasComHorario.has(diaSem);
+    const el = document.createElement('div');
+    const isHoje = data.toDateString() === hoje.toDateString();
+    const isSel = dataStr === diaSelecionado;
+
+    let cls = 'cal-dia';
+    if (passado) cls += ' passado';
+    else if (!temHorario) cls += ' sem-horario';
+    else cls += ' tem-horario';
+    if (isHoje && !passado) cls += ' hoje';
+    if (isSel) cls += ' selecionado';
+
+    el.className = cls;
+    el.textContent = d;
+
+    if (!passado && temHorario) {
+      el.onclick = () => selecionarDia(dataStr, diaSem);
+    }
+    grid.appendChild(el);
+  }
+}
+
+function selecionarDia(dataStr, diaSem) {
+  diaSelecionado = dataStr;
+  horarioSelecionado = null;
+  document.getElementById('btn-step2').disabled = true;
+  renderCalendario();
+  renderHorarios(dataStr, diaSem);
+}
+
+function renderHorarios(dataStr, diaSem) {
+  const horariosHoje = horarios.filter(h => h.dia_semana === diaSem);
+  const card = document.getElementById('card-horarios');
+  const grid = document.getElementById('horarios-grid');
+
+  if (!horariosHoje.length) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+
+  // Gerar slots
+  const slots = [];
+  horariosHoje.forEach(h => {
+    let [hh, mm] = h.hora_inicio.split(':').map(Number);
+    const [hfim, mfim] = h.hora_fim.split(':').map(Number);
+    const dur = h.duracao_sessao || 50;
+    while (hh * 60 + mm + dur <= hfim * 60 + mfim) {
+      const slot = String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0');
+      slots.push(slot);
+      const total = hh * 60 + mm + dur;
+      hh = Math.floor(total / 60);
+      mm = total % 60;
+    }
+  });
+
+  // Verificar ocupados
+  const ocupados = new Set(
+    sessoesMarcadas
+      .filter(s => s.startsWith(dataStr))
+      .map(s => s.substring(11, 16))
+  );
+
+  grid.innerHTML = slots.map(slot => {
+    const ocup = ocupados.has(slot);
+    return '<button class="horario-btn' + (ocup ? ' ocupado' : '') + '" ' +
+      (ocup ? 'disabled' : 'onclick="selecionarHorario(\'' + slot + '\')"') + '>' +
+      slot + '</button>';
+  }).join('');
+}
+
+function selecionarHorario(hora) {
+  horarioSelecionado = hora;
+  document.querySelectorAll('.horario-btn').forEach(b => b.classList.remove('selecionado'));
+  event.target.classList.add('selecionado');
+  document.getElementById('btn-step2').disabled = false;
+}
+
+function mesAnterior() {
+  calAtual.setMonth(calAtual.getMonth() - 1);
+  const hoje = new Date();
+  if (calAtual < new Date(hoje.getFullYear(), hoje.getMonth(), 1)) {
+    calAtual = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  }
+  renderCalendario();
+}
+
+function proximoMes() {
+  calAtual.setMonth(calAtual.getMonth() + 1);
+  const limite = new Date();
+  limite.setMonth(limite.getMonth() + 2);
+  if (calAtual > limite) return;
+  renderCalendario();
+}
+
+// ── CONFIRMAR ──
+async function confirmarAgendamento() {
+  const btn = document.getElementById('btn-confirmar');
+  const err = document.getElementById('err3');
+  err.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;"></i> Enviando...';
+
+  const dataHora = diaSelecionado + 'T' + horarioSelecionado + ':00';
+
+  const { error } = await sb.from('agendamentos_solicitados').insert([{
+    user_id: profissional.user_id,
+    nome: document.getElementById('p-nome').value.trim(),
+    telefone: document.getElementById('p-tel').value.trim(),
+    queixa: document.getElementById('p-queixa').value.trim() || null,
+    data_hora: dataHora,
+    tipo: tipoSessao,
+    status: 'Pendente',
+  }]);
+
+  if (error) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-check"></i> Confirmar agendamento';
+    document.getElementById('err3-txt').textContent = 'Erro ao enviar. Tente novamente.';
+    err.style.display = 'flex';
+    return;
+  }
+
+  document.getElementById('step3').style.display = 'none';
+  document.getElementById('step-sucesso').style.display = 'block';
+  document.getElementById('suc-prof').textContent = profissional.nome || 'O profissional';
+  document.querySelector('.step-bar').style.display = 'none';
+}
+</script>
+</body>
+</html>
