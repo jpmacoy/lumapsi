@@ -819,6 +819,38 @@ tr:hover td{background:#FAFAFF}
                   <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="cfg-email" type="email"></div>
                   <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" id="cfg-whats" placeholder="(11) 99999-9999"></div>
                 </div>
+                <div class="form-row mb12">
+                  <div class="form-group"><label class="form-label">Cidade</label><input class="form-input" id="cfg-cidade" placeholder="Rio de Janeiro"></div>
+                  <div class="form-group"><label class="form-label">Bairro</label><input class="form-input" id="cfg-bairro" placeholder="Botafogo"></div>
+                </div>
+                <div class="form-row mb12">
+                  <div class="form-group"><label class="form-label">Instagram</label><input class="form-input" id="cfg-instagram" placeholder="@seuperfil"></div>
+                  <div class="form-group"><label class="form-label">Modalidade de atendimento</label>
+                    <select class="form-input" id="cfg-modalidade">
+                      <option value="ambos">Presencial e Online</option>
+                      <option value="presencial">Apenas Presencial</option>
+                      <option value="online">Apenas Online</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group mb12">
+                  <label class="form-label">Abordagem terapêutica</label>
+                  <input class="form-input" id="cfg-abordagem" placeholder="Ex: Terapia Cognitivo-Comportamental (TCC), Psicanálise...">
+                </div>
+                <div class="form-group mb12">
+                  <label class="form-label">Sobre mim <span style="font-weight:400;color:var(--t3)">(aparece na sua página pública)</span></label>
+                  <textarea class="form-input" id="cfg-sobre" rows="4" placeholder="Conte sua trajetória, motivações e como você trabalha com seus pacientes..."></textarea>
+                </div>
+                <div class="form-group mb12">
+                  <label class="form-label">Especialidades <span style="font-weight:400;color:var(--t3)">(selecione as que você atende)</span></label>
+                  <div id="cfg-especialidades" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+                    ${['Ansiedade','Depressão','Relacionamentos','Autoconhecimento','Família','Trabalho e carreira','Luto','Trauma','Transtornos alimentares','Saúde mental','Adolescentes','Infantil','LGBTQIA+','Burnout','Autoestima','Fobia','TOC','Vícios'].map(e => 
+                      `<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;">
+                        <input type="checkbox" value="${e}" class="esp-check" style="width:auto;margin:0"> ${e}
+                      </label>`
+                    ).join('')}
+                  </div>
+                </div>
                 <div class="form-row">
                   <div class="form-group">
                     <label class="form-label">Tipo de chave PIX</label>
@@ -2519,6 +2551,13 @@ async function salvarConfig() {
 
   const pixTipo = document.getElementById('cfg-pix-tipo').value;
   const pixChave = document.getElementById('cfg-pix-chave').value;
+  const cidade = document.getElementById('cfg-cidade').value;
+  const bairro = document.getElementById('cfg-bairro').value;
+  const instagram = document.getElementById('cfg-instagram').value;
+  const modalidade = document.getElementById('cfg-modalidade').value;
+  const abordagem = document.getElementById('cfg-abordagem').value;
+  const sobre = document.getElementById('cfg-sobre').value;
+  const espChecks = Array.from(document.querySelectorAll('.esp-check:checked')).map(c => c.value);
 
   const { error } = await sb.from('configuracoes').upsert({
     user_id: user.id,
@@ -2527,6 +2566,13 @@ async function salvarConfig() {
     valor_online: parseFloat(valOnline) || null,
     pix_tipo: pixTipo || null,
     pix_chave: pixChave || null,
+    cidade: cidade || null,
+    bairro: bairro || null,
+    instagram: instagram || null,
+    modalidade: modalidade || 'ambos',
+    abordagem: abordagem || null,
+    sobre_mim: sobre || null,
+    especialidades: espChecks.length ? JSON.stringify(espChecks) : null,
   }, { onConflict: 'user_id' });
 
   if (error) { toast('Erro ao salvar: ' + error.message, 'error'); return; }
@@ -2579,6 +2625,20 @@ async function carregarConfig() {
   if (data.valor_online) document.getElementById('cfg-val-online').value = data.valor_online;
   if (data.pix_tipo) document.getElementById('cfg-pix-tipo').value = data.pix_tipo;
   if (data.pix_chave) document.getElementById('cfg-pix-chave').value = data.pix_chave;
+  if (data.cidade) document.getElementById('cfg-cidade').value = data.cidade;
+  if (data.bairro) document.getElementById('cfg-bairro').value = data.bairro;
+  if (data.instagram) document.getElementById('cfg-instagram').value = data.instagram;
+  if (data.modalidade) document.getElementById('cfg-modalidade').value = data.modalidade;
+  if (data.abordagem) document.getElementById('cfg-abordagem').value = data.abordagem;
+  if (data.sobre_mim) document.getElementById('cfg-sobre').value = data.sobre_mim;
+  if (data.especialidades) {
+    try {
+      const esps = JSON.parse(data.especialidades);
+      document.querySelectorAll('.esp-check').forEach(c => {
+        c.checked = esps.includes(c.value);
+      });
+    } catch(e) {}
+  }
 }
 
 
