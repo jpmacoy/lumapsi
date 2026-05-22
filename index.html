@@ -937,65 +937,47 @@ tr:hover td{background:#FAFAFF}
 ════════════════════════════════════ -->
 <div class="modal-bd" id="modal-bd" onclick="fecharModal()">
 
-  <!-- Nova Sessão -->
-  <div class="modal" 
-      <!-- MODAL DOCUMENTOS -->
-      <div class="modal" id="m-documentos" onclick="event.stopPropagation()" style="display:none;max-width:500px;">
-          <div class="modal-hd"><span class="modal-title"><i class="ti ti-file-certificate"></i> Gerar Documento</span><button class="modal-close" onclick="fecharModal()"><i class="ti ti-x"></i></button></div>
-          <div class="modal-body" style="padding:20px;">
-            <div style="font-size:13px;color:var(--t2);margin-bottom:16px;">Selecione o tipo de documento para gerar em PDF:</div>
-            <div id="doc-paciente-info" style="background:var(--bg);border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;border:1px solid var(--border);">
-              <div class="av av-sm av-purple" id="doc-pac-av">—</div>
-              <div>
-                <div style="font-size:13px;font-weight:500;" id="doc-pac-nome">—</div>
-                <div style="font-size:11px;color:var(--t3);" id="doc-pac-info">—</div>
-              </div>
-            </div>
-            <div id="doc-lista-tipos" style="display:flex;flex-direction:column;gap:10px;">
-              <div onclick="selecionarDocumento('declaracao')" style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;">
-                <div style="width:40px;height:40px;border-radius:10px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                  <i class="ti ti-calendar-check" style="font-size:20px;color:#4F46E5;"></i>
-                </div>
-                <div>
-                  <div style="font-size:13px;font-weight:500;">Declaração de comparecimento</div>
-                  <div style="font-size:12px;color:var(--t2);margin-top:2px;">Confirma que o paciente esteve em sessão em data específica</div>
-                </div>
-                <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--t3);"></i>
-              </div>
-              <div onclick="selecionarDocumento('atestado')" style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;">
-                <div style="width:40px;height:40px;border-radius:10px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                  <i class="ti ti-heart-rate-monitor" style="font-size:20px;color:#059669;"></i>
-                </div>
-                <div>
-                  <div style="font-size:13px;font-weight:500;">Atestado de acompanhamento</div>
-                  <div style="font-size:12px;color:var(--t2);margin-top:2px;">Atesta que o paciente está em tratamento psicológico</div>
-                </div>
-                <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--t3);"></i>
-              </div>
-              <div onclick="selecionarDocumento('laudo')" style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;">
-                <div style="width:40px;height:40px;border-radius:10px;background:#FFF7ED;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                  <i class="ti ti-report-medical" style="font-size:20px;color:#D97706;"></i>
-                </div>
-                <div>
-                  <div style="font-size:13px;font-weight:500;">Laudo psicológico</div>
-                  <div style="font-size:12px;color:var(--t2);margin-top:2px;">Documento técnico com avaliação e parecer clínico</div>
-                </div>
-                <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--t3);"></i>
-              </div>
-            </div>
-            <div id="doc-form-extra" style="display:none;margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
-              <div style="font-size:13px;font-weight:500;margin-bottom:12px;" id="doc-form-title">Informações adicionais</div>
-              <div id="doc-form-fields"></div>
-              <div style="display:flex;gap:8px;margin-top:16px;">
-                <button class="btn btn-ghost btn-sm" onclick="voltarListaDocumentos()">Voltar</button>
-                <button class="btn btn-primary" style="flex:1;" onclick="confirmarGerarDocumento()"><i class="ti ti-file-type-pdf"></i> Gerar PDF</button>
-              </div>
-            </div>
-          </div>
+
+  <!-- MODAL DOCUMENTOS -->
+  <div class="modal" id="m-documentos" onclick="event.stopPropagation()" style="display:none;max-width:500px;">
+    <div class="modal-hd"><span class="modal-title"><i class="ti ti-file-certificate"></i> Gerar Documento</span><button class="modal-close" onclick="fecharModal()"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body" style="padding:20px;">
+      <div style="font-size:13px;color:var(--t2);margin-bottom:16px;">Selecione o tipo de documento para gerar em PDF:</div>
+      <div id="doc-paciente-info" style="background:var(--bg);border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;border:1px solid var(--border);">
+        <div class="av av-sm av-purple" id="doc-pac-av">JP</div>
+        <div><div style="font-size:13px;font-weight:500;" id="doc-pac-nome">Paciente</div><div style="font-size:11px;color:var(--t3);" id="doc-pac-info">—</div></div>
+      </div>
+      <div id="doc-lista-tipos" style="display:flex;flex-direction:column;gap:10px;">
+        <div onclick="selecionarDocumento('declaracao')" style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-calendar-check" style="font-size:20px;color:#4F46E5;"></i></div>
+          <div><div style="font-size:13px;font-weight:500;">Declaração de comparecimento</div><div style="font-size:12px;color:var(--t2);margin-top:2px;">Confirma que o paciente esteve em sessão em data específica</div></div>
+          <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--t3);"></i>
+        </div>
+        <div onclick="selecionarDocumento('atestado')" style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-heart-rate-monitor" style="font-size:20px;color:#059669;"></i></div>
+          <div><div style="font-size:13px;font-weight:500;">Atestado de acompanhamento</div><div style="font-size:12px;color:var(--t2);margin-top:2px;">Atesta que o paciente está em tratamento psicológico</div></div>
+          <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--t3);"></i>
+        </div>
+        <div onclick="selecionarDocumento('laudo')" style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:#FFF7ED;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-report-medical" style="font-size:20px;color:#D97706;"></i></div>
+          <div><div style="font-size:13px;font-weight:500;">Laudo psicológico</div><div style="font-size:12px;color:var(--t2);margin-top:2px;">Documento técnico com avaliação e parecer clínico</div></div>
+          <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--t3);"></i>
         </div>
       </div>
+      <div id="doc-form-extra" style="display:none;margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+        <div style="font-size:13px;font-weight:500;margin-bottom:12px;" id="doc-form-title">Informações adicionais</div>
+        <div id="doc-form-fields"></div>
+        <div style="display:flex;gap:8px;margin-top:16px;">
+          <button class="btn btn-ghost btn-sm" onclick="voltarListaDocumentos()">Voltar</button>
+          <button class="btn btn-primary" style="flex:1;" onclick="confirmarGerarDocumento()"><i class="ti ti-file-type-pdf"></i> Gerar PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      <div class="modal-backdrop" id="m-nova-sessao" onclick="event.stopPropagation()" style="display:none;">
+  <!-- Nova Sessão -->
+
+      <div class="modal" id="m-nova-sessao" onclick="event.stopPropagation()" style="display:none;">
     <div class="modal-hd"><span class="modal-title">Nova sessão</span><button class="modal-close" onclick="fecharModal()"><i class="ti ti-x"></i></button></div>
     <div class="modal-body">
       <div class="form-row">
