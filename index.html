@@ -361,7 +361,15 @@ tr:hover td{background:#FAFAFF}
     </div>
     <div class="sidebar-foot">
       <div class="user-row">
-        <div class="av av-sm av-purple" id="user-av">PS</div>
+        <div style="position:relative;flex-shrink:0;cursor:pointer;" onclick="abrirUploadFoto()" title="Alterar foto">
+          <div class="av av-sm av-purple" id="user-av" style="overflow:hidden;position:relative;">
+            <img id="user-foto" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none;position:absolute;top:0;left:0;border-radius:50%;">
+            <span id="user-av-initials">PS</span>
+          </div>
+          <div style="position:absolute;bottom:-1px;right:-1px;width:14px;height:14px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;border:2px solid var(--sidebar-bg,#1E1B4B);">
+            <i class="ti ti-camera" style="font-size:7px;color:#fff;"></i>
+          </div>
+        </div>
         <div><div style="font-size:12px;font-weight:500;" id="user-nome">Profissional</div><div style="font-size:10px;color:var(--t3);" id="user-email-display">—</div></div>
         <i class="ti ti-logout" style="margin-left:auto;font-size:15px;color:var(--t3);cursor:pointer;" onclick="fazerLogout()" title="Sair"></i>
       </div>
@@ -863,6 +871,22 @@ tr:hover td{background:#FAFAFF}
             </div>
             <div class="card">
               <div class="card-head"><span class="card-title">Conta</span></div>
+              <div style="padding:16px;display:flex;align-items:center;gap:16px;border-bottom:0.5px solid var(--border-s);">
+                <div style="position:relative;cursor:pointer;" onclick="abrirUploadFoto()">
+                  <div class="av av-lg av-purple" style="width:64px;height:64px;font-size:22px;overflow:hidden;position:relative;">
+                    <img id="user-foto-cfg" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none;position:absolute;top:0;left:0;border-radius:50%;">
+                    <span id="user-av-cfg-initials">PS</span>
+                  </div>
+                  <div style="position:absolute;bottom:0;right:0;width:20px;height:20px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);">
+                    <i class="ti ti-camera" style="font-size:10px;color:#fff;"></i>
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size:14px;font-weight:500;" id="cfg-nome-display">—</div>
+                  <div style="font-size:12px;color:var(--t3);" id="cfg-email-display">—</div>
+                  <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="abrirUploadFoto()"><i class="ti ti-camera"></i> Alterar foto</button>
+                </div>
+              </div>
               <div style="padding:16px;">
                 <button class="btn btn-ghost btn-sm btn-full" onclick="fazerLogout()"><i class="ti ti-logout"></i> Sair do sistema</button>
               </div>
@@ -1231,6 +1255,7 @@ function iniciarApp(user) {
   carregarTudo();
   carregarConfig();
   verificarStatusGoogleCalendar();
+  carregarFotoPerfil();
 }
 
 // Verificar sessão existente
@@ -2437,8 +2462,19 @@ async function carregarConfig() {
     document.getElementById('cfg-nome').value = data.nome;
     document.getElementById('user-nome').textContent = data.nome;
     const ini = data.nome.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase();
-    document.getElementById('user-av').textContent = ini;
+    const avEl = document.getElementById('user-av');
+    if (avEl) {
+      const initialsEl = document.getElementById('user-av-initials');
+      if (initialsEl) initialsEl.textContent = ini;
+      else avEl.textContent = ini;
+    }
+    const cfgInitials = document.getElementById('user-av-cfg-initials');
+    if (cfgInitials) cfgInitials.textContent = ini;
+    const cfgNome = document.getElementById('cfg-nome-display');
+    if (cfgNome) cfgNome.textContent = data.nome;
   }
+  const cfgEmail = document.getElementById('cfg-email-display');
+  if (cfgEmail) cfgEmail.textContent = user.email || '';
   if (data.crp) document.getElementById('cfg-crp').value = data.crp;
   if (data.email) document.getElementById('cfg-email').value = data.email;
   if (data.whatsapp) document.getElementById('cfg-whats').value = data.whatsapp;
@@ -3646,5 +3682,6 @@ function instalarPWA() {
   });
 }
 </script>
+<input type="file" id="foto-input" accept="image/*" style="display:none;" onchange="processarFoto(this)">
 </body>
 </html>
