@@ -339,6 +339,7 @@ tr:hover td{background:#FAFAFF}
 <div id="sidebar-overlay" class="sidebar-overlay" onclick="fecharMenu()"></div>
 <div id="pg-app">
 <div class="app">
+  <input type="file" id="foto-input" accept="image/*" style="display:none;" onchange="processarFoto(this)">
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="logo-wrap">
@@ -3682,6 +3683,5 @@ function instalarPWA() {
   });
 }
 </script>
-<input type="file" id="foto-input" accept="image/*" style="display:none;" onchange="processarFoto(this)">
 </body>
 </html>
