@@ -996,7 +996,7 @@ tr:hover td{background:#FAFAFF}
         <div class="form-group">
           <label class="form-label">Link da sala <span style="font-size:10px;color:var(--t3);">(gerado automaticamente)</span></label>
           <div style="display:flex;gap:8px;">
-            <input class="form-input" id="ns-link" placeholder="https://meet.jit.si/..." style="flex:1;">
+            <input class="form-input" id="ns-link" placeholder="https://lumapsi.daily.co/..." style="flex:1;">
             <button class="btn btn-ghost btn-sm" onclick="gerarLinkJitsi()" type="button"><i class="ti ti-refresh"></i> Gerar</button>
           </div>
         </div>
@@ -1169,7 +1169,7 @@ tr:hover td{background:#FAFAFF}
         <div class="form-group">
           <label class="form-label">Link da sala online</label>
           <div style="display:flex;gap:8px;">
-            <input class="form-input" id="es-link" placeholder="https://meet.jit.si/..." style="flex:1;">
+            <input class="form-input" id="es-link" placeholder="https://lumapsi.daily.co/..." style="flex:1;">
             <button class="btn btn-ghost btn-sm" onclick="gerarLinkJitsiEditar()" type="button"><i class="ti ti-refresh"></i></button>
           </div>
         </div>
@@ -2970,29 +2970,62 @@ function abrirModalPessoal() {
 // ════════════════════════════════════
 // JITSI — SALA VIRTUAL
 // ════════════════════════════════════
-function gerarUrlJitsi() {
+const DAILY_DOMAIN = 'lumapsi';
+
+function gerarNomeSala() {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  const codigo = Array.from({length: 12}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-  return 'https://meet.jit.si/lumapsi-' + codigo;
+  const codigo = Array.from({length: 10}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  return 'sessao-' + codigo;
 }
 
-function gerarLinkJitsi() {
-  const url = gerarUrlJitsi();
+async function criarSalaDaily(nomeSala, expiracaoHoras) {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch('https://pbqvfokpounurzmmlcor.supabase.co/functions/v1/daily-room', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.access_token,
+        'apikey': SUPA_KEY,
+      },
+      body: JSON.stringify({ nome: nomeSala, expiracao_horas: expiracaoHoras || 25 })
+    });
+    const data = await res.json();
+    return data.url || ('https://' + DAILY_DOMAIN + '.daily.co/' + nomeSala);
+  } catch(e) {
+    return 'https://' + DAILY_DOMAIN + '.daily.co/' + nomeSala;
+  }
+}
+
+function gerarUrlJitsi() {
+  return 'https://' + DAILY_DOMAIN + '.daily.co/' + gerarNomeSala();
+}
+
+async function gerarLinkJitsi() {
+  const btn = document.querySelector('[onclick="gerarLinkJitsi()"]');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;"></i>'; }
+  const nome = gerarNomeSala();
+  const url = await criarSalaDaily(nome, 25);
   document.getElementById('ns-link').value = url;
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-refresh"></i> Gerar'; }
 }
 
-function gerarLinkJitsiEditar() {
-  const url = gerarUrlJitsi();
+async function gerarLinkJitsiEditar() {
   const el = document.getElementById('es-link');
-  if (el) el.value = url;
+  if (!el) return;
+  const nome = gerarNomeSala();
+  const url = await criarSalaDaily(nome, 25);
+  el.value = url;
 }
 
-function toggleLinkNs(tipo) {
+async function toggleLinkNs(tipo) {
   const wrap = document.getElementById('ns-link-wrap');
   if (tipo === 'Online') {
     wrap.style.display = 'block';
     if (!document.getElementById('ns-link').value) {
-      document.getElementById('ns-link').value = gerarUrlJitsi();
+      const nome = gerarNomeSala();
+      const url = await criarSalaDaily(nome, 25);
+      document.getElementById('ns-link').value = url;
     }
   } else {
     wrap.style.display = 'none';
