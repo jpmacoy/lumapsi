@@ -783,6 +783,21 @@ tr:hover td{background:#FAFAFF}
                   <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="cfg-email" type="email"></div>
                   <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" id="cfg-whats" placeholder="(11) 99999-9999"></div>
                 </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Tipo de chave PIX</label>
+                    <select class="form-input" id="cfg-pix-tipo">
+                      <option value="">Selecione...</option>
+                      <option value="cpf">CPF</option>
+                      <option value="telefone">Telefone</option>
+                      <option value="email">E-mail</option>
+                      <option value="aleatoria">Chave aleatória</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Chave PIX</label>
+                    <input class="form-input" id="cfg-pix-chave" placeholder="Sua chave PIX"></div>
+                </div>
                 <button class="btn btn-primary btn-sm" onclick="salvarConfig()"><i class="ti ti-check"></i> Salvar perfil</button>
               </div>
             </div>
@@ -2466,11 +2481,16 @@ async function salvarConfig() {
   const valPres = document.getElementById('cfg-val-pres').value;
   const valOnline = document.getElementById('cfg-val-online').value;
 
+  const pixTipo = document.getElementById('cfg-pix-tipo').value;
+  const pixChave = document.getElementById('cfg-pix-chave').value;
+
   const { error } = await sb.from('configuracoes').upsert({
     user_id: user.id,
     nome, crp, email, whatsapp: whats,
     valor_presencial: parseFloat(valPres) || null,
     valor_online: parseFloat(valOnline) || null,
+    pix_tipo: pixTipo || null,
+    pix_chave: pixChave || null,
   }, { onConflict: 'user_id' });
 
   if (error) { toast('Erro ao salvar: ' + error.message, 'error'); return; }
@@ -2521,6 +2541,8 @@ async function carregarConfig() {
   if (data.whatsapp) document.getElementById('cfg-whats').value = data.whatsapp;
   if (data.valor_presencial) document.getElementById('cfg-val-pres').value = data.valor_presencial;
   if (data.valor_online) document.getElementById('cfg-val-online').value = data.valor_online;
+  if (data.pix_tipo) document.getElementById('cfg-pix-tipo').value = data.pix_tipo;
+  if (data.pix_chave) document.getElementById('cfg-pix-chave').value = data.pix_chave;
 }
 
 
@@ -2581,7 +2603,18 @@ async function enviarCobranca(pacienteId, valor, numSessoes) {
   const pac = todosPacientes.find(p => p.id == pacienteId);
   if (!pac || !pac.telefone) return false;
   const nome = pac.nome.split(' ')[0];
-  const msg = 'Olá ' + nome + '! 😊\n\nPassando para informar que há *' + numSessoes + ' sessão(ões)* com pagamento pendente no valor total de *R$' + valor.toLocaleString('pt-BR') + '*.' + '\n\nVocê pode realizar o pagamento via Pix ou da forma que preferir. Qualquer dúvida, estou à disposição! 🙏';
+
+  // Buscar chave PIX do profissional
+  const { data: { user } } = await sb.auth.getUser();
+  const { data: cfg } = await sb.from('configuracoes').select('pix_chave, pix_tipo').eq('user_id', user.id).single();
+  
+  let pixInfo = '';
+  if (cfg && cfg.pix_chave) {
+    const tipoLabel = { cpf: 'CPF', telefone: 'Telefone', email: 'E-mail', aleatoria: 'Chave aleatória' }[cfg.pix_tipo] || 'PIX';
+    pixInfo = '\n\n💳 *Dados para pagamento:*\nChave PIX (' + tipoLabel + '): *' + cfg.pix_chave + '*';
+  }
+
+  const msg = 'Olá ' + nome + '! 😊\n\nPassando para informar que há *' + numSessoes + ' sessão(ões)* com pagamento pendente no valor total de *R$' + valor.toLocaleString('pt-BR') + '*.' + pixInfo + '\n\nQualquer dúvida, estou à disposição! 🙏';
   const result = await enviarWhatsApp(pac.telefone, msg);
   return result.ok;
 }
@@ -2666,11 +2699,22 @@ async function enviarResumoDia() {
 }
 
 
-function whatsappPaciente(pacId) {
+async function whatsappPaciente(pacId) {
   const pac = todosPacientes.find(p => p.id === pacId);
   if (!pac || !pac.telefone) { toast('Paciente sem WhatsApp cadastrado', 'error'); return; }
   const tel = pac.telefone.replace(/\D/g, '');
-  const msg = encodeURIComponent('Olá ' + pac.nome.split(' ')[0] + ', tudo bem? Passando para lembrar sobre o pagamento da(s) sessão(ões) pendente(s). Qualquer dúvida estou à disposição!');
+
+  // Buscar chave PIX
+  const { data: { user } } = await sb.auth.getUser();
+  const { data: cfg } = await sb.from('configuracoes').select('pix_chave, pix_tipo').eq('user_id', user.id).single();
+  
+  let pixInfo = '';
+  if (cfg && cfg.pix_chave) {
+    const tipoLabel = { cpf: 'CPF', telefone: 'Telefone', email: 'E-mail', aleatoria: 'Chave aleatória' }[cfg.pix_tipo] || 'PIX';
+    pixInfo = '%0A%0A💳 *Dados para pagamento:*%0AChave PIX (' + tipoLabel + '): *' + cfg.pix_chave + '*';
+  }
+
+  const msg = encodeURIComponent('Olá ' + pac.nome.split(' ')[0] + ', tudo bem? Passando para lembrar sobre o pagamento da(s) sessão(ões) pendente(s). Qualquer dúvida estou à disposição!') + pixInfo;
   window.open('https://wa.me/55' + tel + '?text=' + msg, '_blank');
 }
 
