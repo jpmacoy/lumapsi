@@ -905,6 +905,14 @@ tr:hover td{background:#FAFAFF}
                   </div>
                 </div>
                 <div class="form-group">
+                  <label class="form-label">Sua página de perfil público</label>
+                  <div style="display:flex;gap:8px;align-items:center;">
+                    <div style="flex:1;background:var(--bg);border:1px solid var(--border-s);border-radius:var(--rs);padding:9px 12px;font-size:12px;color:var(--t3);">lumapsi.com.br/perfil/<span id="cfg-perfil-preview" style="color:var(--brand);font-weight:500;">—</span></div>
+                    <button class="btn btn-ghost btn-sm" onclick="copiarLinkPerfil()" title="Copiar link do perfil"><i class="ti ti-copy"></i></button>
+                    <a id="cfg-perfil-link" href="#" target="_blank" class="btn btn-ghost btn-sm" title="Abrir perfil"><i class="ti ti-external-link"></i></a>
+                  </div>
+                </div>
+                <div class="form-group">
                   <label class="form-label">Seu slug (identificador único)</label>
                   <input class="form-input" id="cfg-slug" placeholder="ex: joao, dra-maria..." oninput="atualizarSlugPreview(this.value)">
                   <div style="font-size:11px;color:var(--t3);margin-top:4px;">Use apenas letras minúsculas, números e hífens. Sem espaços.</div>
