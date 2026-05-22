@@ -584,6 +584,7 @@ tr:hover td{background:#FAFAFF}
           </select>
           <button class="btn btn-ghost btn-sm" onclick="exportarPDF()"><i class="ti ti-file-type-pdf"></i> Exportar PDF</button>
           <button class="btn btn-sm" style="background:var(--brand-light);color:var(--brand-dark);border:none;" onclick="gerarResumoProntuarioIA(document.getElementById('sel-pac-pront').value)"><i class="ti ti-sparkles"></i> Resumo com IA</button>
+          <button class="btn btn-sm" style="background:#EEF2FF;color:#4F46E5;border:none;" onclick="abrirDocumentos()"><i class="ti ti-file-certificate"></i> Documentos</button>
           <div style="flex:1;"></div>
           <button class="btn btn-primary btn-sm" onclick="abrirModal('nova-evolucao')"><i class="ti ti-plus"></i> Nova evolução</button>
         </div>
@@ -937,7 +938,68 @@ tr:hover td{background:#FAFAFF}
 <div class="modal-bd" id="modal-bd" onclick="fecharModal()">
 
   <!-- Nova Sessão -->
-  <div class="modal" id="m-nova-sessao" onclick="event.stopPropagation()" style="display:none;">
+  <div class="modal" 
+      <!-- MODAL DOCUMENTOS -->
+      <div class="modal-backdrop" id="m-documentos" style="display:none;">
+        <div class="modal" style="max-width:500px;">
+          <div class="modal-head">
+            <span class="modal-title"><i class="ti ti-file-certificate"></i> Gerar Documento</span>
+            <button class="icon-btn" onclick="fecharModal()"><i class="ti ti-x"></i></button>
+          </div>
+          <div style="padding:20px;">
+            <div style="font-size:13px;color:var(--t2);margin-bottom:16px;">Selecione o tipo de documento para gerar em PDF:</div>
+            <div id="doc-paciente-info" style="background:var(--bg);border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;border:1px solid var(--border);">
+              <div class="av av-sm av-purple" id="doc-pac-av">—</div>
+              <div>
+                <div style="font-size:13px;font-weight:500;" id="doc-pac-nome">—</div>
+                <div style="font-size:11px;color:var(--t3);" id="doc-pac-info">—</div>
+              </div>
+            </div>
+            <div id="doc-lista-tipos" style="display:flex;flex-direction:column;gap:10px;">
+              <div onclick="selecionarDocumento('declaracao')" style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;">
+                <div style="width:40px;height:40px;border-radius:10px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <i class="ti ti-calendar-check" style="font-size:20px;color:#4F46E5;"></i>
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:500;">Declaração de comparecimento</div>
+                  <div style="font-size:12px;color:var(--t2);margin-top:2px;">Confirma que o paciente esteve em sessão em data específica</div>
+                </div>
+                <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--t3);"></i>
+              </div>
+              <div onclick="selecionarDocumento('atestado')" style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;">
+                <div style="width:40px;height:40px;border-radius:10px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <i class="ti ti-heart-rate-monitor" style="font-size:20px;color:#059669;"></i>
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:500;">Atestado de acompanhamento</div>
+                  <div style="font-size:12px;color:var(--t2);margin-top:2px;">Atesta que o paciente está em tratamento psicológico</div>
+                </div>
+                <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--t3);"></i>
+              </div>
+              <div onclick="selecionarDocumento('laudo')" style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;">
+                <div style="width:40px;height:40px;border-radius:10px;background:#FFF7ED;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <i class="ti ti-report-medical" style="font-size:20px;color:#D97706;"></i>
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:500;">Laudo psicológico</div>
+                  <div style="font-size:12px;color:var(--t2);margin-top:2px;">Documento técnico com avaliação e parecer clínico</div>
+                </div>
+                <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--t3);"></i>
+              </div>
+            </div>
+            <div id="doc-form-extra" style="display:none;margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+              <div style="font-size:13px;font-weight:500;margin-bottom:12px;" id="doc-form-title">Informações adicionais</div>
+              <div id="doc-form-fields"></div>
+              <div style="display:flex;gap:8px;margin-top:16px;">
+                <button class="btn btn-ghost btn-sm" onclick="voltarListaDocumentos()">Voltar</button>
+                <button class="btn btn-primary" style="flex:1;" onclick="confirmarGerarDocumento()"><i class="ti ti-file-type-pdf"></i> Gerar PDF</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-backdrop" id="m-nova-sessao" onclick="event.stopPropagation()" style="display:none;">
     <div class="modal-hd"><span class="modal-title">Nova sessão</span><button class="modal-close" onclick="fecharModal()"><i class="ti ti-x"></i></button></div>
     <div class="modal-body">
       <div class="form-row">
@@ -3722,6 +3784,188 @@ function processarFoto(input) {
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
+}
+
+// ════════════════════════════════════
+// DOCUMENTOS CLÍNICOS
+// ════════════════════════════════════
+var docTipoSelecionado = null;
+var docPacAtual = null;
+var docConfigAtual = null;
+
+async function abrirDocumentos() {
+  var pacId = document.getElementById('sel-pac-pront').value;
+  if (!pacId) { toast('Selecione um paciente primeiro', 'error'); return; }
+
+  docPacAtual = todosPacientes.find(function(p) { return p.id == pacId; });
+  if (!docPacAtual) return;
+
+  // Preencher info do paciente no modal
+  var ini = docPacAtual.nome.split(' ').map(function(n) { return n[0]; }).slice(0,2).join('').toUpperCase();
+  document.getElementById('doc-pac-av').textContent = ini;
+  document.getElementById('doc-pac-nome').textContent = docPacAtual.nome;
+
+  // Calcular tempo de acompanhamento
+  var { data: sessoes } = await sb.from('sessoes').select('data_hora').eq('paciente_id', pacId).eq('status', 'Realizada').order('data_hora', {ascending: true});
+  var totalSessoes = sessoes ? sessoes.length : 0;
+  var primeiraSessao = sessoes && sessoes.length ? new Date(sessoes[0].data_hora) : null;
+  var tempoAcomp = primeiraSessao ? calcularTempoAcomp(primeiraSessao) : 'período não disponível';
+  document.getElementById('doc-pac-info').textContent = totalSessoes + ' sessões realizadas · ' + tempoAcomp;
+
+  docConfigAtual = { totalSessoes: totalSessoes, primeiraSessao: primeiraSessao, tempoAcomp: tempoAcomp };
+
+  // Resetar para lista de tipos
+  document.getElementById('doc-lista-tipos').style.display = 'flex';
+  document.getElementById('doc-form-extra').style.display = 'none';
+  docTipoSelecionado = null;
+
+  abrirModal('m-documentos');
+}
+
+function calcularTempoAcomp(dataInicio) {
+  var agora = new Date();
+  var meses = (agora.getFullYear() - dataInicio.getFullYear()) * 12 + (agora.getMonth() - dataInicio.getMonth());
+  if (meses < 1) return 'menos de 1 mês';
+  if (meses === 1) return '1 mês';
+  if (meses < 12) return meses + ' meses';
+  var anos = Math.floor(meses / 12);
+  var mRest = meses % 12;
+  return anos + ' ano' + (anos > 1 ? 's' : '') + (mRest ? ' e ' + mRest + ' mês' + (mRest > 1 ? 'es' : '') : '');
+}
+
+function selecionarDocumento(tipo) {
+  docTipoSelecionado = tipo;
+  document.getElementById('doc-lista-tipos').style.display = 'none';
+  document.getElementById('doc-form-extra').style.display = 'block';
+
+  var titles = { declaracao: 'Declaração de comparecimento', atestado: 'Atestado de acompanhamento', laudo: 'Laudo psicológico' };
+  document.getElementById('doc-form-title').textContent = titles[tipo];
+
+  var fields = '';
+  var hoje = new Date().toISOString().split('T')[0];
+
+  if (tipo === 'declaracao') {
+    fields = '<div class="form-group"><label class="form-label">Data da sessão</label><input type="date" class="form-input" id="doc-data-sessao" value="' + hoje + '"></div>' +
+      '<div class="form-group"><label class="form-label">Horário</label><input type="time" class="form-input" id="doc-hora-sessao" value="09:00"></div>' +
+      '<div class="form-group"><label class="form-label">Finalidade (opcional)</label><input type="text" class="form-input" id="doc-finalidade" placeholder="Ex: apresentação no trabalho, INSS..."></div>';
+  } else if (tipo === 'atestado') {
+    fields = '<div class="form-group"><label class="form-label">Finalidade (opcional)</label><input type="text" class="form-input" id="doc-finalidade" placeholder="Ex: afastamento do trabalho, perícia..."></div>' +
+      '<div class="form-group"><label class="form-label">Observações adicionais (opcional)</label><textarea class="form-input" id="doc-obs" rows="3" placeholder="Informações complementares..."></textarea></div>';
+  } else if (tipo === 'laudo') {
+    fields = '<div class="form-group"><label class="form-label">Demanda / Motivo do atendimento</label><textarea class="form-input" id="doc-demanda" rows="2" placeholder="Descreva brevemente o motivo do atendimento..."></textarea></div>' +
+      '<div class="form-group"><label class="form-label">Hipótese diagnóstica (CID ou descrição)</label><input type="text" class="form-input" id="doc-cid" placeholder="Ex: F41.1 - Transtorno de ansiedade generalizada"></div>' +
+      '<div class="form-group"><label class="form-label">Conclusão / Parecer técnico</label><textarea class="form-input" id="doc-parecer" rows="3" placeholder="Conclusões e recomendações..."></textarea></div>';
+  }
+
+  document.getElementById('doc-form-fields').innerHTML = fields;
+}
+
+function voltarListaDocumentos() {
+  document.getElementById('doc-lista-tipos').style.display = 'flex';
+  document.getElementById('doc-form-extra').style.display = 'none';
+  docTipoSelecionado = null;
+}
+
+async function confirmarGerarDocumento() {
+  if (!docTipoSelecionado || !docPacAtual) return;
+
+  var { data: { user } } = await sb.auth.getUser();
+  var { data: cfg } = await sb.from('configuracoes').select('*').eq('user_id', user.id).single();
+
+  var psiNome = (cfg && cfg.nome) ? cfg.nome : 'Psicólogo(a)';
+  var psiCrp = (cfg && cfg.crp) ? cfg.crp : '';
+  var psiEmail = user.email || '';
+  var psiTel = (cfg && cfg.telefone) ? cfg.telefone : '';
+
+  var hoje = new Date();
+  var hojeStr = hoje.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  var pacNome = docPacAtual.nome;
+  var pacCpf = docPacAtual.cpf || '';
+
+  var html = '';
+
+  if (docTipoSelecionado === 'declaracao') {
+    var dataSessao = document.getElementById('doc-data-sessao').value;
+    var horaSessao = document.getElementById('doc-hora-sessao').value;
+    var finalidade = document.getElementById('doc-finalidade').value;
+    var dataSessaoFmt = new Date(dataSessao + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+    html = gerarHtmlDeclaracao(psiNome, psiCrp, pacNome, pacCpf, dataSessaoFmt, horaSessao, finalidade, hojeStr, psiEmail, psiTel);
+  } else if (docTipoSelecionado === 'atestado') {
+    var finalidade2 = document.getElementById('doc-finalidade').value;
+    var obs = document.getElementById('doc-obs').value;
+    html = gerarHtmlAtestado(psiNome, psiCrp, pacNome, pacCpf, docConfigAtual.tempoAcomp, docConfigAtual.totalSessoes, finalidade2, obs, hojeStr, psiEmail, psiTel);
+  } else if (docTipoSelecionado === 'laudo') {
+    var demanda = document.getElementById('doc-demanda').value;
+    var cid = document.getElementById('doc-cid').value;
+    var parecer = document.getElementById('doc-parecer').value;
+    html = gerarHtmlLaudo(psiNome, psiCrp, pacNome, pacCpf, docConfigAtual.tempoAcomp, docConfigAtual.totalSessoes, demanda, cid, parecer, hojeStr, psiEmail, psiTel);
+  }
+
+  var win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  setTimeout(function() { win.print(); }, 800);
+  fecharModal();
+}
+
+function gerarHtmlDeclaracao(psi, crp, pac, cpf, dataSessao, hora, finalidade, hoje, email, tel) {
+  var finalidadeTexto = finalidade ? ' para fins de ' + finalidade : '';
+  return gerarHtmlBase('DECLARAÇÃO DE COMPARECIMENTO',
+    '<p>Declaro para os devidos fins que o(a) paciente <strong>' + pac + '</strong>' + (cpf ? ', CPF ' + cpf + ',' : '') + ' compareceu a atendimento psicológico nesta clínica no dia <strong>' + dataSessao + '</strong>, às <strong>' + hora + '</strong>h, com duração de 50 (cinquenta) minutos' + finalidadeTexto + '.</p>' +
+    '<p>O presente atendimento foi realizado por profissional habilitado junto ao Conselho Regional de Psicologia.</p>',
+    psi, crp, hoje, email, tel);
+}
+
+function gerarHtmlAtestado(psi, crp, pac, cpf, tempo, totalSessoes, finalidade, obs, hoje, email, tel) {
+  var finalidadeTexto = finalidade ? ' para fins de ' + finalidade : '';
+  var obsTexto = obs ? '<p>' + obs + '</p>' : '';
+  return gerarHtmlBase('ATESTADO DE ACOMPANHAMENTO PSICOLÓGICO',
+    '<p>Atesto que o(a) paciente <strong>' + pac + '</strong>' + (cpf ? ', CPF ' + cpf + ',' : '') + ' encontra-se em acompanhamento psicológico regular há <strong>' + tempo + '</strong>, tendo realizado <strong>' + totalSessoes + ' sessão(ões)</strong> de psicoterapia individual' + finalidadeTexto + '.</p>' +
+    '<p>O acompanhamento segue protocolo clínico adequado, com frequência regular de atendimentos.</p>' + obsTexto,
+    psi, crp, hoje, email, tel);
+}
+
+function gerarHtmlLaudo(psi, crp, pac, cpf, tempo, totalSessoes, demanda, cid, parecer, hoje, email, tel) {
+  return gerarHtmlBase('LAUDO PSICOLÓGICO',
+    '<p><strong>Identificação:</strong> ' + pac + (cpf ? ', CPF ' + cpf : '') + '</p>' +
+    '<p><strong>Período de acompanhamento:</strong> ' + tempo + ' (' + totalSessoes + ' sessões realizadas)</p>' +
+    (demanda ? '<br><p><strong>Demanda / Motivo do atendimento:</strong></p><p>' + demanda + '</p>' : '') +
+    (cid ? '<br><p><strong>Hipótese diagnóstica:</strong></p><p>' + cid + '</p>' : '') +
+    (parecer ? '<br><p><strong>Conclusão / Parecer técnico:</strong></p><p>' + parecer + '</p>' : '') +
+    '<br><p>As informações contidas neste laudo são de caráter confidencial e destinam-se exclusivamente ao fim indicado, sendo vedada sua reprodução ou utilização para outros fins sem autorização do(a) profissional responsável.</p>',
+    psi, crp, hoje, email, tel);
+}
+
+function gerarHtmlBase(titulo, corpo, psi, crp, hoje, email, tel) {
+  return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>' + titulo + '</title>' +
+    '<style>body{font-family:Georgia,serif;max-width:720px;margin:40px auto;padding:40px;color:#1a1a1a;font-size:14px;line-height:1.8;}' +
+    '.header{text-align:center;border-bottom:2px solid #3730A3;padding-bottom:20px;margin-bottom:30px;}' +
+    '.logo-text{font-size:24px;font-weight:bold;color:#3730A3;letter-spacing:1px;}' +
+    '.psi-name{font-size:15px;font-weight:600;margin-top:8px;}' +
+    '.psi-crp{font-size:13px;color:#555;}' +
+    '.doc-titulo{text-align:center;font-size:16px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:30px 0;color:#1a1a1a;}' +
+    '.corpo{text-align:justify;margin:20px 0;}' +
+    '.corpo p{margin-bottom:12px;}' +
+    '.assinatura{margin-top:60px;text-align:center;}' +
+    '.linha-ass{width:280px;border-top:1px solid #333;margin:0 auto 8px;}' +
+    '.footer{margin-top:40px;padding-top:16px;border-top:1px solid #ddd;font-size:11px;color:#888;text-align:center;}' +
+    '@media print{body{margin:0;padding:30px;}}</style></head><body>' +
+    '<div class="header">' +
+    '<div class="logo-text">LumaPsi</div>' +
+    '<div class="psi-name">' + psi + '</div>' +
+    '<div class="psi-crp">Psicólogo(a)' + (crp ? ' · CRP ' + crp : '') + '</div>' +
+    (email ? '<div class="psi-crp">' + email + (tel ? ' · ' + tel : '') + '</div>' : '') +
+    '</div>' +
+    '<div class="doc-titulo">' + titulo + '</div>' +
+    '<div class="corpo">' + corpo + '</div>' +
+    '<div class="assinatura">' +
+    '<p>' + hoje + '</p>' +
+    '<div class="linha-ass"></div>' +
+    '<p>' + psi + '</p>' +
+    '<p>' + (crp ? 'CRP ' + crp : 'Psicólogo(a)') + '</p>' +
+    '</div>' +
+    '<div class="footer">Documento gerado pelo LumaPsi · lumapsi.com.br · ' + hoje + '</div>' +
+    '</body></html>';
 }
 
 </script>
