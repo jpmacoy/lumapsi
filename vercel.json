@@ -3,6 +3,7 @@
     { "source": "/vendas", "destination": "/vendas.html" },
     { "source": "/cadastro", "destination": "/cadastro.html" },
     { "source": "/agendar/:slug", "destination": "/agendar.html" },
+    { "source": "/perfil/:slug", "destination": "/perfil.html" },
     { "source": "/", "destination": "/index.html" }
   ]
 }
