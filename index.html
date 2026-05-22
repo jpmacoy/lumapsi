@@ -942,7 +942,7 @@ tr:hover td{background:#FAFAFF}
       <!-- MODAL DOCUMENTOS -->
       <div class="modal" id="m-documentos" onclick="event.stopPropagation()" style="display:none;max-width:500px;">
           <div class="modal-hd"><span class="modal-title"><i class="ti ti-file-certificate"></i> Gerar Documento</span><button class="modal-close" onclick="fecharModal()"><i class="ti ti-x"></i></button></div>
-          <div style="padding:20px;">
+          <div class="modal-body" style="padding:20px;">
             <div style="font-size:13px;color:var(--t2);margin-bottom:16px;">Selecione o tipo de documento para gerar em PDF:</div>
             <div id="doc-paciente-info" style="background:var(--bg);border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;border:1px solid var(--border);">
               <div class="av av-sm av-purple" id="doc-pac-av">—</div>
@@ -3790,6 +3790,7 @@ var docPacAtual = null;
 var docConfigAtual = null;
 
 async function abrirDocumentos() {
+  console.log('abrirDocumentos chamado');
   var pacId = document.getElementById('sel-pac-pront').value;
   if (!pacId) { toast('Selecione um paciente primeiro', 'error'); return; }
 
