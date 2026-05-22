@@ -3946,7 +3946,7 @@ function processarFoto(input) {
         if (!uploadResult.error) {
           const { data: urlData } = sb.storage.from('avatars').getPublicUrl(user.id + '.jpg');
           if (urlData && urlData.publicUrl) {
-            await sb.from('configuracoes').update({ foto_url: urlData.publicUrl }).eq('user_id', user.id);
+            await sb.from('configuracoes').upsert({ user_id: user.id, foto_url: urlData.publicUrl }, { onConflict: 'user_id' });
           }
         }
       } catch(e) { console.log('Upload storage:', e); }
