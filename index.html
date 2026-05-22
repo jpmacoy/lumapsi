@@ -2,8 +2,15 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LumaPsi — Sistema Clínico</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>LumaPsi — Sistema Clnico</title>
+<meta name="description" content="Sistema de gesto clnica para psiclogos">
+<meta name="theme-color" content="#3730A3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LumaPsi">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
@@ -3601,6 +3608,36 @@ async function carregarDashPessoal() {
   }).join('');
 }
 
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register("/sw.js")
+      .then(function(reg) { console.log("SW ok:", reg.scope); })
+      .catch(function(err) { console.log("SW erro:", err); });
+  });
+}
+var deferredPrompt;
+window.addEventListener("beforeinstallprompt", function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  var btn = document.getElementById("pwa-install-btn");
+  if (btn) btn.style.display = "flex";
+});
+window.addEventListener("appinstalled", function() {
+  var btn = document.getElementById("pwa-install-btn");
+  if (btn) btn.style.display = "none";
+  deferredPrompt = null;
+  toast("LumaPsi instalado!", "success");
+});
+function instalarPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(function(result) {
+    if (result.outcome === "accepted") toast("LumaPsi instalado com sucesso!", "success");
+    deferredPrompt = null;
+  });
+}
 </script>
 </body>
 </html>
