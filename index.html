@@ -844,11 +844,24 @@ tr:hover td{background:#FAFAFF}
                 <div class="form-group mb12">
                   <label class="form-label">Especialidades <span style="font-weight:400;color:var(--t3)">(selecione as que você atende)</span></label>
                   <div id="cfg-especialidades" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
-                    ${['Ansiedade','Depressão','Relacionamentos','Autoconhecimento','Família','Trabalho e carreira','Luto','Trauma','Transtornos alimentares','Saúde mental','Adolescentes','Infantil','LGBTQIA+','Burnout','Autoestima','Fobia','TOC','Vícios'].map(e => 
-                      `<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;">
-                        <input type="checkbox" value="${e}" class="esp-check" style="width:auto;margin:0"> ${e}
-                      </label>`
-                    ).join('')}
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Ansiedade" class="esp-check" style="width:auto;margin:0"> Ansiedade</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Depressão" class="esp-check" style="width:auto;margin:0"> Depressão</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Relacionamentos" class="esp-check" style="width:auto;margin:0"> Relacionamentos</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Autoconhecimento" class="esp-check" style="width:auto;margin:0"> Autoconhecimento</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Família" class="esp-check" style="width:auto;margin:0"> Família</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Trabalho e carreira" class="esp-check" style="width:auto;margin:0"> Trabalho e carreira</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Luto" class="esp-check" style="width:auto;margin:0"> Luto</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Trauma" class="esp-check" style="width:auto;margin:0"> Trauma</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Transtornos alimentares" class="esp-check" style="width:auto;margin:0"> Transtornos alimentares</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Saúde mental" class="esp-check" style="width:auto;margin:0"> Saúde mental</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Adolescentes" class="esp-check" style="width:auto;margin:0"> Adolescentes</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Infantil" class="esp-check" style="width:auto;margin:0"> Infantil</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="LGBTQIA+" class="esp-check" style="width:auto;margin:0"> LGBTQIA+</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Burnout" class="esp-check" style="width:auto;margin:0"> Burnout</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Autoestima" class="esp-check" style="width:auto;margin:0"> Autoestima</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Fobia" class="esp-check" style="width:auto;margin:0"> Fobia</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="TOC" class="esp-check" style="width:auto;margin:0"> TOC</label>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;"><input type="checkbox" value="Vícios" class="esp-check" style="width:auto;margin:0"> Vícios</label>
                   </div>
                 </div>
                 <div class="form-row">
@@ -3929,7 +3942,13 @@ function processarFoto(input) {
         var u8arr = new Uint8Array(n);
         while(n--) u8arr[n] = bstr.charCodeAt(n);
         var blob = new Blob([u8arr], {type: 'image/jpeg'});
-        await sb.storage.from('avatars').upload(user.id + '.jpg', blob, { upsert: true, contentType: 'image/jpeg' });
+        const uploadResult = await sb.storage.from('avatars').upload(user.id + '.jpg', blob, { upsert: true, contentType: 'image/jpeg' });
+        if (!uploadResult.error) {
+          const { data: urlData } = sb.storage.from('avatars').getPublicUrl(user.id + '.jpg');
+          if (urlData && urlData.publicUrl) {
+            await sb.from('configuracoes').update({ foto_url: urlData.publicUrl }).eq('user_id', user.id);
+          }
+        }
       } catch(e) { console.log('Upload storage:', e); }
     };
     img.src = e.target.result;
