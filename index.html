@@ -2614,6 +2614,10 @@ async function carregarSlug() {
   if (data?.slug) {
     document.getElementById('cfg-slug').value = data.slug;
     document.getElementById('cfg-slug-preview').textContent = data.slug;
+    const perfilPreview = document.getElementById('cfg-perfil-preview');
+    if (perfilPreview) perfilPreview.textContent = data.slug;
+    const perfilLink = document.getElementById('cfg-perfil-link');
+    if (perfilLink) perfilLink.href = 'https://www.lumapsi.com.br/perfil/' + data.slug;
   }
 }
 
