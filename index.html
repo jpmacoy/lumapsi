@@ -82,20 +82,21 @@ select.form-input{cursor:pointer}
 .logo-wrap{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px}
 .logo-icon{width:36px;height:36px;background:rgba(129,140,248,0.25);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(129,140,248,0.35)}
 .logo-icon i{color:#fff;font-size:18px}
-.logo-name{font-size:16px;font-weight:700;color:#fff;letter-spacing:-0.3px}
-.logo-sub{font-size:10px;color:rgba(255,255,255,0.4)}
+.logo-name{font-size:15px;font-weight:700;color:#fff;letter-spacing:-0.2px;font-variant-numeric:tabular-nums}
+.logo-sub{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:0.3px}
 .nav{padding:12px 10px;flex:1;overflow-y:auto}
-.nav-lbl{font-size:9px;font-weight:600;color:rgba(255,255,255,0.28);letter-spacing:1.4px;text-transform:uppercase;padding:12px 12px 4px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:13px;color:rgba(255,255,255,0.5);cursor:pointer;margin-bottom:1px;user-select:none;transition:background 0.18s ease,color 0.18s ease;position:relative;overflow:hidden}
-.nav-item::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%) scaleY(0);width:3px;height:22px;background:#818CF8;border-radius:0 3px 3px 0;transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1)}
-.nav-item:hover::before,.nav-item.active::before{transform:translateY(-50%) scaleY(1)}
-.nav-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.88)}
-.nav-item:hover i{transform:translateX(2px);color:#A5B4FC}
-.nav-item:hover .nav-lbl-text{transform:translateX(2px)}
-.nav-item.active{background:rgba(129,140,248,0.16);color:#E0E7FF;font-weight:500}
-.nav-item.active i{color:#A5B4FC}
-.nav-item i{font-size:16px;flex-shrink:0;transition:transform 0.18s ease,color 0.18s ease;color:rgba(255,255,255,0.4)}
-.nav-item .nav-lbl-text{transition:transform 0.18s ease}
+.nav-lbl{font-size:9px;font-weight:600;color:rgba(255,255,255,0.25);letter-spacing:1.5px;text-transform:uppercase;padding:14px 12px 5px;display:flex;align-items:center;gap:8px}.nav-lbl::after{content:"";flex:1;height:1px;background:rgba(255,255,255,0.07);border-radius:1px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:13px;color:rgba(255,255,255,0.5);cursor:pointer;margin-bottom:2px;user-select:none;transition:background 0.2s ease,color 0.2s ease;position:relative;overflow:hidden}
+.nav-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#A5B4FC,#818CF8);border-radius:0 3px 3px 0;transform:scaleY(0) scaleX(0);transform-origin:center;transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1),opacity 0.2s}
+.nav-item:hover::before,.nav-item.active::before{transform:scaleY(1) scaleX(1)}
+.nav-item:hover{background:rgba(255,255,255,0.09);color:rgba(255,255,255,0.92)}
+.nav-item:hover i{transform:translateX(3px);color:#C7D2FE}
+.nav-item:hover .nav-lbl-text{transform:translateX(3px);color:rgba(255,255,255,0.92)}
+.nav-item.active{background:linear-gradient(90deg,rgba(129,140,248,0.22),rgba(129,140,248,0.08));color:#E0E7FF;font-weight:500}
+.nav-item.active i{color:#A5B4FC;transform:translateX(2px)}
+.nav-item.active .nav-lbl-text{transform:translateX(2px)}
+.nav-item i{font-size:16px;flex-shrink:0;transition:transform 0.2s ease,color 0.2s ease;color:rgba(255,255,255,0.38)}
+.nav-item .nav-lbl-text{transition:transform 0.2s ease,color 0.2s ease;flex:1}
 .nav-badge{margin-left:auto;background:rgba(239,68,68,0.9);color:#fff;font-size:9px;font-weight:700;min-width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0 4px}
 .sidebar-foot{padding:12px 10px;border-top:1px solid rgba(255,255,255,0.08)}
 .user-row{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:10px;cursor:pointer;transition:background 0.18s}
@@ -393,19 +394,19 @@ tr:hover td{background:#FAFAFF}
     </div>
     <div class="nav">
       <div class="nav-lbl">Principal</div>
-      <div class="nav-item active" onclick="irPara('dashboard',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
-      <div class="nav-item" onclick="irPara('agenda',this)"><i class="ti ti-calendar"></i> Agenda</div>
-      <div class="nav-item" onclick="irPara('pacientes',this)"><i class="ti ti-users"></i> Pacientes</div>
-      <div class="nav-item" onclick="irPara('prontuario',this)"><i class="ti ti-notes"></i> Prontuário</div>
-      <div class="nav-item" onclick="irPara('sessoes',this)"><i class="ti ti-clock"></i> Sessões <span class="nav-badge" id="badge-sessoes">0</span></div>
+      <div class="nav-item active" onclick="irPara('dashboard',this)"><i class="ti ti-layout-dashboard"></i><span class="nav-lbl-text">Dashboard</span></div>
+      <div class="nav-item" onclick="irPara('agenda',this)"><i class="ti ti-calendar"></i><span class="nav-lbl-text">Agenda</span></div>
+      <div class="nav-item" onclick="irPara('pacientes',this)"><i class="ti ti-users"></i><span class="nav-lbl-text">Pacientes</span></div>
+      <div class="nav-item" onclick="irPara('prontuario',this)"><i class="ti ti-notes"></i><span class="nav-lbl-text">Prontuário</span></div>
+      <div class="nav-item" onclick="irPara('sessoes',this)"><i class="ti ti-clock"></i><span class="nav-lbl-text">Sessões</span><span class="nav-badge" id="badge-sessoes">0</span></div>
       <div class="nav-lbl">Financeiro</div>
-      <div class="nav-item" onclick="irPara('financeiro',this)"><i class="ti ti-building"></i> Consultório</div>
-      <div class="nav-item" onclick="irPara('pessoal',this)"><i class="ti ti-wallet"></i> Pessoal</div>
+      <div class="nav-item" onclick="irPara('financeiro',this)"><i class="ti ti-building"></i><span class="nav-lbl-text">Consultório</span></div>
+      <div class="nav-item" onclick="irPara('pessoal',this)"><i class="ti ti-wallet"></i><span class="nav-lbl-text">Pessoal</span></div>
       <div class="nav-lbl">Crescimento</div>
-      <div class="nav-item" onclick="irPara('marketing',this)"><i class="ti ti-sparkles"></i> Marketing IA</div>
+      <div class="nav-item" onclick="irPara('marketing',this)"><i class="ti ti-sparkles"></i><span class="nav-lbl-text">Marketing IA</span></div>
       <div class="nav-lbl">Análise</div>
-      <div class="nav-item" onclick="irPara('relatorios',this)"><i class="ti ti-chart-bar"></i> Relatórios</div>
-      <div class="nav-item" onclick="irPara('config',this)"><i class="ti ti-settings"></i> Configurações</div>
+      <div class="nav-item" onclick="irPara('relatorios',this)"><i class="ti ti-chart-bar"></i><span class="nav-lbl-text">Relatórios</span></div>
+      <div class="nav-item" onclick="irPara('config',this)"><i class="ti ti-settings"></i><span class="nav-lbl-text">Configurações</span></div>
     </div>
     <div class="sidebar-foot">
       <div class="user-row">
