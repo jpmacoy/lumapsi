@@ -232,17 +232,21 @@ body {
   gap: 10px;
 }
 .esp-item {
-  background: #fff;
-  border: 1px solid var(--borda);
-  border-radius: 12px;
-  padding: 10px 16px;
+  background: var(--roxo-claro);
+  border: 1px solid rgba(79,70,229,0.15);
+  border-radius: 50px;
+  padding: 8px 16px;
   font-size: 13px;
-  color: var(--preto);
+  color: var(--roxo);
+  font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  transition: all .15s;
 }
-.esp-item i { color: var(--roxo); font-size: 15px; }
+.esp-item:hover { background: var(--roxo); color: #fff; }
+.esp-item:hover i { color: #fff; }
+.esp-item i { color: var(--roxo); font-size: 14px; }
 
 /* ── MODALIDADES ─────────────────── */
 .modal-grid {
@@ -255,8 +259,17 @@ body {
   border: 1px solid var(--borda);
   border-radius: 16px;
   padding: 20px;
+  transition: all .2s;
 }
-.modal-card.destaque { border-color: var(--roxo-med); }
+.modal-card.destaque { 
+  border-color: var(--roxo-med);
+  box-shadow: 0 4px 16px rgba(79,70,229,0.08);
+}
+.modal-card:hover {
+  border-color: var(--roxo-med);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(79,70,229,0.1);
+}
 .modal-icon {
   width: 44px; height: 44px;
   border-radius: 12px;
@@ -635,6 +648,24 @@ function renderPerfil(cfg) {
 
     <!-- CTA FINAL -->
     <div class="content" style="padding-top:0;">
+      <!-- AVISO DE CONFIANÇA -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:40px;padding:20px;background:#fff;border-radius:16px;border:1px solid var(--borda);">
+        <div style="text-align:center;">
+          <div style="font-size:22px;font-weight:700;color:var(--roxo);">100%</div>
+          <div style="font-size:12px;color:var(--cinza);">Sigilo garantido</div>
+        </div>
+        <div style="width:1px;height:40px;background:var(--borda);"></div>
+        <div style="text-align:center;">
+          <div style="font-size:22px;font-weight:700;color:var(--roxo);">CFP</div>
+          <div style="font-size:12px;color:var(--cinza);">Registro ativo</div>
+        </div>
+        <div style="width:1px;height:40px;background:var(--borda);"></div>
+        <div style="text-align:center;">
+          <div style="font-size:22px;font-weight:700;color:var(--roxo);">50min</div>
+          <div style="font-size:12px;color:var(--cinza);">Por sessão</div>
+        </div>
+      </div>
+
       <div class="cta-box">
         <h2>Pronto para começar?</h2>
         <p>O primeiro passo é o mais importante. Estou aqui para te acompanhar.</p>
