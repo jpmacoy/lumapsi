@@ -206,6 +206,8 @@ async function carregarPerfil(){
   renderPerfil(cfg);
 }
 
+var _userId="",_psiNome="",_psiWhats="";
+function enviarSolicitacaoForm(){enviarSolicitacao(_userId,_psiNome,_psiWhats);}
 function renderPerfil(cfg){
   const nome=cfg.nome||"Psicologo(a)";
   const primeiroNome=nome.split(" ")[0];
@@ -223,6 +225,9 @@ function renderPerfil(cfg){
   const fotoUrl=cfg.foto_url||"";
   const instagram=cfg.instagram||"";
   const iniciais=nome.split(" ").map(n=>n[0]).slice(0,2).join("").toUpperCase();
+  _userId=cfg.user_id;
+  _psiNome=nome;
+  _psiWhats=whats;
   let esps=[];
   try{esps=JSON.parse(cfg.especialidades||"[]");}catch(e){}
 
@@ -346,7 +351,7 @@ function renderPerfil(cfg){
     "<div class='form-g'><label class='form-l'>Preferencia de horario</label><select class='form-i' id='ag-horario'><option value=''>Sem preferencia</option><option>Manha</option><option>Tarde</option><option>Noite</option></select></div>"+
     (tipoOpts.includes("option value")&&tipoOpts.split("option").length>3?"<div class='form-g'><label class='form-l'>Modalidade</label><select class='form-i' id='ag-tipo'>"+tipoOpts+"</select></div>":"<input type='hidden' id='ag-tipo' value='"+(modalidade==="online"?"Online":"Presencial")+"'>")+
     "<div class='form-g'><label class='form-l'>O que te traz a terapia? (opcional)</label><textarea class='form-i' id='ag-msg' placeholder='Pode ser breve. O importante e dar o primeiro passo.'></textarea></div>"+
-    "<button class='btn-sub' onclick="enviarSolicitacao('"+cfg.user_id+"','"+nome+"','"+whats+"')"><i class='ti ti-calendar-check'></i>Enviar solicitacao</button>"+
+    "<button class='btn-sub' onclick='enviarSolicitacaoForm()'><i class='ti ti-calendar-check'></i>Enviar solicitacao</button>"+
     "</div></div></section>"+
 
     // FOOTER
