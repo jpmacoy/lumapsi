@@ -3339,30 +3339,83 @@ async function gerarEvolucaoIA() {
   const pacId = document.getElementById('ne-pac').value;
   const btn = document.getElementById('btn-gerar-ia');
 
-  if (!palavras) { toast('Digite palavras-chave para gerar a evolução', 'error'); return; }
-
-  // Buscar dados do paciente para contextualizar
-  const pac = todosPacientes.find(p => p.id == pacId);
-  const abordagem = pac?.abordagem || 'psicoterapia';
-  const queixa = pac?.queixa_principal || '';
+  if (!palavras) { toast('Digite as anotações da sessão para gerar a evolução', 'error'); return; }
+  if (!pacId) { toast('Selecione um paciente', 'error'); return; }
 
   btn.disabled = true;
   btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;"></i> Gerando...';
 
-  const prompt = `Você é um assistente especializado em psicologia clínica. Gere uma evolução clínica profissional e estruturada em português brasileiro para um prontuário psicológico.
+  // Buscar dados completos do paciente
+  const pac = todosPacientes.find(p => p.id == pacId);
+  const nomePac = pac?.nome || 'Paciente';
+  const queixaPrincipal = pac?.queixa_principal || '';
 
-Abordagem terapêutica: ${abordagem}
-${queixa ? 'Queixa principal do paciente: ' + queixa : ''}
-Palavras-chave da sessão: ${palavras}
+  // Buscar abordagem do psicólogo (nas configurações)
+  const { data: { user } } = await sb.auth.getUser();
+  const { data: cfg } = await sb.from('configuracoes').select('abordagem, nome, crp').eq('user_id', user.id).single();
+  const abordagemPsi = cfg?.abordagem || 'Psicoterapia';
+  const nomePsi = cfg?.nome || 'Psicólogo(a)';
 
-Escreva uma evolução clínica completa com 2 a 3 parágrafos que:
-- Descreva o estado emocional e comportamental do paciente na sessão
-- Relate as intervenções terapêuticas realizadas
-- Indique a resposta do paciente às intervenções
-- Use linguagem clínica adequada e profissional
-- Seja objetiva e em terceira pessoa
+  // Buscar últimas 3 evoluções para contexto histórico
+  const { data: evolucoes } = await sb.from('evolucoes')
+    .select('conteudo, created_at')
+    .eq('paciente_id', pacId)
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(3);
 
-Escreva apenas a evolução, sem títulos, sem introdução e sem explicações adicionais.`;
+  // Contar total de sessões realizadas
+  const { count } = await sb.from('sessoes')
+    .select('*', { count: 'exact', head: true })
+    .eq('paciente_id', pacId)
+    .eq('user_id', user.id)
+    .eq('status', 'Realizada');
+
+  const numSessao = (count || 0) + 1;
+
+  // Montar contexto histórico
+  let historicoTexto = '';
+  if (evolucoes && evolucoes.length > 0) {
+    historicoTexto = 'HISTÓRICO DAS ÚLTIMAS SESSÕES:\n';
+    evolucoes.reverse().forEach((ev, i) => {
+      const data = new Date(ev.created_at).toLocaleDateString('pt-BR');
+      historicoTexto += `Sessão ${data}: ${ev.conteudo.substring(0, 300)}...\n\n`;
+    });
+  }
+
+  const prompt = `Você é um assistente clínico especializado em psicologia. Sua tarefa é gerar uma evolução clínica estruturada no formato SOAP para o prontuário psicológico, em português brasileiro formal.
+
+DADOS DO PROFISSIONAL:
+- Psicólogo(a): ${nomePsi}
+- Abordagem terapêutica: ${abordagemPsi}
+
+DADOS DO PACIENTE:
+- Nome: ${nomePac}
+- Queixa principal: ${queixaPrincipal || 'Não informada'}
+- Número da sessão: ${numSessao}ª sessão
+
+${historicoTexto ? historicoTexto : ''}
+
+ANOTAÇÕES DO PSICÓLOGO SOBRE ESTA SESSÃO:
+${palavras}
+
+INSTRUÇÕES:
+Gere uma evolução clínica profissional no formato SOAP adaptado à psicologia:
+
+**S - SUBJETIVO:** O que o paciente relatou na sessão (sentimentos, situações, queixas do período). Use as anotações fornecidas. Escreva em 2-3 frases objetivas em terceira pessoa.
+
+**O - OBJETIVO:** O que o psicólogo observou durante a sessão (comportamento, humor, postura, nível de engajamento, aspectos não-verbais). Infira a partir das anotações e do contexto. Escreva em 2-3 frases.
+
+**A - AVALIAÇÃO:** Análise clínica — relação com a queixa principal, progresso em relação às sessões anteriores, hipóteses e reflexões clínicas baseadas na abordagem ${abordagemPsi}. Escreva em 2-4 frases.
+
+**P - PLANO:** Intervenções realizadas nesta sessão e encaminhamentos para as próximas (tarefas, técnicas, foco terapêutico). Escreva em 2-3 frases.
+
+IMPORTANTE:
+- Escreva em terceira pessoa ("O paciente relata...", "Observa-se...", "Avalia-se...")
+- Use linguagem clínica profissional mas acessível
+- Seja fiel às anotações fornecidas — não invente informações que não estejam nas anotações
+- Mantenha coerência com o histórico quando disponível
+- Inclua apenas os 4 blocos SOAP, sem introdução nem conclusão`;
 
   try {
     const res = await fetch(GROQ_URL, {
