@@ -392,6 +392,8 @@ tr:hover td{background:#FAFAFF}
       <div class="nav-lbl">Financeiro</div>
       <div class="nav-item" onclick="irPara('financeiro',this)"><i class="ti ti-building"></i> Consultório</div>
       <div class="nav-item" onclick="irPara('pessoal',this)"><i class="ti ti-wallet"></i> Pessoal</div>
+      <div class="nav-lbl">Crescimento</div>
+      <div class="nav-item" onclick="irPara('marketing',this)"><i class="ti ti-sparkles"></i> Marketing IA</div>
       <div class="nav-lbl">Análise</div>
       <div class="nav-item" onclick="irPara('relatorios',this)"><i class="ti ti-chart-bar"></i> Relatórios</div>
       <div class="nav-item" onclick="irPara('config',this)"><i class="ti ti-settings"></i> Configurações</div>
@@ -438,6 +440,20 @@ tr:hover td{background:#FAFAFF}
         </div>
 
         <div id="dash-tab-consultorio">
+        <!-- MENSAGEM DIÁRIA -->
+        <div id="msg-diaria" style="margin-bottom:14px;border-radius:12px;overflow:hidden;display:none;">
+          <div style="padding:16px 20px;display:flex;align-items:center;gap:16px;position:relative;">
+            <div id="msg-diaria-icon" style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;"></div>
+            <div style="flex:1;">
+              <div id="msg-diaria-label" style="font-size:10px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;margin-bottom:3px;opacity:.7;"></div>
+              <div id="msg-diaria-texto" style="font-size:13px;line-height:1.55;"></div>
+            </div>
+            <button onclick="this.parentElement.parentElement.style.display='none'" style="background:none;border:none;cursor:pointer;opacity:.4;padding:4px;flex-shrink:0;">
+              <i class="ti ti-x" style="font-size:14px;"></i>
+            </button>
+          </div>
+        </div>
+
         <!-- PRÓXIMA SESSÃO EM DESTAQUE -->
         <div id="dash-proxima" style="background:var(--brand);border-radius:var(--r);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
           <div style="width:44px;height:44px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -1029,6 +1045,98 @@ tr:hover td{background:#FAFAFF}
             </table>
           </div>
         </div>
+      <!-- ── MARKETING ── -->
+      <div class="screen" id="sc-marketing" style="display:none;">
+        <div style="margin-bottom:24px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+            <h2 style="font-size:20px;font-weight:500;margin:0;">Marketing com IA</h2>
+            <i class="ti ti-sparkles" style="color:var(--purple);font-size:18px;"></i>
+          </div>
+          <p style="font-size:13px;color:var(--t2);margin:0;">Crie conteudo profissional para crescer nas redes sociais e atrair mais pacientes.</p>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+
+          <div class="card" style="cursor:pointer;" onclick="abrirFerramentaMarketing('post')">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+              <div style="width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#E040FB,#7B1FA2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="ti ti-brand-instagram" style="color:#fff;font-size:21px;"></i>
+              </div>
+              <div>
+                <div style="font-size:13px;font-weight:500;">Post para Instagram</div>
+                <div style="font-size:11px;color:var(--t3);">Legenda pronta para publicar</div>
+              </div>
+            </div>
+            <p style="font-size:12px;color:var(--t2);line-height:1.6;margin:0;">Informe o tema e receba uma legenda completa com hashtags e chamada para acao no tom certo para psicologos.</p>
+          </div>
+
+          <div class="card" style="cursor:pointer;" onclick="abrirFerramentaMarketing('calendario')">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+              <div style="width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#26C6DA,#00838F);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="ti ti-calendar-event" style="color:#fff;font-size:21px;"></i>
+              </div>
+              <div>
+                <div style="font-size:13px;font-weight:500;">Calendario de conteudo</div>
+                <div style="font-size:11px;color:var(--t3);">12 ideias para o mes</div>
+              </div>
+            </div>
+            <p style="font-size:12px;color:var(--t2);line-height:1.6;margin:0;">Gere um calendario com 12 sugestoes de posts para o mes equilibrando educacao conexao e captacao.</p>
+          </div>
+
+          <div class="card" style="cursor:pointer;" onclick="abrirFerramentaMarketing('boasvindas')">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+              <div style="width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#66BB6A,#2E7D32);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="ti ti-brand-whatsapp" style="color:#fff;font-size:21px;"></i>
+              </div>
+              <div>
+                <div style="font-size:13px;font-weight:500;">Mensagem de boas-vindas</div>
+                <div style="font-size:11px;color:var(--t3);">Para novo paciente via WhatsApp</div>
+              </div>
+            </div>
+            <p style="font-size:12px;color:var(--t2);line-height:1.6;margin:0;">Gere uma mensagem acolhedora e personalizada para enviar ao novo paciente apos o primeiro agendamento.</p>
+          </div>
+
+          <div class="card" style="cursor:pointer;" onclick="abrirFerramentaMarketing('bio')">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+              <div style="width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#FFA726,#E65100);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="ti ti-user-circle" style="color:#fff;font-size:21px;"></i>
+              </div>
+              <div>
+                <div style="font-size:13px;font-weight:500;">Bio para Instagram</div>
+                <div style="font-size:11px;color:var(--t3);">Apresentacao profissional</div>
+              </div>
+            </div>
+            <p style="font-size:12px;color:var(--t2);line-height:1.6;margin:0;">Crie uma bio profissional e atrativa para o Instagram com base na sua especialidade e abordagem terapeutica.</p>
+          </div>
+
+        </div>
+
+        <div class="card" id="mkt-area" style="display:none;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border);">
+            <div id="mkt-icon" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div id="mkt-titulo" style="font-size:14px;font-weight:500;"></div>
+              <div id="mkt-subtitulo" style="font-size:12px;color:var(--t3);"></div>
+            </div>
+            <button onclick="document.getElementById('mkt-area').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--t3);padding:4px;line-height:1;">
+              <i class="ti ti-x" style="font-size:16px;"></i>
+            </button>
+          </div>
+          <div id="mkt-form" style="margin-bottom:14px;"></div>
+          <button class="btn btn-primary" id="mkt-gerar-btn" onclick="gerarConteudoMarketing()" style="width:100%;padding:12px;font-size:14px;border-radius:10px;">
+            <i class="ti ti-sparkles"></i> Gerar com IA
+          </button>
+          <div id="mkt-resultado" style="display:none;margin-top:18px;">
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;font-size:13px;line-height:1.75;color:var(--t1);white-space:pre-wrap;max-height:400px;overflow-y:auto;" id="mkt-texto"></div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="btn btn-ghost btn-sm" onclick="copiarTextoMarketing()" style="flex:1;"><i class="ti ti-copy"></i> Copiar</button>
+              <button class="btn btn-ghost btn-sm" onclick="gerarConteudoMarketing()" style="flex:1;"><i class="ti ti-refresh"></i> Gerar outro</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
       </div>
 
     </div>
@@ -1401,6 +1509,7 @@ function iniciarApp(user) {
   carregarConfig();
   verificarStatusGoogleCalendar();
   carregarFotoPerfil();
+  mostrarMensagemDiaria();
 }
 
 // Verificar sessão existente
@@ -1421,6 +1530,7 @@ const paginasMeta = {
   financeiro: { title: 'Financeiro',         sub: () => 'Consultório',                 acao: 'Novo lançamento', modal: 'novo-lancamento' },
   pessoal:    { title: 'Financeiro Pessoal', sub: () => 'Suas finanças pessoais',      acao: 'Novo lançamento', modal: 'novo-lancamento' },
   relatorios: { title: 'Relatórios',         sub: () => 'Análise do período',          acao: null, modal: null },
+  marketing:  { title: 'Marketing com IA',     sub: () => 'Ferramentas para crescer',     acao: null, modal: null },
   config:     { title: 'Configurações',      sub: () => 'Preferências do sistema',     acao: null, modal: null },
 };
 
@@ -1454,6 +1564,7 @@ function irPara(pag, el) {
   if (pag === 'relatorios') carregarRelatorios();
   if (pag === 'agenda') carregarAgenda();
   if (pag === 'config') { carregarHorarios(); carregarSlug(); verificarStatusGoogleCalendar(); }
+  if (pag === 'marketing') { mostrarMensagemDiaria(); }
 }
 
 function acaoPrincipal() {
@@ -4169,6 +4280,245 @@ function gerarHtmlBase(titulo, corpo, psi, crp, hoje, email, tel) {
     '</div>' +
     '<div class="footer">Documento gerado pelo LumaPsi · lumapsi.com.br · ' + hoje + '</div>' +
     '</body></html>';
+}
+
+
+// ===== MENSAGEM DIARIA =====
+const MSGS_DIARIAS = [
+  {icon:"🌿",cor:"#E8F5E9",ct:"#2E7D32",label:"Cuidado com voce",texto:"Antes de cuidar dos outros, cuide de voce. A qualidade da sua presenca terapeutica comeca no seu proprio bem-estar. Como voce esta hoje?"},
+  {icon:"✨",cor:"#EDE7F6",ct:"#512DA8",label:"Proposito",texto:"Cada sessao que voce conduz com presenca e escuta genuina transforma uma vida. O impacto do seu trabalho vai muito alem do que voce consegue ver."},
+  {icon:"🌊",cor:"#E3F2FD",ct:"#1565C0",label:"Equilibrio",texto:"E normal sentir o peso do que ouve. Supervisao, analise pessoal e descanso nao sao luxo. Sao parte da sua pratica clinica."},
+  {icon:"🌸",cor:"#FCE4EC",ct:"#880E4F",label:"Conexao",texto:"A relacao terapeutica e o coracao da mudanca. A sua capacidade de criar vinculos seguros e uma habilidade rara e preciosa."},
+  {icon:"🔥",cor:"#FFF3E0",ct:"#E65100",label:"Motivacao",texto:"Voce escolheu uma das profissoes mais significativas que existem. Cada paciente que sai mais leve da sua sala carrega um pedaco da sua dedicacao."},
+  {icon:"🌱",cor:"#F1F8E9",ct:"#33691E",label:"Crescimento",texto:"O psicologo que nunca para de aprender e aquele que mais transforma. Cada livro e supervisao e investimento no seu cuidado."},
+  {icon:"💫",cor:"#F3E5F5",ct:"#4A148C",label:"Presenca",texto:"Presenca total e o maior presente que voce pode oferecer. Quando voce esta inteiramente ali, o paciente sente. E isso ja cura."},
+  {icon:"🏔️",cor:"#ECEFF1",ct:"#263238",label:"Resiliencia",texto:"Ha sessoes dificeis, pacientes que abandonam, casos que frustram. Isso nao significa fracasso. Significa que voce esta na linha de frente de algo que importa."},
+  {icon:"🎯",cor:"#E8EAF6",ct:"#1A237E",label:"Foco",texto:"Um dia de cada vez, uma sessao de cada vez. A consistencia ao longo do tempo e o que realmente transforma vidas."},
+  {icon:"🌙",cor:"#EDE7F6",ct:"#4527A0",label:"Descanso",texto:"Descansar tambem e trabalhar. Um psicologo descansado escuta melhor, percebe mais e oferece presenca que nenhuma tecnica substitui."},
+  {icon:"💚",cor:"#E8F5E9",ct:"#1B5E20",label:"Autocompaixao",texto:"Voce cobra de si mesmo o mesmo cuidado que ensina aos pacientes? Autocompaixao nao e fraqueza. E o modelo que voce demonstra na pratica."},
+  {icon:"🦋",cor:"#FFF8E1",ct:"#F57F17",label:"Transformacao",texto:"As mudancas na terapia raramente sao lineares. Confie no processo mesmo quando o progresso parece invisivel. A semente plantada hoje floresce no tempo certo."},
+  {icon:"🌺",cor:"#FCE4EC",ct:"#AD1457",label:"Gratidao",texto:"Pausa. Pense em um paciente que evoluiu significativamente. Voce fez parte disso. Permita-se receber essa gratidao."},
+  {icon:"⚡",cor:"#FFF3E0",ct:"#BF360C",label:"Energia",texto:"Se voce esta sentindo esgotamento, e sinal. Nao de fraqueza, mas de que deu muito de si. Recarregar nao e opcional, e profissional."},
+];
+
+function mostrarMensagemDiaria() {
+  var el = document.getElementById("msg-diaria");
+  if (!el) return;
+  var hoje = new Date();
+  var idx = (hoje.getFullYear() * 365 + hoje.getMonth() * 30 + hoje.getDate()) % MSGS_DIARIAS.length;
+  var m = MSGS_DIARIAS[idx];
+  el.style.background = m.cor;
+  el.style.display = "block";
+  document.getElementById("msg-diaria-icon").textContent = m.icon;
+  document.getElementById("msg-diaria-icon").style.background = "rgba(255,255,255,0.5)";
+  document.getElementById("msg-diaria-label").textContent = m.label;
+  document.getElementById("msg-diaria-label").style.color = m.ct;
+  document.getElementById("msg-diaria-texto").textContent = m.texto;
+  document.getElementById("msg-diaria-texto").style.color = m.ct;
+  var btn = el.querySelector("button");
+  if (btn) btn.style.color = m.ct;
+}
+
+// ===== MARKETING IA =====
+var mktTipo = null;
+
+var MKT = {
+  post: {
+    titulo: "Post para Instagram",
+    sub: "Legenda pronta para publicar",
+    iconHtml: '<i class="ti ti-brand-instagram" style="font-size:20px;color:#fff;"></i>',
+    iconBg: "linear-gradient(135deg,#E040FB,#7B1FA2)",
+    formHtml: function() {
+      return '<div class="form-group mb12"><label class="form-label">Tema do post *</label>' +
+        '<input class="form-input" id="mkt-campo1" placeholder="Ex: ansiedade no trabalho, autoestima, limites saudaveis..."></div>' +
+        '<div class="form-group mb12"><label class="form-label">Tom da mensagem</label>' +
+        '<select class="form-input" id="mkt-campo2">' +
+        '<option value="educativo">Educativo e informativo</option>' +
+        '<option value="reflexivo">Reflexivo e acolhedor</option>' +
+        '<option value="motivacional">Motivacional</option>' +
+        '<option value="pessoal">Pessoal e humanizado</option>' +
+        '</select></div>' +
+        '<div class="form-group"><label class="form-label">Incluir hashtags?</label>' +
+        '<select class="form-input" id="mkt-campo3">' +
+        '<option value="sim">Sim, incluir hashtags</option>' +
+        '<option value="nao">Nao incluir hashtags</option>' +
+        '</select></div>';
+    },
+    buildPrompt: async function(cfg) {
+      var tema = document.getElementById("mkt-campo1").value || "saude mental";
+      var tomMap = {educativo:"educativo e informativo", reflexivo:"reflexivo e acolhedor", motivacional:"motivacional", pessoal:"pessoal e humanizado"};
+      var tom = tomMap[document.getElementById("mkt-campo2").value] || "educativo";
+      var ht = document.getElementById("mkt-campo3").value === "sim";
+      var p = "Voce e especialista em marketing para psicologos. Crie uma legenda de post para Instagram.\n\n";
+      p += "Psicologo: " + (cfg.nome || "Psicologo") + "\n";
+      p += "Abordagem: " + (cfg.abordagem || "psicoterapia") + "\n";
+      p += "Tema: " + tema + "\n";
+      p += "Tom: " + tom + "\n\n";
+      p += "Instrucoes:\n";
+      p += "- Comece com frase impactante que prenda atencao\n";
+      p += "- Desenvolva em 3 a 5 paragrafos curtos\n";
+      p += "- Termine com chamada para acao sutil\n";
+      p += "- Linguagem acessivel, sem jargoes\n";
+      p += "- Escreva em portugues brasileiro\n";
+      if (ht) p += "- Adicione 8 a 12 hashtags relevantes ao final\n";
+      p += "\nEscreva apenas a legenda, sem explicacoes.";
+      return p;
+    }
+  },
+  calendario: {
+    titulo: "Calendario de conteudo",
+    sub: "12 ideias de posts para o mes",
+    iconHtml: '<i class="ti ti-calendar-event" style="font-size:20px;color:#fff;"></i>',
+    iconBg: "linear-gradient(135deg,#26C6DA,#00838F)",
+    formHtml: function() {
+      return '<div class="form-group mb12"><label class="form-label">Mes de referencia</label>' +
+        '<input class="form-input" id="mkt-campo1" placeholder="Ex: junho 2026"></div>' +
+        '<div class="form-group"><label class="form-label">Foco principal</label>' +
+        '<select class="form-input" id="mkt-campo2">' +
+        '<option value="geral">Mix equilibrado de conteudos</option>' +
+        '<option value="captacao">Captacao de novos pacientes</option>' +
+        '<option value="educacao">Educacao em saude mental</option>' +
+        '<option value="humanizacao">Humanizacao e conexao</option>' +
+        '</select></div>';
+    },
+    buildPrompt: async function(cfg) {
+      var mes = document.getElementById("mkt-campo1").value || "proximo mes";
+      var focoMap = {geral:"mix equilibrado", captacao:"captacao de novos pacientes", educacao:"educacao em saude mental", humanizacao:"humanizacao e conexao"};
+      var foco = focoMap[document.getElementById("mkt-campo2").value] || "mix equilibrado";
+      var p = "Crie um calendario de conteudo para Instagram de um psicologo.\n\n";
+      p += "Profissional: " + (cfg.nome || "Psicologo") + " - " + (cfg.abordagem || "psicoterapia") + "\n";
+      p += "Mes: " + mes + "\n";
+      p += "Foco: " + foco + "\n\n";
+      p += "Gere exatamente 12 ideias numeradas no formato:\n";
+      p += "1. [Tipo] - [Tema] - [Sugestao de abertura]\n\n";
+      p += "Tipos: Educativo, Reflexao, Dica pratica, Desmistificando, Bastidores, Data especial, Pergunta engajadora, Fato, Historia, Motivacional, CTA, Conexao.\n";
+      p += "Seja especifico e criativo. Portugues brasileiro.";
+      return p;
+    }
+  },
+  boasvindas: {
+    titulo: "Mensagem de boas-vindas",
+    sub: "Para enviar ao novo paciente via WhatsApp",
+    iconHtml: '<i class="ti ti-brand-whatsapp" style="font-size:20px;color:#fff;"></i>',
+    iconBg: "linear-gradient(135deg,#66BB6A,#2E7D32)",
+    formHtml: function() {
+      return '<div class="form-group mb12"><label class="form-label">Nome do paciente *</label>' +
+        '<input class="form-input" id="mkt-campo1" placeholder="Ex: Ana, Carlos..."></div>' +
+        '<div class="form-group mb12"><label class="form-label">Tipo de atendimento</label>' +
+        '<select class="form-input" id="mkt-campo2">' +
+        '<option value="online">Online</option>' +
+        '<option value="presencial">Presencial</option>' +
+        '</select></div>' +
+        '<div class="form-group"><label class="form-label">Informacao adicional (opcional)</label>' +
+        '<input class="form-input" id="mkt-campo3" placeholder="Ex: primeira sessao, retorno, avaliacao..."></div>';
+    },
+    buildPrompt: async function(cfg) {
+      var nomePac = document.getElementById("mkt-campo1").value || "paciente";
+      var tipo = document.getElementById("mkt-campo2").value;
+      var info = document.getElementById("mkt-campo3").value || "";
+      var p = "Crie uma mensagem de boas-vindas para WhatsApp de um psicologo para novo paciente.\n\n";
+      p += "Psicologo: " + (cfg.nome || "Psicologo") + "\n";
+      p += "Paciente: " + nomePac + "\n";
+      p += "Atendimento: " + tipo + "\n";
+      if (info) p += "Info adicional: " + info + "\n";
+      p += "\nInstrucoes:\n";
+      p += "- Tom acolhedor, humano e profissional\n";
+      p += "- Maximo 5 linhas\n";
+      p += "- Faca o paciente sentir que esta em boas maos\n";
+      p += "- Use no maximo 2 emojis\n";
+      p += "- Portugues brasileiro\n";
+      p += "\nEscreva apenas a mensagem, pronta para enviar.";
+      return p;
+    }
+  },
+  bio: {
+    titulo: "Bio para Instagram",
+    sub: "Apresentacao profissional atrativa",
+    iconHtml: '<i class="ti ti-user-circle" style="font-size:20px;color:#fff;"></i>',
+    iconBg: "linear-gradient(135deg,#FFA726,#E65100)",
+    formHtml: function() {
+      return '<div class="form-group mb12"><label class="form-label">Estilo da bio</label>' +
+        '<select class="form-input" id="mkt-campo1">' +
+        '<option value="profissional">Profissional e direto</option>' +
+        '<option value="acolhedor">Acolhedor e humano</option>' +
+        '<option value="moderno">Moderno e descontraido</option>' +
+        '</select></div>' +
+        '<div class="form-group"><label class="form-label">Destacar algo especifico (opcional)</label>' +
+        '<input class="form-input" id="mkt-campo2" placeholder="Ex: atendo casais, 10 anos de experiencia..."></div>';
+    },
+    buildPrompt: async function(cfg) {
+      var estiloMap = {profissional:"profissional e direto", acolhedor:"acolhedor e humano", moderno:"moderno e descontraido"};
+      var estilo = estiloMap[document.getElementById("mkt-campo1").value] || "profissional";
+      var destaque = document.getElementById("mkt-campo2").value || "";
+      var p = "Crie uma bio para Instagram de psicologo.\n\n";
+      p += "Nome: " + (cfg.nome || "Psicologo") + "\n";
+      p += "Abordagem: " + (cfg.abordagem || "psicoterapia") + "\n";
+      if (cfg.cidade) p += "Cidade: " + cfg.cidade + "\n";
+      if (destaque) p += "Destaque: " + destaque + "\n";
+      p += "Estilo: " + estilo + "\n\n";
+      p += "Instrucoes:\n";
+      p += "- Maximo 150 caracteres\n";
+      p += "- Comece com o que faz\n";
+      p += "- Mencione para quem atende ou diferencial\n";
+      p += "- Termine com CTA\n";
+      p += "- No maximo 2 emojis estrategicos\n";
+      p += "- Portugues brasileiro\n";
+      p += "\nEscreva apenas a bio.";
+      return p;
+    }
+  }
+};
+
+async function abrirFerramentaMarketing(tipo) {
+  mktTipo = tipo;
+  var f = MKT[tipo];
+  if (!f) return;
+  var area = document.getElementById("mkt-area");
+  var icon = document.getElementById("mkt-icon");
+  icon.innerHTML = f.iconHtml;
+  icon.style.background = f.iconBg;
+  document.getElementById("mkt-titulo").textContent = f.titulo;
+  document.getElementById("mkt-subtitulo").textContent = f.sub;
+  document.getElementById("mkt-form").innerHTML = f.formHtml();
+  document.getElementById("mkt-resultado").style.display = "none";
+  area.style.display = "block";
+  area.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+async function gerarConteudoMarketing() {
+  if (!mktTipo) return;
+  var btn = document.getElementById("mkt-gerar-btn");
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin .8s linear infinite;display:inline-block;"></i> Gerando...';
+  try {
+    var sessao = await sb.auth.getSession();
+    var uid = sessao.data.session ? sessao.data.session.user.id : null;
+    var cfg = {};
+    if (uid) {
+      var res = await sb.from("configuracoes").select("nome,abordagem,cidade,especialidades").eq("user_id", uid).single();
+      if (res.data) cfg = res.data;
+    }
+    var prompt = await MKT[mktTipo].buildPrompt(cfg);
+    var r = await fetch(GROQ_URL, {
+      method: "POST",
+      headers: {"Content-Type":"application/json","Authorization":"Bearer " + GROQ_KEY},
+      body: JSON.stringify({model: GROQ_MODEL, messages:[{role:"user",content:prompt}], max_tokens:900, temperature:0.85})
+    });
+    var data = await r.json();
+    var texto = data.choices[0].message.content;
+    document.getElementById("mkt-texto").textContent = texto;
+    document.getElementById("mkt-resultado").style.display = "block";
+    document.getElementById("mkt-resultado").scrollIntoView({behavior:"smooth", block:"nearest"});
+  } catch(e) {
+    toast("Erro ao gerar conteudo. Tente novamente.", "error");
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-sparkles"></i> Gerar com IA';
+}
+
+function copiarTextoMarketing() {
+  var txt = document.getElementById("mkt-texto").textContent;
+  navigator.clipboard.writeText(txt).then(function() { toast("Copiado!", "success"); });
 }
 
 </script>
