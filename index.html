@@ -653,11 +653,39 @@ tr:hover td{background:#FAFAFF}
             <input class="form-input" style="padding-left:32px;width:200px;" placeholder="Buscar..." oninput="buscarPaciente(this.value)">
           </div>
         </div>
-        <div class="g4 mb16">
-          <div class="mc"><div class="mc-lbl">Ativos</div><div class="mc-val" id="pm-ativos">—</div></div>
-          <div class="mc"><div class="mc-lbl">Em avaliação</div><div class="mc-val" id="pm-aval">—</div></div>
-          <div class="mc"><div class="mc-lbl">Ticket médio</div><div class="mc-val" id="pm-ticket">—</div></div>
-          <div class="mc"><div class="mc-lbl">Total</div><div class="mc-val" id="pm-total">—</div></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
+          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#059669,#34D399);border-radius:14px 14px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Ativos</div>
+              <div style="width:30px;height:30px;border-radius:8px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;"><i class="ti ti-heart-handshake" style="font-size:14px;color:#059669;"></i></div>
+            </div>
+            <div style="font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--t1);" id="pm-ativos">—</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#D97706,#FCD34D);border-radius:14px 14px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Em avaliação</div>
+              <div style="width:30px;height:30px;border-radius:8px;background:#FFF7ED;display:flex;align-items:center;justify-content:center;"><i class="ti ti-user-check" style="font-size:14px;color:#D97706;"></i></div>
+            </div>
+            <div style="font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--t1);" id="pm-aval">—</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#5046E5,#818CF8);border-radius:14px 14px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Ticket médio</div>
+              <div style="width:30px;height:30px;border-radius:8px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;"><i class="ti ti-currency-dollar" style="font-size:14px;color:#5046E5;"></i></div>
+            </div>
+            <div style="font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--t1);" id="pm-ticket">—</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#7C3AED,#A78BFA);border-radius:14px 14px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Total</div>
+              <div style="width:30px;height:30px;border-radius:8px;background:#F5F3FF;display:flex;align-items:center;justify-content:center;"><i class="ti ti-users" style="font-size:14px;color:#7C3AED;"></i></div>
+            </div>
+            <div style="font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--t1);" id="pm-total">—</div>
+          </div>
         </div>
         <div class="g2" id="grid-pacientes"><div class="loading">Carregando pacientes...</div></div>
       </div>
@@ -697,11 +725,47 @@ tr:hover td{background:#FAFAFF}
             <option value="">Todos os pacientes</option>
           </select>
         </div>
-        <div class="g4 mb16">
-          <div class="mc"><div class="mc-lbl">Total</div><div class="mc-val" id="sm-total">—</div></div>
-          <div class="mc"><div class="mc-lbl">Realizadas</div><div class="mc-val" id="sm-real">—</div></div>
-          <div class="mc"><div class="mc-lbl">Comparecimento</div><div class="mc-val" id="sm-comp">—</div></div>
-          <div class="mc"><div class="mc-lbl">Pendentes pag.</div><div class="mc-val" id="sm-pend" style="color:var(--amber);">—</div></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
+          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#5046E5,#818CF8);border-radius:14px 14px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Total</div>
+              <div style="width:30px;height:30px;border-radius:8px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;">
+                <i class="ti ti-calendar-stats" style="font-size:14px;color:#5046E5;"></i>
+              </div>
+            </div>
+            <div style="font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--t1);" id="sm-total">—</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#059669,#34D399);border-radius:14px 14px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Realizadas</div>
+              <div style="width:30px;height:30px;border-radius:8px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;">
+                <i class="ti ti-check" style="font-size:14px;color:#059669;"></i>
+              </div>
+            </div>
+            <div style="font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--t1);" id="sm-real">—</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#7C3AED,#A78BFA);border-radius:14px 14px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Comparecimento</div>
+              <div style="width:30px;height:30px;border-radius:8px;background:#F5F3FF;display:flex;align-items:center;justify-content:center;">
+                <i class="ti ti-chart-pie" style="font-size:14px;color:#7C3AED;"></i>
+              </div>
+            </div>
+            <div style="font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--t1);" id="sm-comp">—</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#D97706,#FCD34D);border-radius:14px 14px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Pendentes pag.</div>
+              <div style="width:30px;height:30px;border-radius:8px;background:#FFF7ED;display:flex;align-items:center;justify-content:center;">
+                <i class="ti ti-clock-dollar" style="font-size:14px;color:#D97706;"></i>
+              </div>
+            </div>
+            <div style="font-size:26px;font-weight:700;letter-spacing:-1px;color:#D97706;" id="sm-pend">—</div>
+          </div>
         </div>
         <div class="card" style="padding:0;overflow:hidden;">
           <div class="tbl-wrap">
@@ -1323,22 +1387,21 @@ tr:hover td{background:#FAFAFF}
         <div style="position:relative;">
           <textarea class="form-input" id="ne-texto" style="min-height:120px;" placeholder="Descreva a evolução da sessão..."></textarea>
         </div>
-        <div style="background:var(--brand-light);border-radius:var(--rs);padding:10px 12px;margin-top:8px;">
-          <div style="font-size:11px;font-weight:500;color:var(--brand-dark);margin-bottom:6px;display:flex;align-items:center;gap:5px;">
-            <i class="ti ti-sparkles"></i> Gerar com IA
-          </div>
-          <input class="form-input" id="ne-palavras" placeholder="Ex: ansiedade, respiração, TCC, tarefa de casa..." style="margin-bottom:6px;font-size:12px;">
-          <div style="background:linear-gradient(135deg,#3730A3,#5046E5);border-radius:10px;padding:14px 16px;margin-top:4px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div style="margin-top:8px;">
+          <label class="form-label" style="margin-bottom:6px;">Anotações da sessão <span style="font-size:11px;color:var(--t3);font-weight:400;">(quanto mais detalhe, melhor a IA gera)</span></label>
+          <textarea class="form-input" id="ne-palavras" placeholder="Descreva o que aconteceu na sessão: o que o paciente relatou, como estava emocionalmente, o que foi trabalhado, resposta às intervenções..." style="font-size:12px;min-height:80px;margin-bottom:8px;"></textarea>
+          <div style="background:linear-gradient(135deg,#1E1B4B,#3730A3,#5046E5);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:-15px;right:-15px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.05);"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;">
               <div>
-                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
                   <i class="ti ti-sparkles" style="color:#A5B4FC;font-size:14px;"></i>
-                  <span style="font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:#A5B4FC;">IA Clínica</span>
+                  <span style="font-size:10px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:#A5B4FC;">IA Clínica — Formato SOAP</span>
                 </div>
-                <div style="font-size:12px;color:rgba(255,255,255,0.75);line-height:1.4;">Descreva a sessão acima e a IA gera a evolução no formato SOAP</div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5;">Gera Subjetivo, Objetivo, Avaliação e Plano automaticamente com base nas suas anotações e no histórico do paciente.</div>
               </div>
-              <button class="btn btn-sm" style="background:#fff;color:#3730A3;border:none;white-space:nowrap;flex-shrink:0;font-weight:500;" onclick="gerarEvolucaoIA()" id="btn-gerar-ia">
-                <i class="ti ti-sparkles"></i> Gerar evolução
+              <button class="btn btn-sm" style="background:#fff;color:#3730A3;border:none;white-space:nowrap;flex-shrink:0;font-weight:600;padding:8px 14px;" onclick="gerarEvolucaoIA()" id="btn-gerar-ia">
+                <i class="ti ti-sparkles"></i> Gerar
               </button>
             </div>
           </div>
