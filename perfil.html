@@ -3,534 +3,395 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LumaPsi — Perfil</title>
+<title>LumaPsi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --roxo:#4F46E5;
-  --roxo-cl:#EEF2FF;
-  --roxo-med:#818CF8;
-  --verde:#059669;
-  --verde-cl:#ECFDF5;
-  --creme:#FDFBF7;
-  --creme-escuro:#F5F0E8;
-  --cinza:#6B7280;
-  --cinza-cl:#F9FAFB;
-  --preto:#111827;
-  --borda:#E5E7EB;
-  --quente:#7C5C3C;
+  --roxo:#4F46E5;--roxo-cl:#EEF2FF;--roxo-med:#818CF8;
+  --verde:#059669;--verde-cl:#ECFDF5;
+  --creme:#FAFAF8;--cinza:#6B7280;--preto:#111827;--borda:#E5E7EB;
 }
-body{font-family:'DM Sans',sans-serif;background:#fff;color:var(--preto);min-height:100vh;-webkit-font-smoothing:antialiased}
+body{font-family:"DM Sans",sans-serif;background:#fff;color:var(--preto);-webkit-font-smoothing:antialiased}
 
-/* NAV FLUTUANTE */
-.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;transition:all .3s;}
-.nav.scrolled{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--borda);box-shadow:0 2px 20px rgba(0,0,0,0.05);}
-.nav-logo{font-family:'Lora',serif;font-size:15px;color:var(--preto);text-decoration:none;opacity:0;}
-.nav.scrolled .nav-logo{opacity:1;}
-.nav-cta{background:var(--roxo);color:#fff;border:none;padding:10px 22px;border-radius:50px;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;font-family:'DM Sans',sans-serif;transition:all .15s;}
-.nav-cta:hover{background:#4338CA;transform:translateY(-1px);}
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;background:transparent;transition:all .3s}
+.nav.scrolled{background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--borda)}
+.nav-nome{font-family:"Lora",serif;font-size:15px;color:var(--preto);opacity:0;transition:opacity .3s}
+.nav.scrolled .nav-nome{opacity:1}
+.nav-btn{background:var(--roxo);color:#fff;border:none;padding:9px 20px;border-radius:50px;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;font-family:"DM Sans",sans-serif}
 
-/* HERO */
-.hero{min-height:100vh;display:flex;align-items:center;padding:100px 24px 80px;background:var(--creme);position:relative;overflow:hidden;}
-.hero::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;border-radius:50%;background:rgba(79,70,229,0.04);}
-.hero::after{content:'';position:absolute;bottom:-80px;left:-60px;width:350px;height:350px;border-radius:50%;background:rgba(5,150,105,0.04);}
-.hero-inner{max-width:960px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;position:relative;z-index:1;}
-.hero-foto-wrap{position:relative;}
-.hero-foto{width:100%;aspect-ratio:4/5;border-radius:24px;object-fit:cover;display:block;}
-.hero-foto-placeholder{width:100%;aspect-ratio:4/5;border-radius:24px;background:linear-gradient(135deg,#E0D7F5,#C7D2FE);display:flex;align-items:center;justify-content:center;font-size:80px;font-weight:600;color:var(--roxo);}
-.hero-badge{position:absolute;bottom:-20px;right:-20px;background:#fff;border-radius:16px;padding:12px 18px;box-shadow:0 8px 30px rgba(0,0,0,0.12);display:flex;align-items:center;gap:10px;}
-.hero-badge-dot{width:10px;height:10px;border-radius:50%;background:#10B981;flex-shrink:0;}
-.hero-badge-txt{font-size:12px;font-weight:500;color:var(--preto);}
-.hero-badge-sub{font-size:11px;color:var(--cinza);}
-.hero-content{}
-.hero-tag{display:inline-flex;align-items:center;gap:6px;background:var(--roxo-cl);color:var(--roxo);font-size:12px;font-weight:500;padding:6px 14px;border-radius:50px;margin-bottom:20px;}
-.hero-nome{font-family:'Lora',serif;font-size:42px;line-height:1.15;color:var(--preto);margin-bottom:8px;font-weight:600;}
-.hero-crp{font-size:13px;color:var(--cinza);margin-bottom:20px;}
-.hero-frase{font-family:'Lora',serif;font-size:18px;line-height:1.7;color:var(--quente);font-style:italic;margin-bottom:28px;padding-left:16px;border-left:3px solid var(--roxo-med);}
-.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px;}
-.btn-primary{background:var(--roxo);color:#fff;border:none;padding:14px 28px;border-radius:50px;font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;transition:all .15s;}
-.btn-primary:hover{background:#4338CA;transform:translateY(-2px);box-shadow:0 8px 20px rgba(79,70,229,0.3);}
-.btn-wpp{background:#25D366;color:#fff;border:none;padding:14px 24px;border-radius:50px;font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;transition:all .15s;}
-.btn-wpp:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(37,211,102,0.3);}
-.hero-info{display:flex;gap:24px;flex-wrap:wrap;}
-.hero-info-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--cinza);}
-.hero-info-item i{color:var(--roxo);font-size:15px;}
-.hero-info-item strong{color:var(--preto);}
+/* HERO — limpo, elegante */
+.hero{background:var(--creme);padding:100px 32px 64px;border-bottom:1px solid var(--borda)}
+.hero-inner{max-width:860px;margin:0 auto;display:flex;align-items:flex-start;gap:48px}
+.hero-left{flex-shrink:0;text-align:center;width:200px}
+.hero-foto{width:160px;height:160px;border-radius:50%;object-fit:cover;border:4px solid #fff;box-shadow:0 0 0 1px var(--borda),0 8px 32px rgba(0,0,0,0.1);display:block;margin:0 auto 16px}
+.hero-foto-ph{width:160px;height:160px;border-radius:50%;background:var(--roxo-cl);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:600;color:var(--roxo);border:4px solid #fff;box-shadow:0 0 0 1px var(--borda);margin:0 auto 16px}
+.hero-status{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--borda);border-radius:50px;padding:5px 12px;font-size:12px;color:var(--cinza)}
+.hero-status-dot{width:8px;height:8px;border-radius:50%;background:#10B981;flex-shrink:0}
+.hero-right{flex:1;padding-top:4px}
+.hero-crp{font-size:12px;color:var(--cinza);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.hero-crp i{font-size:14px;color:var(--roxo)}
+.hero-nome{font-family:"Lora",serif;font-size:38px;font-weight:600;line-height:1.15;color:var(--preto);margin-bottom:10px}
+.hero-abord{font-size:14px;color:var(--cinza);margin-bottom:20px;display:flex;align-items:center;gap:6px}
+.hero-abord i{color:var(--roxo);font-size:14px}
+.hero-frase{font-family:"Lora",serif;font-size:17px;line-height:1.75;color:#374151;font-style:italic;margin-bottom:28px;padding:16px 20px;background:var(--roxo-cl);border-radius:12px;border-left:3px solid var(--roxo-med)}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.btn-ag{background:var(--roxo);color:#fff;border:none;padding:13px 26px;border-radius:50px;font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:7px;font-family:"DM Sans",sans-serif;transition:all .15s}
+.btn-ag:hover{background:#4338CA;transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,70,229,0.25)}
+.btn-wpp{background:#fff;color:#25D366;border:1.5px solid #25D366;padding:13px 22px;border-radius:50px;font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:7px;font-family:"DM Sans",sans-serif;transition:all .15s}
+.btn-wpp:hover{background:#25D366;color:#fff}
+.hero-info{display:flex;gap:20px;flex-wrap:wrap}
+.hi{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--cinza)}
+.hi i{color:var(--roxo);font-size:14px}
+.hi strong{color:var(--preto);font-size:13px}
 
 /* SEÇÕES */
-section{padding:80px 24px;}
-.container{max-width:800px;margin:0 auto;}
-.sec-tag{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--roxo);margin-bottom:12px;}
-.sec-titulo{font-family:'Lora',serif;font-size:32px;line-height:1.3;color:var(--preto);margin-bottom:16px;}
-.sec-sub{font-size:16px;line-height:1.8;color:var(--cinza);}
-
-/* SOBRE MIM */
-.sobre{background:#fff;}
-.sobre-texto{font-size:16px;line-height:1.9;color:#374151;}
-.sobre-texto p{margin-bottom:16px;}
-.sobre-texto p:last-child{margin-bottom:0;}
+section{padding:64px 32px}
+.container{max-width:680px;margin:0 auto}
+.sec-tag{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--roxo);margin-bottom:10px}
+.sec-h{font-family:"Lora",serif;font-size:28px;line-height:1.3;color:var(--preto);margin-bottom:14px}
+.sec-p{font-size:15px;line-height:1.85;color:#4B5563}
+.sec-p p{margin-bottom:14px}
+.sec-p p:last-child{margin-bottom:0}
 
 /* PARA QUEM */
-.para-quem{background:var(--creme);}
-.pq-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:32px;}
-.pq-item{background:#fff;border-radius:16px;padding:24px;border:1px solid var(--borda);}
-.pq-icon{width:44px;height:44px;border-radius:12px;background:var(--roxo-cl);display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
-.pq-icon i{color:var(--roxo);font-size:20px;}
-.pq-titulo{font-size:15px;font-weight:500;margin-bottom:6px;}
-.pq-desc{font-size:13px;color:var(--cinza);line-height:1.6;}
+.pq-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+.pq-card{background:var(--creme);border:1px solid var(--borda);border-radius:14px;padding:20px}
+.pq-icon{width:40px;height:40px;border-radius:10px;background:var(--roxo-cl);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.pq-icon i{color:var(--roxo);font-size:18px}
+.pq-h{font-size:14px;font-weight:500;margin-bottom:5px}
+.pq-p{font-size:13px;color:var(--cinza);line-height:1.55}
 
 /* ABORDAGEM */
-.abordagem{background:#fff;}
-.ab-card{background:var(--creme);border-radius:20px;padding:32px;border-left:4px solid var(--roxo);margin-top:24px;}
-.ab-texto{font-size:15px;line-height:1.9;color:#374151;}
+.ab-box{background:var(--creme);border-radius:16px;padding:28px;border-left:4px solid var(--roxo);margin-top:20px}
+.ab-p{font-size:15px;line-height:1.85;color:#374151}
 
 /* ESPECIALIDADES */
-.especialidades{background:var(--creme);}
-.esp-lista{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;}
-.esp-pill{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--borda);border-radius:50px;padding:10px 18px;font-size:13px;color:var(--preto);font-weight:400;transition:all .15s;}
-.esp-pill:hover{border-color:var(--roxo);color:var(--roxo);background:var(--roxo-cl);}
-.esp-pill i{font-size:14px;color:var(--roxo);}
+.esp-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.esp-p{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--borda);border-radius:50px;padding:8px 16px;font-size:13px;color:var(--preto);transition:all .15s;cursor:default}
+.esp-p:hover{border-color:var(--roxo);color:var(--roxo);background:var(--roxo-cl)}
+.esp-p i{font-size:13px;color:var(--roxo)}
 
-/* COMO FUNCIONA */
-.processo{background:#fff;}
-.proc-steps{display:flex;flex-direction:column;gap:0;margin-top:32px;}
-.proc-step{display:flex;gap:24px;position:relative;padding-bottom:40px;}
-.proc-step:last-child{padding-bottom:0;}
-.proc-step::before{content:'';position:absolute;left:19px;top:44px;bottom:0;width:2px;background:var(--borda);}
-.proc-step:last-child::before{display:none;}
-.proc-num{width:40px;height:40px;border-radius:50%;background:var(--roxo);color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Lora',serif;}
-.proc-content{}
-.proc-titulo{font-size:16px;font-weight:500;margin-bottom:6px;padding-top:8px;}
-.proc-desc{font-size:14px;color:var(--cinza);line-height:1.6;}
+/* PROCESSO */
+.proc{display:flex;flex-direction:column;gap:0;margin-top:28px}
+.proc-item{display:flex;gap:20px;padding-bottom:36px;position:relative}
+.proc-item:last-child{padding-bottom:0}
+.proc-item::before{content:"";position:absolute;left:18px;top:40px;bottom:0;width:2px;background:var(--borda)}
+.proc-item:last-child::before{display:none}
+.proc-n{width:38px;height:38px;border-radius:50%;background:var(--roxo);color:#fff;font-family:"Lora",serif;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.proc-txt{}
+.proc-h{font-size:15px;font-weight:500;margin-bottom:5px;padding-top:7px}
+.proc-p{font-size:13px;color:var(--cinza);line-height:1.6}
 
 /* MODALIDADES */
-.modalidades{background:var(--creme);}
-.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:28px;}
-.mod-card{background:#fff;border-radius:20px;padding:28px;border:1px solid var(--borda);transition:all .2s;}
-.mod-card:hover{border-color:var(--roxo-med);transform:translateY(-3px);box-shadow:0 12px 30px rgba(79,70,229,0.08);}
-.mod-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
-.mod-titulo{font-size:17px;font-weight:500;margin-bottom:6px;}
-.mod-sub{font-size:13px;color:var(--cinza);margin-bottom:16px;line-height:1.5;}
-.mod-valor{font-size:20px;font-weight:600;color:var(--roxo);}
-.mod-duracao{font-size:12px;color:var(--cinza);}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+.mod-card{background:#fff;border:1.5px solid var(--borda);border-radius:16px;padding:24px;transition:all .2s}
+.mod-card:hover{border-color:var(--roxo-med);box-shadow:0 8px 24px rgba(79,70,229,0.08);transform:translateY(-2px)}
+.mod-ic{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.mod-h{font-size:16px;font-weight:500;margin-bottom:4px}
+.mod-s{font-size:13px;color:var(--cinza);margin-bottom:12px;line-height:1.5}
+.mod-val{font-size:22px;font-weight:600;color:var(--roxo)}
+.mod-dur{font-size:12px;color:var(--cinza)}
 
 /* AGENDAMENTO */
-.agendamento{background:linear-gradient(135deg,#1E1B4B 0%,#3730A3 50%,#4F46E5 100%);position:relative;overflow:hidden;}
-.agendamento::before{content:'';position:absolute;top:-80px;right:-80px;width:400px;height:400px;border-radius:50%;background:rgba(255,255,255,0.04);}
-.agendamento::after{content:'';position:absolute;bottom:-60px;left:50px;width:250px;height:250px;border-radius:50%;background:rgba(255,255,255,0.03);}
-.ag-inner{max-width:720px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;position:relative;}
-.ag-left .sec-tag{color:#A5B4FC;}
-.ag-left .sec-titulo{color:#fff;}
-.ag-left .sec-sub{color:rgba(255,255,255,0.7);font-size:14px;margin-bottom:28px;}
-.ag-trust{display:flex;flex-direction:column;gap:12px;}
-.ag-trust-item{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,0.8);font-size:13px;}
-.ag-trust-item i{color:#A5B4FC;font-size:16px;}
-
-/* FORM */
-.ag-form{background:#fff;border-radius:20px;padding:28px;}
-.form-titulo{font-size:17px;font-weight:500;margin-bottom:4px;}
-.form-sub{font-size:13px;color:var(--cinza);margin-bottom:20px;}
-.form-group{margin-bottom:14px;}
-.form-label{display:block;font-size:12px;font-weight:500;color:var(--cinza);margin-bottom:5px;}
-.form-input{width:100%;padding:11px 14px;border:1.5px solid var(--borda);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;color:var(--preto);}
-.form-input:focus{border-color:var(--roxo);}
-textarea.form-input{resize:vertical;min-height:80px;}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.btn-submit{background:var(--roxo);color:#fff;border:none;padding:14px;border-radius:10px;font-size:14px;font-weight:500;width:100%;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;}
-.btn-submit:hover{background:#4338CA;}
-.btn-submit:disabled{background:var(--cinza);cursor:not-allowed;}
+.ag-section{background:var(--creme);border-top:1px solid var(--borda)}
+.ag-inner{max-width:860px;margin:0 auto;display:grid;grid-template-columns:1fr 1.2fr;gap:60px;align-items:start}
+.ag-left{}
+.ag-left .sec-tag{color:var(--roxo)}
+.ag-confianca{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.ag-c{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--cinza)}
+.ag-c i{color:var(--roxo);font-size:15px;flex-shrink:0}
+.ag-form{background:#fff;border:1px solid var(--borda);border-radius:20px;padding:28px}
+.form-h{font-size:16px;font-weight:500;margin-bottom:4px}
+.form-s{font-size:13px;color:var(--cinza);margin-bottom:20px}
+.form-g{margin-bottom:14px}
+.form-l{display:block;font-size:12px;font-weight:500;color:var(--cinza);margin-bottom:5px}
+.form-i{width:100%;padding:11px 14px;border:1.5px solid var(--borda);border-radius:10px;font-size:14px;font-family:"DM Sans",sans-serif;outline:none;transition:border-color .15s;color:var(--preto);background:#fff}
+.form-i:focus{border-color:var(--roxo)}
+textarea.form-i{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn-sub{width:100%;background:var(--roxo);color:#fff;border:none;padding:14px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:"DM Sans",sans-serif;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-sub:hover{background:#4338CA}
+.btn-sub:disabled{background:var(--cinza);cursor:not-allowed}
 
 /* FOOTER */
-.footer-prof{background:var(--preto);padding:32px 24px;text-align:center;}
-.footer-prof a{color:#818CF8;text-decoration:none;font-size:13px;}
-.footer-prof p{font-size:12px;color:#6B7280;margin-top:6px;}
+footer{background:#111827;padding:28px 32px;text-align:center}
+footer a{color:#818CF8;text-decoration:none;font-size:13px}
+footer p{font-size:12px;color:#6B7280;margin-top:6px}
 
 /* TOAST */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--preto);color:#fff;padding:12px 24px;border-radius:50px;font-size:14px;z-index:1000;transition:transform .3s;}
-.toast.show{transform:translateX(-50%) translateY(0);}
-.toast.ok{background:var(--verde);}
-.toast.err{background:#DC2626;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--preto);color:#fff;padding:12px 24px;border-radius:50px;font-size:14px;z-index:1000;transition:transform .3s}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--verde)}
+.toast.err{background:#DC2626}
 
 /* LOADING */
-.loading{display:flex;align-items:center;justify-content:center;min-height:100vh;gap:12px;font-size:14px;color:var(--cinza);}
-.spinner{width:24px;height:24px;border:2px solid var(--borda);border-top-color:var(--roxo);border-radius:50%;animation:spin .8s linear infinite;}
+.loading{display:flex;align-items:center;justify-content:center;min-height:100vh;gap:12px;font-size:14px;color:var(--cinza)}
+.spinner{width:24px;height:24px;border:2px solid var(--borda);border-top-color:var(--roxo);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.not-found{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;text-align:center;padding:40px 24px;}
-.not-found h1{font-family:'Lora',serif;font-size:32px;margin-bottom:8px;}
-.not-found p{color:var(--cinza);margin-bottom:24px;}
+.not-found{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;text-align:center;padding:40px 24px}
+.not-found h1{font-family:"Lora",serif;font-size:28px;margin-bottom:8px}
 
-/* RESPONSIVO */
 @media(max-width:768px){
-  .hero-inner{grid-template-columns:1fr;gap:40px;}
-  .hero-foto-wrap{order:-1;max-width:320px;margin:0 auto;}
-  .hero-nome{font-size:32px;}
-  .pq-grid{grid-template-columns:1fr;}
-  .mod-grid{grid-template-columns:1fr;}
-  .ag-inner{grid-template-columns:1fr;}
-  .form-row{grid-template-columns:1fr;}
-  section{padding:60px 20px;}
+  .hero-inner{flex-direction:column;align-items:center;text-align:center;gap:24px}
+  .hero-right{padding-top:0}
+  .hero-btns{justify-content:center}
+  .hero-info{justify-content:center}
+  .pq-grid{grid-template-columns:1fr}
+  .mod-grid{grid-template-columns:1fr}
+  .ag-inner{grid-template-columns:1fr}
+  section{padding:48px 20px}
+  .hero{padding:80px 20px 48px}
 }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav" id="nav-bar">
-  <a href="#" class="nav-logo" id="nav-nome-prof">—</a>
-  <a href="#agendar" class="nav-cta">Agendar sessão</a>
+<nav class="nav" id="nav">
+  <span class="nav-nome" id="nav-nome"></span>
+  <a href="#agendar" class="nav-btn">Agendar sessão</a>
 </nav>
 
-<div id="root">
-  <div class="loading"><div class="spinner"></div>Carregando perfil...</div>
-</div>
-
+<div id="root"><div class="loading"><div class="spinner"></div>Carregando...</div></div>
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPA_URL = 'https://pbqvfokpounurzmmlcor.supabase.co';
-const SUPA_KEY = 'sb_publishable_ERIUNIAjp2FJyXNF6IS_dw_RNopwplO';
-const { createClient } = supabase;
-const sb = createClient(SUPA_URL, SUPA_KEY);
+const SUPA_URL="https://pbqvfokpounurzmmlcor.supabase.co";
+const SUPA_KEY="sb_publishable_ERIUNIAjp2FJyXNF6IS_dw_RNopwplO";
+const {createClient}=supabase;
+const sb=createClient(SUPA_URL,SUPA_KEY);
 
-// Nav scroll effect
-window.addEventListener('scroll', () => {
-  const nav = document.getElementById('nav-bar');
-  if (nav) nav.className = window.scrollY > 60 ? 'nav scrolled' : 'nav';
+window.addEventListener("scroll",()=>{
+  const n=document.getElementById("nav");
+  if(n) n.className=window.scrollY>60?"nav scrolled":"nav";
 });
 
-function getSlug() {
-  const path = window.location.pathname;
-  const parts = path.split('/').filter(Boolean);
-  if (parts[0] === 'perfil' && parts[1]) return parts[1];
-  if (parts[0] === 'agendar' && parts[1]) return parts[1];
-  if (parts.length === 1) return parts[0];
+function getSlug(){
+  const p=window.location.pathname.split("/").filter(Boolean);
+  if(p[0]==="perfil"&&p[1]) return p[1];
+  if(p[0]==="agendar"&&p[1]) return p[1];
+  if(p.length===1) return p[0];
   return null;
 }
 
-function toast(msg, tipo) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show ' + (tipo === 'ok' ? 'ok' : tipo === 'err' ? 'err' : '');
-  setTimeout(() => t.className = 'toast', 3000);
+function toast(msg,tipo){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.className="toast show "+(tipo==="ok"?"ok":tipo==="err"?"err":"");
+  setTimeout(()=>t.className="toast",3000);
 }
 
-const ESP_ICONS = {
-  'Ansiedade':'brain','Depressão':'mood-sad','Relacionamentos':'heart','Autoconhecimento':'user-search',
-  'Família':'users','Trabalho e carreira':'briefcase','Luto':'flower','Trauma':'shield',
-  'Transtornos alimentares':'apple','Saúde mental':'heartbeat','Adolescentes':'school',
-  'Infantil':'baby-carriage','LGBTQIA+':'rainbow','Fobia':'eye-off','TOC':'refresh',
-  'Burnout':'battery-off','Autoestima':'star','Vícios':'hand-stop',
+const EICONS={
+  "Ansiedade":"brain","Depressao":"mood-sad","Relacionamentos":"heart",
+  "Autoconhecimento":"user-search","Familia":"users","Trabalho e carreira":"briefcase",
+  "Luto":"flower","Trauma":"shield","Transtornos alimentares":"apple",
+  "Saude mental":"heartbeat","Adolescentes":"school","Infantil":"baby-carriage",
+  "LGBTQIA+":"rainbow","Fobia":"eye-off","TOC":"refresh","Burnout":"battery-off",
+  "Autoestima":"star","Vicios":"hand-stop",
 };
+function eicon(e){
+  const k=Object.keys(EICONS).find(k=>e.toLowerCase().includes(k.toLowerCase()));
+  return EICONS[k]||"heart";
+}
 
-async function carregarPerfil() {
-  const slug = getSlug();
-  if (!slug) { mostrarNotFound('Perfil não encontrado.'); return; }
-  const { data: cfg, error } = await sb.from('configuracoes').select('*').eq('slug', slug).single();
-  if (error || !cfg) { mostrarNotFound('Este perfil não existe ou foi removido.'); return; }
+async function carregarPerfil(){
+  const slug=getSlug();
+  if(!slug){mostrarNotFound("Perfil nao encontrado.");return;}
+  const {data:cfg,error}=await sb.from("configuracoes").select("*").eq("slug",slug).single();
+  if(error||!cfg){mostrarNotFound("Este perfil nao existe ou foi removido.");return;}
   renderPerfil(cfg);
 }
 
-function renderPerfil(cfg) {
-  const nome = cfg.nome || 'Psicólogo(a)';
-  const primeiroNome = nome.split(' ')[0];
-  const crp = cfg.crp ? 'CRP ' + cfg.crp : '';
-  const whats = cfg.whatsapp ? cfg.whatsapp.replace(/\D/g, '') : '';
-  const cidade = cfg.cidade || '';
-  const bairro = cfg.bairro || '';
-  const localStr = [bairro, cidade].filter(Boolean).join(', ');
-  const abordagem = cfg.abordagem || '';
-  const sobreMim = cfg.sobre_mim || '';
-  const modalidade = cfg.modalidade || 'ambos';
-  const valPres = cfg.valor_presencial ? 'R$' + Number(cfg.valor_presencial).toLocaleString('pt-BR') : '';
-  const valOnline = cfg.valor_online ? 'R$' + Number(cfg.valor_online).toLocaleString('pt-BR') : '';
-  const duracao = cfg.duracao_sessao || 50;
-  const fotoUrl = cfg.foto_url || '';
-  const instagram = cfg.instagram || '';
-  const iniciais = nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+function renderPerfil(cfg){
+  const nome=cfg.nome||"Psicologo(a)";
+  const primeiroNome=nome.split(" ")[0];
+  const crp=cfg.crp?"CRP "+cfg.crp:"";
+  const whats=cfg.whatsapp?cfg.whatsapp.replace(/\D/g,""):"";
+  const cidade=cfg.cidade||"";
+  const bairro=cfg.bairro||"";
+  const local=[bairro,cidade].filter(Boolean).join(", ");
+  const abordagem=cfg.abordagem||"";
+  const sobreMim=cfg.sobre_mim||"";
+  const modalidade=cfg.modalidade||"ambos";
+  const valPres=cfg.valor_presencial?"R$"+Number(cfg.valor_presencial).toLocaleString("pt-BR"):"";
+  const valOnline=cfg.valor_online?"R$"+Number(cfg.valor_online).toLocaleString("pt-BR"):"";
+  const duracao=cfg.duracao_sessao||50;
+  const fotoUrl=cfg.foto_url||"";
+  const instagram=cfg.instagram||"";
+  const iniciais=nome.split(" ").map(n=>n[0]).slice(0,2).join("").toUpperCase();
+  let esps=[];
+  try{esps=JSON.parse(cfg.especialidades||"[]");}catch(e){}
 
-  let especialidades = [];
-  try { especialidades = JSON.parse(cfg.especialidades || '[]'); } catch(e) {}
+  document.title=nome+(cidade?" | Psicologo(a) em "+cidade:"");
+  const nn=document.getElementById("nav-nome");
+  if(nn) nn.textContent=nome;
 
-  document.title = nome + ' | Psicólogo(a)' + (cidade ? ' em ' + cidade : '');
-  const navNome = document.getElementById('nav-nome-prof');
-  if (navNome) navNome.textContent = nome;
+  const fotoHTML=fotoUrl
+    ? "<img src='"+fotoUrl+"' alt='"+nome+"' class='hero-foto'>"
+    : "<div class='hero-foto-ph'>"+iniciais+"</div>";
 
-  // Foto
-  const fotoHTML = fotoUrl
-    ? '<img src="' + fotoUrl + '" alt="' + nome + '" class="hero-foto">'
-    : '<div class="hero-foto-placeholder">' + iniciais + '</div>';
+  const frase=abordagem
+    ? "Um espaco seguro para voce se encontrar, atraves da "+abordagem+"."
+    : "Um espaco seguro de escuta genuina e transformacao.";
 
-  // Info strip
-  const infos = [];
-  if (localStr) infos.push('<div class="hero-info-item"><i class="ti ti-map-pin"></i><span>' + localStr + '</span></div>');
-  if (duracao) infos.push('<div class="hero-info-item"><i class="ti ti-clock"></i><strong>' + duracao + 'min</strong><span>por sessão</span></div>');
-  if (modalidade !== 'presencial') infos.push('<div class="hero-info-item"><i class="ti ti-video"></i><span>Online</span></div>');
-  if (modalidade !== 'online') infos.push('<div class="hero-info-item"><i class="ti ti-building"></i><span>Presencial</span></div>');
+  const sobreHTML=sobreMim
+    ? sobreMim.split("\n").filter(p=>p.trim()).map(p=>"<p>"+p+"</p>").join("")
+    : "<p>Ola! Sou "+primeiroNome+", psicologo(a) clinico(a). Meu trabalho e oferecer um espaco de escuta genuina, onde voce pode ser exatamente quem voce e — sem julgamentos.</p>";
 
-  // Frase do hero — usa abordagem como tagline
-  const fraseHero = abordagem
-    ? 'Um espaço seguro para você se encontrar, através da ' + abordagem + '.'
-    : 'Um espaço seguro de escuta, acolhimento e transformação.';
+  const DESCS={
+    "Ansiedade":"Voce se sente ansioso com frequencia e quer aprender a viver com mais leveza.",
+    "Depressao":"Voce perdeu o prazer pelas coisas e quer reconectar com o sentido de viver.",
+    "Relacionamentos":"Voce busca relacoes mais saudaveis e conexoes verdadeiras.",
+    "Autoconhecimento":"Voce quer entender melhor a si mesmo e fazer escolhas mais conscientes.",
+    "Familia":"Voce enfrenta conflitos familiares e quer restaurar vinculos.",
+    "Trabalho e carreira":"Voce se sente esgotado ou sem proposito no trabalho.",
+    "Luto":"Voce perdeu alguem e precisa de espaco para processar a dor.",
+    "Trauma":"Voce carrega marcas do passado e quer seguir em frente com mais liberdade.",
+    "Burnout":"Voce chegou no limite e precisa se reconstruir com cuidado.",
+    "Autoestima":"Voce quer aprender a se valorizar e ocupar o proprio espaco com seguranca.",
+  };
 
-  // Sobre mim — divide em parágrafos
-  const sobreHTML = sobreMim
-    ? sobreMim.split('\n').filter(p=>p.trim()).map(p => '<p>' + p + '</p>').join('')
-    : '<p>Olá! Sou ' + primeiroNome + ', psicólogo(a) clínico(a) com foco em oferecer um espaço de escuta genuína e acolhimento. Acredito que a terapia é um caminho poderoso de autoconhecimento e transformação.</p>';
+  const pqItems=esps.slice(0,4).map(e=>{
+    const ic=eicon(e);
+    const desc=Object.keys(DESCS).find(k=>e.toLowerCase().includes(k.toLowerCase()));
+    return "<div class='pq-card'><div class='pq-icon'><i class='ti ti-"+ic+"'></i></div><div class='pq-h'>"+e+"</div><div class='pq-p'>"+(DESCS[desc]||"Voce busca apoio e um espaco seguro para crescer.")+"</div></div>";
+  }).join("");
 
-  // Para quem — gerado com base nas especialidades
-  const paraQuemItems = especialidades.length > 0
-    ? especialidades.slice(0, 4).map(e => {
-        const icon = ESP_ICONS[e] || 'heart';
-        const descs = {
-          'Ansiedade': 'Que sente aquela angústia constante e quer aprender a viver com mais leveza.',
-          'Depressão': 'Que perdeu a vontade e quer reconectar com o sentido da vida.',
-          'Relacionamentos': 'Que busca relações mais saudáveis e conexões verdadeiras.',
-          'Autoconhecimento': 'Que quer entender melhor a si mesmo e fazer escolhas mais conscientes.',
-          'Família': 'Que enfrenta conflitos familiares e quer restaurar vínculos.',
-          'Trabalho e carreira': 'Que se sente esgotado ou sem propósito no trabalho.',
-          'Luto': 'Que perdeu alguém e precisa de um espaço para processar a dor.',
-          'Trauma': 'Que carrega marcas do passado e quer seguir em frente.',
-          'Burnout': 'Que chegou no limite e precisa se reconstruir.',
-          'Autoestima': 'Que quer aprender a se valorizar e ocupar o próprio espaço.',
-        };
-        const desc = descs[e] || 'Que busca apoio e um espaço seguro para crescer.';
-        return '<div class="pq-item"><div class="pq-icon"><i class="ti ti-' + icon + '"></i></div><div class="pq-titulo">Para quem tem ' + e.toLowerCase() + '</div><div class="pq-desc">' + desc + '</div></div>';
-      }).join('')
-    : '<div class="pq-item"><div class="pq-icon"><i class="ti ti-heart"></i></div><div class="pq-titulo">Para quem busca autoconhecimento</div><div class="pq-desc">Que quer entender melhor a si mesmo e fazer escolhas mais conscientes.</div></div><div class="pq-item"><div class="pq-icon"><i class="ti ti-mood-smile"></i></div><div class="pq-titulo">Para quem está sobrecarregado</div><div class="pq-desc">Que chegou ao limite e precisa de apoio para se reorganizar.</div></div>';
+  const espPills=esps.map(e=>"<div class='esp-p'><i class='ti ti-"+eicon(e)+"'></i>"+e+"</div>").join("");
 
-  // Especialidades pills
-  const espHTML = especialidades.length > 0
-    ? especialidades.map(e => '<div class="esp-pill"><i class="ti ti-' + (ESP_ICONS[e]||'heart') + '"></i>' + e + '</div>').join('')
-    : '';
-
-  // Modalidades
-  let modCards = '';
-  if (modalidade === 'presencial' || modalidade === 'ambos') {
-    modCards += '<div class="mod-card"><div class="mod-icon" style="background:#EEF2FF;"><i class="ti ti-building" style="font-size:22px;color:#5046E5;"></i></div><div class="mod-titulo">Presencial</div><div class="mod-sub">' + (localStr || 'Consulte disponibilidade') + '</div>' + (valPres ? '<div class="mod-valor">' + valPres + '</div><div class="mod-duracao">sessão de ' + duracao + ' minutos</div>' : '') + '</div>';
+  let modCards="";
+  if(modalidade==="presencial"||modalidade==="ambos"){
+    modCards+="<div class='mod-card'><div class='mod-ic' style='background:#EEF2FF'><i class='ti ti-building' style='font-size:22px;color:#5046E5'></i></div><div class='mod-h'>Presencial</div><div class='mod-s'>"+(local||"Consulte disponibilidade")+"</div>"+(valPres?"<div class='mod-val'>"+valPres+"</div><div class='mod-dur'>sessao de "+duracao+" minutos</div>":"")+"</div>";
   }
-  if (modalidade === 'online' || modalidade === 'ambos') {
-    modCards += '<div class="mod-card"><div class="mod-icon" style="background:#ECFDF5;"><i class="ti ti-video" style="font-size:22px;color:#059669;"></i></div><div class="mod-titulo">Online</div><div class="mod-sub">De qualquer lugar do Brasil e exterior</div>' + (valOnline ? '<div class="mod-valor">' + valOnline + '</div><div class="mod-duracao">sessão de ' + duracao + ' minutos</div>' : '') + '</div>';
+  if(modalidade==="online"||modalidade==="ambos"){
+    modCards+="<div class='mod-card'><div class='mod-ic' style='background:#ECFDF5'><i class='ti ti-video' style='font-size:22px;color:#059669'></i></div><div class='mod-h'>Online</div><div class='mod-s'>De qualquer lugar do Brasil e exterior</div>"+(valOnline?"<div class='mod-val'>"+valOnline+"</div><div class='mod-dur'>sessao de "+duracao+" minutos</div>":"")+"</div>";
   }
 
-  // Form de tipo
-  const tipoOptions = [];
-  if (modalidade !== 'online') tipoOptions.push('<option value="Presencial">Presencial</option>');
-  if (modalidade !== 'presencial') tipoOptions.push('<option value="Online">Online</option>');
+  const tipoOpts=(modalidade!=="online"?"<option value='Presencial'>Presencial</option>":"")+(modalidade!=="presencial"?"<option value='Online'>Online</option>":"");
 
-  document.getElementById('root').innerHTML = `
-    <!-- NAV NOME -->
-    <script>document.getElementById('nav-nome-prof').textContent='${nome}';<\/script>
+  const heroInfos=[];
+  if(local) heroInfos.push("<div class='hi'><i class='ti ti-map-pin'></i>"+local+"</div>");
+  if(duracao) heroInfos.push("<div class='hi'><i class='ti ti-clock'></i><strong>"+duracao+"min</strong>&nbsp;por sessao</div>");
+  if(modalidade!=="presencial") heroInfos.push("<div class='hi'><i class='ti ti-video'></i>Online</div>");
+  if(modalidade!=="online") heroInfos.push("<div class='hi'><i class='ti ti-building'></i>Presencial</div>");
 
-    <!-- HERO -->
-    <section class="hero">
-      <div class="hero-inner">
-        <div class="hero-foto-wrap">
-          ${fotoHTML}
-          <div class="hero-badge">
-            <div class="hero-badge-dot"></div>
-            <div>
-              <div class="hero-badge-txt">Aceitando pacientes</div>
-              <div class="hero-badge-sub">${crp}</div>
-            </div>
-          </div>
-        </div>
-        <div class="hero-content">
-          <div class="hero-tag"><i class="ti ti-shield-check" style="font-size:13px;"></i> Profissional verificado</div>
-          <h1 class="hero-nome">${nome}</h1>
-          <div class="hero-crp">${crp}${crp && abordagem ? ' · ' : ''}${abordagem}</div>
-          <p class="hero-frase">"${fraseHero}"</p>
-          <div class="hero-btns">
-            <a href="#agendar" class="btn-primary"><i class="ti ti-calendar"></i> Agendar sessão</a>
-            ${whats ? '<a href="https://wa.me/55' + whats + '" target="_blank" class="btn-wpp"><i class="ti ti-brand-whatsapp"></i> WhatsApp</a>' : ''}
-          </div>
-          <div class="hero-info">${infos.join('')}</div>
-        </div>
-      </div>
-    </section>
+  document.getElementById("root").innerHTML=
+    "<nav class='nav' id='nav'><span class='nav-nome' id='nav-nome2'>"+nome+"</span><a href='#agendar' class='nav-btn'>Agendar sessao</a></nav>"+
 
-    ${sobreMim ? `
-    <!-- SOBRE MIM -->
-    <section class="sobre">
-      <div class="container">
-        <div class="sec-tag">Sobre mim</div>
-        <h2 class="sec-titulo">Quem está do outro lado</h2>
-        <div class="sobre-texto">${sobreHTML}</div>
-      </div>
-    </section>` : ''}
+    // HERO
+    "<section class='hero'>"+
+    "<div class='hero-inner'>"+
+    "<div class='hero-left'>"+fotoHTML+
+    "<div class='hero-status'><div class='hero-status-dot'></div>Aceitando pacientes</div>"+
+    "</div>"+
+    "<div class='hero-right'>"+
+    (crp?"<div class='hero-crp'><i class='ti ti-id-badge'></i>"+crp+"</div>":"")+
+    "<h1 class='hero-nome'>"+nome+"</h1>"+
+    (abordagem?"<div class='hero-abord'><i class='ti ti-sparkles'></i>"+abordagem+"</div>":"")+
+    "<p class='hero-frase'>"+frase+"</p>"+
+    "<div class='hero-btns'>"+
+    "<a href='#agendar' class='btn-ag'><i class='ti ti-calendar'></i>Agendar sessao</a>"+
+    (whats?"<a href='https://wa.me/55"+whats+"' target='_blank' class='btn-wpp'><i class='ti ti-brand-whatsapp'></i>WhatsApp</a>":"")+
+    "</div>"+
+    "<div class='hero-info'>"+heroInfos.join("")+"</div>"+
+    "</div></div></section>"+
 
-    ${especialidades.length > 0 ? `
-    <!-- PARA QUEM -->
-    <section class="para-quem">
-      <div class="container">
-        <div class="sec-tag">Para quem é</div>
-        <h2 class="sec-titulo">Posso te ajudar se você...</h2>
-        <p class="sec-sub">Cada pessoa carrega uma história única. Aqui estão algumas das situações com as quais trabalho com mais frequência.</p>
-        <div class="pq-grid">${paraQuemItems}</div>
-      </div>
-    </section>` : ''}
+    // SOBRE MIM
+    (sobreMim?"<section style='background:#fff'><div class='container'><div class='sec-tag'>Sobre mim</div><h2 class='sec-h'>Quem esta do outro lado</h2><div class='sec-p'>"+sobreHTML+"</div></div></section>":"")+
 
-    ${abordagem ? `
-    <!-- ABORDAGEM -->
-    <section class="abordagem">
-      <div class="container">
-        <div class="sec-tag">A abordagem</div>
-        <h2 class="sec-titulo">Como eu trabalho</h2>
-        <div class="ab-card">
-          <p class="ab-texto">Meu trabalho é baseado na <strong>${abordagem}</strong>. Essa abordagem me permite acompanhar cada pessoa de forma individualizada, respeitando o seu ritmo e a sua história. Acredito que a mudança acontece quando existe uma relação terapêutica de confiança, onde você pode ser exatamente quem você é — sem julgamentos.</p>
-        </div>
-      </div>
-    </section>` : ''}
+    // PARA QUEM
+    (esps.length>0?"<section style='background:var(--creme)'><div class='container'><div class='sec-tag'>Para quem e</div><h2 class='sec-h'>Posso te ajudar se voce...</h2><p class='sec-p' style='margin-bottom:0'>Estas sao algumas das situacoes com as quais trabalho com mais frequencia.</p><div class='pq-grid'>"+pqItems+"</div></div></section>":"")+
 
-    ${espHTML ? `
-    <!-- ESPECIALIDADES -->
-    <section class="especialidades">
-      <div class="container">
-        <div class="sec-tag">Áreas de atuação</div>
-        <h2 class="sec-titulo">O que trabalhamos juntos</h2>
-        <div class="esp-lista">${espHTML}</div>
-      </div>
-    </section>` : ''}
+    // ABORDAGEM
+    (abordagem?"<section style='background:#fff'><div class='container'><div class='sec-tag'>A abordagem</div><h2 class='sec-h'>Como eu trabalho</h2><div class='ab-box'><p class='ab-p'>Meu trabalho e baseado na <strong>"+abordagem+"</strong>. Isso me permite acompanhar cada pessoa de forma individualizada, respeitando o seu ritmo e a sua historia. Acredito que a mudanca acontece quando existe confianca — onde voce pode ser exatamente quem voce e.</p></div></div></section>":"")+
 
-    <!-- COMO FUNCIONA -->
-    <section class="processo">
-      <div class="container">
-        <div class="sec-tag">Como funciona</div>
-        <h2 class="sec-titulo">Três passos para começar</h2>
-        <div class="proc-steps">
-          <div class="proc-step">
-            <div class="proc-num">1</div>
-            <div class="proc-content">
-              <div class="proc-titulo">Entre em contato</div>
-              <div class="proc-desc">Preencha o formulário abaixo ou me chame pelo WhatsApp. Sem burocracia — uma mensagem já basta para começarmos.</div>
-            </div>
-          </div>
-          <div class="proc-step">
-            <div class="proc-num">2</div>
-            <div class="proc-content">
-              <div class="proc-titulo">Sessão de acolhimento</div>
-              <div class="proc-desc">Na primeira sessão, você me conta o que te trouxe até aqui e como você está. É um espaço de escuta, sem pressa e sem julgamentos.</div>
-            </div>
-          </div>
-          <div class="proc-step">
-            <div class="proc-num">3</div>
-            <div class="proc-content">
-              <div class="proc-titulo">Seu processo começa</div>
-              <div class="proc-desc">Definimos juntos a frequência e o foco do trabalho. A partir daí, cada sessão é um passo em direção ao que você quer construir.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    // ESPECIALIDADES
+    (espPills?"<section style='background:var(--creme)'><div class='container'><div class='sec-tag'>Areas de atuacao</div><h2 class='sec-h'>O que trabalhamos juntos</h2><div class='esp-wrap'>"+espPills+"</div></div></section>":"")+
 
-    <!-- MODALIDADES -->
-    ${modCards ? `
-    <section class="modalidades">
-      <div class="container">
-        <div class="sec-tag">Atendimento</div>
-        <h2 class="sec-titulo">Onde e como nos encontramos</h2>
-        <div class="mod-grid">${modCards}</div>
-      </div>
-    </section>` : ''}
+    // COMO FUNCIONA
+    "<section style='background:#fff'><div class='container'><div class='sec-tag'>Como funciona</div><h2 class='sec-h'>Tres passos para comecar</h2>"+
+    "<div class='proc'>"+
+    "<div class='proc-item'><div class='proc-n'>1</div><div class='proc-txt'><div class='proc-h'>Entre em contato</div><div class='proc-p'>Preencha o formulario abaixo ou me chame pelo WhatsApp. Sem burocracia — uma mensagem ja basta para comecarmos.</div></div></div>"+
+    "<div class='proc-item'><div class='proc-n'>2</div><div class='proc-txt'><div class='proc-h'>Sessao de acolhimento</div><div class='proc-p'>Na primeira sessao, voce me conta o que te trouxe ate aqui. E um espaco de escuta, sem pressa e sem julgamentos.</div></div></div>"+
+    "<div class='proc-item'><div class='proc-n'>3</div><div class='proc-txt'><div class='proc-h'>Seu processo comeca</div><div class='proc-p'>Definimos juntos o foco do trabalho. Cada sessao e um passo em direcao ao que voce quer construir.</div></div></div>"+
+    "</div></div></section>"+
 
-    <!-- AGENDAMENTO -->
-    <section class="agendamento" id="agendar">
-      <div class="ag-inner">
-        <div class="ag-left">
-          <div class="sec-tag">Primeiro passo</div>
-          <h2 class="sec-titulo" style="font-size:28px;">Pronto para começar?</h2>
-          <p class="sec-sub">Preencha o formulário e entrarei em contato para confirmar o horário. É rápido e sem compromisso.</p>
-          <div class="ag-trust">
-            <div class="ag-trust-item"><i class="ti ti-lock"></i> Sigilo garantido pelo Código de Ética do CFP</div>
-            <div class="ag-trust-item"><i class="ti ti-clock"></i> Resposta em até 24 horas</div>
-            <div class="ag-trust-item"><i class="ti ti-heart"></i> Primeira sessão de acolhimento sem pressão</div>
-            ${instagram ? '<div class="ag-trust-item"><i class="ti ti-brand-instagram"></i> <a href="https://instagram.com/' + instagram.replace("@","") + '" target="_blank" style="color:#A5B4FC;">' + instagram + '</a></div>' : ''}
-          </div>
-        </div>
-        <div class="ag-form" id="form-agendamento">
-          <div class="form-titulo">Solicitar agendamento</div>
-          <div class="form-sub">Sem cartão. Sem compromisso.</div>
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">Seu nome *</label><input class="form-input" id="ag-nome" placeholder="Nome completo"></div>
-            <div class="form-group"><label class="form-label">WhatsApp *</label><input class="form-input" id="ag-tel" placeholder="(21) 99999-9999"></div>
-          </div>
-          <div class="form-group"><label class="form-label">Preferência de horário</label>
-            <select class="form-input" id="ag-horario">
-              <option value="">Sem preferência</option>
-              <option value="Manhã">Manhã</option>
-              <option value="Tarde">Tarde</option>
-              <option value="Noite">Noite</option>
-            </select>
-          </div>
-          ${tipoOptions.length > 1 ? '<div class="form-group"><label class="form-label">Modalidade</label><select class="form-input" id="ag-tipo">' + tipoOptions.join('') + '</select></div>' : '<input type="hidden" id="ag-tipo" value="' + (modalidade === 'online' ? 'Online' : 'Presencial') + '">'}
-          <div class="form-group"><label class="form-label">O que te traz à terapia? (opcional)</label><textarea class="form-input" id="ag-msg" placeholder="Pode ser breve. O importante é dar o primeiro passo."></textarea></div>
-          <button class="btn-submit" onclick="enviarSolicitacao('${cfg.user_id}','${nome}','${whats}')">
-            <i class="ti ti-calendar-check"></i> Enviar solicitação
-          </button>
-        </div>
-      </div>
-    </section>
+    // MODALIDADES
+    (modCards?"<section style='background:var(--creme)'><div class='container'><div class='sec-tag'>Atendimento</div><h2 class='sec-h'>Onde e como nos encontramos</h2><div class='mod-grid'>"+modCards+"</div></div></section>":"")+
 
-    <!-- FOOTER -->
-    <footer class="footer-prof">
-      ${instagram ? '<a href="https://instagram.com/' + instagram.replace("@","") + '" target="_blank"><i class="ti ti-brand-instagram"></i> ' + instagram + '</a> · ' : ''}
-      <a href="https://www.lumapsi.com.br">Powered by LumaPsi</a>
-      <p>${nome}${crp ? ' · ' + crp : ''}</p>
-    </footer>
-  `;
+    // AGENDAMENTO
+    "<section class='ag-section' id='agendar'>"+
+    "<div class='ag-inner'>"+
+    "<div class='ag-left'>"+
+    "<div class='sec-tag'>Primeiro passo</div>"+
+    "<h2 class='sec-h' style='font-size:26px'>Pronto para comecar?</h2>"+
+    "<p class='sec-p' style='font-size:14px;margin-bottom:0'>Preencha o formulario ao lado. Entrarei em contato em breve para confirmarmos o horario.</p>"+
+    "<div class='ag-confianca'>"+
+    "<div class='ag-c'><i class='ti ti-lock'></i>Sigilo garantido pelo Codigo de Etica do CFP</div>"+
+    "<div class='ag-c'><i class='ti ti-clock'></i>Resposta em ate 24 horas</div>"+
+    "<div class='ag-c'><i class='ti ti-heart'></i>Primeira sessao sem pressao</div>"+
+    (instagram?"<div class='ag-c'><i class='ti ti-brand-instagram'></i><a href='https://instagram.com/"+instagram.replace("@","")+"' target='_blank' style='color:var(--roxo)'>"+instagram+"</a></div>":"")+
+    "</div></div>"+
+    "<div class='ag-form' id='ag-form'>"+
+    "<div class='form-h'>Solicitar agendamento</div>"+
+    "<div class='form-s'>Sem compromisso. Respondo em breve.</div>"+
+    "<div class='form-row'>"+
+    "<div class='form-g'><label class='form-l'>Nome *</label><input class='form-i' id='ag-nome' placeholder='Seu nome completo'></div>"+
+    "<div class='form-g'><label class='form-l'>WhatsApp *</label><input class='form-i' id='ag-tel' placeholder='(21) 99999-9999'></div>"+
+    "</div>"+
+    "<div class='form-g'><label class='form-l'>Preferencia de horario</label><select class='form-i' id='ag-horario'><option value=''>Sem preferencia</option><option>Manha</option><option>Tarde</option><option>Noite</option></select></div>"+
+    (tipoOpts.includes("option value")&&tipoOpts.split("option").length>3?"<div class='form-g'><label class='form-l'>Modalidade</label><select class='form-i' id='ag-tipo'>"+tipoOpts+"</select></div>":"<input type='hidden' id='ag-tipo' value='"+(modalidade==="online"?"Online":"Presencial")+"'>")+
+    "<div class='form-g'><label class='form-l'>O que te traz a terapia? (opcional)</label><textarea class='form-i' id='ag-msg' placeholder='Pode ser breve. O importante e dar o primeiro passo.'></textarea></div>"+
+    "<button class='btn-sub' onclick="enviarSolicitacao('"+cfg.user_id+"','"+nome+"','"+whats+"')"><i class='ti ti-calendar-check'></i>Enviar solicitacao</button>"+
+    "</div></div></section>"+
+
+    // FOOTER
+    "<footer>"+(instagram?"<a href='https://instagram.com/"+instagram.replace("@","")+"' target='_blank'><i class='ti ti-brand-instagram'></i> "+instagram+"</a> &middot; ":"")+
+    "<a href='https://www.lumapsi.com.br'>Powered by LumaPsi</a>"+
+    "<p>"+nome+(crp?" &middot; "+crp:"")+"</p></footer>";
 }
 
-async function enviarSolicitacao(userId, psiNome, psiWhats) {
-  const nome = document.getElementById('ag-nome').value.trim();
-  const tel = document.getElementById('ag-tel').value.trim();
-  const horario = document.getElementById('ag-horario').value;
-  const tipo = document.getElementById('ag-tipo').value;
-  const msg = document.getElementById('ag-msg').value.trim();
-
-  if (!nome || !tel) { toast('Preencha nome e WhatsApp', 'err'); return; }
-
-  const btn = document.querySelector('.btn-submit');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin .8s linear infinite;display:inline-block"></i> Enviando...';
-
-  const { error } = await sb.from('agendamentos_solicitados').insert([{
-    user_id: userId,
-    nome, telefone: tel,
-    queixa: msg || ('Preferência: ' + (horario||'Sem preferência') + ' · ' + tipo),
-    data_hora: new Date().toISOString(),
-    status: 'Pendente', tipo: tipo || 'Presencial',
+async function enviarSolicitacao(userId,psiNome,psiWhats){
+  const nome=document.getElementById("ag-nome").value.trim();
+  const tel=document.getElementById("ag-tel").value.trim();
+  const horario=document.getElementById("ag-horario").value;
+  const tipo=document.getElementById("ag-tipo").value;
+  const msg=document.getElementById("ag-msg").value.trim();
+  if(!nome||!tel){toast("Preencha nome e WhatsApp","err");return;}
+  const btn=document.querySelector(".btn-sub");
+  btn.disabled=true;
+  btn.innerHTML="<i class='ti ti-loader' style='animation:spin .8s linear infinite;display:inline-block'></i> Enviando...";
+  const {error}=await sb.from("agendamentos_solicitados").insert([{
+    user_id:userId,nome,telefone:tel,
+    queixa:msg||("Preferencia: "+(horario||"Sem preferencia")+" - "+tipo),
+    data_hora:new Date().toISOString(),status:"Pendente",tipo:tipo||"Presencial",
   }]);
-
-  if (error) {
-    toast('Erro ao enviar. Tente pelo WhatsApp.', 'err');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="ti ti-calendar-check"></i> Enviar solicitação';
+  if(error){
+    toast("Erro ao enviar. Tente pelo WhatsApp.","err");
+    btn.disabled=false;
+    btn.innerHTML="<i class='ti ti-calendar-check'></i>Enviar solicitacao";
     return;
   }
-
-  document.getElementById('form-agendamento').innerHTML = `
-    <div style="text-align:center;padding:32px 0;">
-      <div style="width:64px;height:64px;border-radius:50%;background:#ECFDF5;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-        <i class="ti ti-check" style="font-size:28px;color:#059669;"></i>
-      </div>
-      <div style="font-family:'Lora',serif;font-size:20px;margin-bottom:8px;color:#111827;">Solicitação enviada!</div>
-      <p style="color:#6B7280;font-size:14px;line-height:1.6;">${psiNome} entrará em contato em breve pelo WhatsApp.</p>
-      ${psiWhats ? '<a href="https://wa.me/55' + psiWhats + '?text=Olá! Acabei de solicitar um agendamento." target="_blank" style="display:inline-flex;align-items:center;gap:8px;margin-top:20px;background:#25D366;color:#fff;padding:12px 24px;border-radius:50px;text-decoration:none;font-size:14px;"><i class=\"ti ti-brand-whatsapp\"></i> Chamar no WhatsApp</a>' : ''}
-    </div>`;
-  toast('Solicitação enviada!', 'ok');
+  document.getElementById("ag-form").innerHTML=
+    "<div style='text-align:center;padding:32px 0'>"+
+    "<div style='width:60px;height:60px;border-radius:50%;background:#ECFDF5;display:flex;align-items:center;justify-content:center;margin:0 auto 16px'>"+
+    "<i class='ti ti-check' style='font-size:26px;color:#059669'></i></div>"+
+    "<div style='font-family:Lora,serif;font-size:19px;margin-bottom:8px'>Solicitacao enviada!</div>"+
+    "<p style='color:#6B7280;font-size:14px;line-height:1.6'>"+psiNome+" entrara em contato em breve.</p>"+
+    (psiWhats?"<a href='https://wa.me/55"+psiWhats+"' target='_blank' style='display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:#25D366;color:#fff;padding:11px 22px;border-radius:50px;text-decoration:none;font-size:14px'><i class='ti ti-brand-whatsapp'></i>WhatsApp</a>":"")+
+    "</div>";
+  toast("Enviado!","ok");
 }
 
-function mostrarNotFound(msg) {
-  document.getElementById('root').innerHTML = `
-    <div class="not-found">
-      <div style="font-size:64px;margin-bottom:16px;">🔍</div>
-      <h1>Perfil não encontrado</h1>
-      <p>${msg}</p>
-      <a href="https://www.lumapsi.com.br" style="color:var(--roxo);text-decoration:none;">← Voltar para o LumaPsi</a>
-    </div>`;
+function mostrarNotFound(msg){
+  document.getElementById("root").innerHTML=
+    "<div class='not-found'><div style='font-size:56px;margin-bottom:16px'>&#128269;</div>"+
+    "<h1>Perfil nao encontrado</h1><p style='color:#6B7280;margin-bottom:20px'>"+msg+"</p>"+
+    "<a href='https://www.lumapsi.com.br' style='color:var(--roxo);text-decoration:none'>Voltar ao LumaPsi</a></div>";
 }
 
 carregarPerfil();
