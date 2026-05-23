@@ -1046,7 +1046,7 @@ tr:hover td{background:#FAFAFF}
           </div>
         </div>
       <!-- ── MARKETING ── -->
-      <div class="screen" id="sc-marketing" style="display:none;">
+      <div class="screen" id="sc-marketing">
         <div style="margin-bottom:24px;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
             <h2 style="font-size:20px;font-weight:500;margin:0;">Marketing com IA</h2>
@@ -4285,20 +4285,20 @@ function gerarHtmlBase(titulo, corpo, psi, crp, hoje, email, tel) {
 
 // ===== MENSAGEM DIARIA =====
 const MSGS_DIARIAS = [
-  {icon:"🌿",cor:"#E8F5E9",ct:"#2E7D32",label:"Cuidado com voce",texto:"Antes de cuidar dos outros, cuide de voce. A qualidade da sua presenca terapeutica comeca no seu proprio bem-estar. Como voce esta hoje?"},
-  {icon:"✨",cor:"#EDE7F6",ct:"#512DA8",label:"Proposito",texto:"Cada sessao que voce conduz com presenca e escuta genuina transforma uma vida. O impacto do seu trabalho vai muito alem do que voce consegue ver."},
-  {icon:"🌊",cor:"#E3F2FD",ct:"#1565C0",label:"Equilibrio",texto:"E normal sentir o peso do que ouve. Supervisao, analise pessoal e descanso nao sao luxo. Sao parte da sua pratica clinica."},
-  {icon:"🌸",cor:"#FCE4EC",ct:"#880E4F",label:"Conexao",texto:"A relacao terapeutica e o coracao da mudanca. A sua capacidade de criar vinculos seguros e uma habilidade rara e preciosa."},
-  {icon:"🔥",cor:"#FFF3E0",ct:"#E65100",label:"Motivacao",texto:"Voce escolheu uma das profissoes mais significativas que existem. Cada paciente que sai mais leve da sua sala carrega um pedaco da sua dedicacao."},
-  {icon:"🌱",cor:"#F1F8E9",ct:"#33691E",label:"Crescimento",texto:"O psicologo que nunca para de aprender e aquele que mais transforma. Cada livro e supervisao e investimento no seu cuidado."},
-  {icon:"💫",cor:"#F3E5F5",ct:"#4A148C",label:"Presenca",texto:"Presenca total e o maior presente que voce pode oferecer. Quando voce esta inteiramente ali, o paciente sente. E isso ja cura."},
-  {icon:"🏔️",cor:"#ECEFF1",ct:"#263238",label:"Resiliencia",texto:"Ha sessoes dificeis, pacientes que abandonam, casos que frustram. Isso nao significa fracasso. Significa que voce esta na linha de frente de algo que importa."},
-  {icon:"🎯",cor:"#E8EAF6",ct:"#1A237E",label:"Foco",texto:"Um dia de cada vez, uma sessao de cada vez. A consistencia ao longo do tempo e o que realmente transforma vidas."},
-  {icon:"🌙",cor:"#EDE7F6",ct:"#4527A0",label:"Descanso",texto:"Descansar tambem e trabalhar. Um psicologo descansado escuta melhor, percebe mais e oferece presenca que nenhuma tecnica substitui."},
-  {icon:"💚",cor:"#E8F5E9",ct:"#1B5E20",label:"Autocompaixao",texto:"Voce cobra de si mesmo o mesmo cuidado que ensina aos pacientes? Autocompaixao nao e fraqueza. E o modelo que voce demonstra na pratica."},
-  {icon:"🦋",cor:"#FFF8E1",ct:"#F57F17",label:"Transformacao",texto:"As mudancas na terapia raramente sao lineares. Confie no processo mesmo quando o progresso parece invisivel. A semente plantada hoje floresce no tempo certo."},
-  {icon:"🌺",cor:"#FCE4EC",ct:"#AD1457",label:"Gratidao",texto:"Pausa. Pense em um paciente que evoluiu significativamente. Voce fez parte disso. Permita-se receber essa gratidao."},
-  {icon:"⚡",cor:"#FFF3E0",ct:"#BF360C",label:"Energia",texto:"Se voce esta sentindo esgotamento, e sinal. Nao de fraqueza, mas de que deu muito de si. Recarregar nao e opcional, e profissional."},
+  {icon:"🌿",cor:"#E8F5E9",ct:"#2E7D32",label:"Cuidado com você",texto:"Antes de cuidar dos outros, cuide de você. A qualidade da sua presença terapêutica começa no seu próprio bem-estar. Como você está hoje?"},
+  {icon:"✨",cor:"#EDE7F6",ct:"#512DA8",label:"Propósito",texto:"Cada sessão que você conduz com presença e escuta genuína transforma uma vida. O impacto do seu trabalho vai muito além do que você consegue ver."},
+  {icon:"🌊",cor:"#E3F2FD",ct:"#1565C0",label:"Equilíbrio",texto:"É normal sentir o peso do que ouve. Supervisão, análise pessoal e descanso não são luxo. São parte da sua prática clínica."},
+  {icon:"🌸",cor:"#FCE4EC",ct:"#880E4F",label:"Conexão",texto:"A relação terapêutica é o coração da mudança. A sua capacidade de criar vínculos seguros é uma habilidade rara e preciosa."},
+  {icon:"🔥",cor:"#FFF3E0",ct:"#E65100",label:"Motivação",texto:"Você escolheu uma das profissões mais significativas que existem. Cada paciente que sai mais leve da sua sala carrega um pedaço da sua dedicação."},
+  {icon:"🌱",cor:"#F1F8E9",ct:"#33691E",label:"Crescimento",texto:"O psicólogo que nunca para de aprender é aquele que mais transforma. Cada livro e supervisão é investimento no seu cuidado."},
+  {icon:"💫",cor:"#F3E5F5",ct:"#4A148C",label:"Presença",texto:"Presença total é o maior presente que você pode oferecer. Quando você está inteiramente ali, o paciente sente — e isso já cura."},
+  {icon:"🏔️",cor:"#ECEFF1",ct:"#263238",label:"Resiliência",texto:"Há sessões difíceis, pacientes que abandonam, casos que frustram. Isso não significa fracasso — significa que você está na linha de frente de algo que importa."},
+  {icon:"🎯",cor:"#E8EAF6",ct:"#1A237E",label:"Foco",texto:"Um dia de cada vez, uma sessão de cada vez. A consistência ao longo do tempo é o que realmente transforma vidas."},
+  {icon:"🌙",cor:"#EDE7F6",ct:"#4527A0",label:"Descanso",texto:"Descansar também é trabalhar. Um psicólogo descansado escuta melhor, percebe mais e oferece presença que nenhuma técnica substitui."},
+  {icon:"💚",cor:"#E8F5E9",ct:"#1B5E20",label:"Autocompaixão",texto:"Você cobra de si mesmo o mesmo cuidado que ensina aos pacientes? Autocompaixão não é fraqueza — é o modelo que você demonstra na prática."},
+  {icon:"🦋",cor:"#FFF8E1",ct:"#F57F17",label:"Transformação",texto:"As mudanças na terapia raramente são lineares. Confie no processo mesmo quando o progresso parece invisível. A semente plantada hoje floresce no tempo certo."},
+  {icon:"🌺",cor:"#FCE4EC",ct:"#AD1457",label:"Gratidão",texto:"Pausa. Pense em um paciente que evoluiu significativamente. Você fez parte disso. Permita-se receber essa gratidão."},
+  {icon:"⚡",cor:"#FFF3E0",ct:"#BF360C",label:"Energia",texto:"Se você está sentindo esgotamento, é sinal — não de fraqueza, mas de que deu muito de si. Recarregar não é opcional, é profissional."},
 ];
 
 function mostrarMensagemDiaria() {
