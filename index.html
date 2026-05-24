@@ -484,110 +484,135 @@ tr:hover td{background:#FAFAFF}
         </div>
 
         <div id="dash-tab-consultorio">
+
         <!-- MENSAGEM DIÁRIA -->
-        <div id="msg-diaria" style="margin-bottom:14px;border-radius:12px;overflow:hidden;display:none;">
-          <div style="padding:16px 20px;display:flex;align-items:center;gap:16px;position:relative;">
-            <div id="msg-diaria-icon" style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;"></div>
+        <div id="msg-diaria" style="margin-bottom:16px;border-radius:14px;overflow:hidden;display:none;border:1px solid rgba(80,70,229,0.15);">
+          <div style="padding:14px 18px;display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(238,237,254,0.9),rgba(238,237,254,0.4));position:relative;">
+            <div id="msg-diaria-icon" style="width:36px;height:36px;border-radius:10px;background:rgba(80,70,229,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;"></div>
             <div style="flex:1;">
-              <div id="msg-diaria-label" style="font-size:10px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;margin-bottom:3px;opacity:.7;"></div>
-              <div id="msg-diaria-texto" style="font-size:13px;line-height:1.55;"></div>
+              <div id="msg-diaria-label" style="font-size:9.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;color:#5046E5;"></div>
+              <div id="msg-diaria-texto" style="font-size:12.5px;line-height:1.5;color:var(--t1);"></div>
             </div>
-            <button onclick="this.parentElement.parentElement.style.display='none'" style="background:none;border:none;cursor:pointer;opacity:.4;padding:4px;flex-shrink:0;">
-              <i class="ti ti-x" style="font-size:14px;"></i>
+            <button onclick="this.parentElement.parentElement.style.display='none'" style="background:none;border:none;cursor:pointer;opacity:.35;padding:4px;flex-shrink:0;transition:opacity .15s;" onmouseenter="this.style.opacity='.7'" onmouseleave="this.style.opacity='.35'">
+              <i class="ti ti-x" style="font-size:13px;"></i>
             </button>
           </div>
         </div>
 
-        <!-- PRÓXIMA SESSÃO EM DESTAQUE -->
-        <div id="dash-proxima" style="background:linear-gradient(135deg,#1E1B4B,#3730A3,#5046E5);border-radius:14px;padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;gap:16px;position:relative;overflow:hidden;">
-          <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.05);"></div>
-          <div style="position:absolute;bottom:-30px;right:80px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.04);"></div>
-          <div style="width:44px;height:44px;background:rgba(255,255,255,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(255,255,255,0.2);">
-            <i class="ti ti-clock" style="color:#fff;font-size:22px;"></i>
-          </div>
-          <div style="flex:1;">
-            <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-bottom:2px;">PRÓXIMA SESSÃO</div>
-            <div style="font-size:15px;font-weight:500;color:#fff;" id="dash-prox-titulo">Carregando...</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.7);" id="dash-prox-sub"></div>
-          </div>
-          <div id="dash-prox-badge" style="background:rgba(255,255,255,0.15);color:#fff;font-size:12px;font-weight:500;padding:6px 14px;border-radius:20px;white-space:nowrap;"></div>
-        </div>
+        <!-- HERO ROW: próxima sessão + mini stats -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
 
-        <!-- MÉTRICAS PRINCIPAIS -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
+          <!-- Próxima sessão — card maior -->
+          <div id="dash-proxima" style="grid-column:span 2;background:linear-gradient(135deg,#1E1B4B 0%,#3730A3 55%,#4F46E5 100%);border-radius:16px;padding:20px 22px;display:flex;align-items:center;gap:16px;position:relative;overflow:hidden;min-height:100px;">
+            <div style="position:absolute;top:-24px;right:-24px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>
+            <div style="position:absolute;bottom:-20px;right:70px;width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none;"></div>
+            <div style="width:46px;height:46px;background:rgba(255,255,255,0.14);border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(255,255,255,0.18);">
+              <i class="ti ti-clock" style="color:#fff;font-size:22px;"></i>
+            </div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:10px;color:rgba(255,255,255,0.55);letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px;">PRÓXIMA SESSÃO</div>
+              <div style="font-size:15px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="dash-prox-titulo">Carregando...</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:2px;" id="dash-prox-sub"></div>
+            </div>
+            <div id="dash-prox-badge" style="background:rgba(255,255,255,0.14);color:#fff;font-size:11px;font-weight:500;padding:5px 12px;border-radius:20px;white-space:nowrap;border:1px solid rgba(255,255,255,0.18);flex-shrink:0;"></div>
+          </div>
 
-          <!-- Sessões hoje -->
-          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#5046E5,#818CF8);border-radius:14px 14px 0 0;"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Sessões hoje</div>
-              <div style="width:34px;height:34px;border-radius:10px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;">
-                <i class="ti ti-calendar-event" style="font-size:16px;color:#5046E5;"></i>
+          <!-- Faturamento do mês -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 20px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#059669,#34D399);border-radius:16px 16px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:10.5px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Faturamento</div>
+              <div style="width:32px;height:32px;border-radius:9px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;">
+                <i class="ti ti-trending-up" style="font-size:15px;color:#059669;"></i>
               </div>
             </div>
-            <div style="font-size:28px;font-weight:700;letter-spacing:-1px;color:var(--t1);line-height:1;" id="dm-sessoes">—</div>
-            <div style="font-size:11px;color:var(--t3);margin-top:6px;display:flex;align-items:center;gap:4px;" id="dm-sessoes-sub">carregando...</div>
-          </div>
-
-          <!-- Faturamento -->
-          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#059669,#34D399);border-radius:14px 14px 0 0;"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Faturamento do mês</div>
-              <div style="width:34px;height:34px;border-radius:10px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;">
-                <i class="ti ti-trending-up" style="font-size:16px;color:#059669;"></i>
-              </div>
-            </div>
-            <div style="font-size:28px;font-weight:700;letter-spacing:-1px;color:var(--t1);line-height:1;" id="dm-fat">—</div>
+            <div style="font-size:24px;font-weight:700;letter-spacing:-0.5px;color:var(--t1);line-height:1;" id="dm-fat">—</div>
             <div style="font-size:11px;color:var(--t3);margin-top:6px;display:flex;align-items:center;gap:4px;" id="dm-fat-sub">carregando...</div>
           </div>
 
           <!-- A receber -->
-          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#D97706,#FCD34D);border-radius:14px 14px 0 0;"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">A receber</div>
-              <div style="width:34px;height:34px;border-radius:10px;background:#FFF7ED;display:flex;align-items:center;justify-content:center;">
-                <i class="ti ti-clock-dollar" style="font-size:16px;color:#D97706;"></i>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 20px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#D97706,#FCD34D);border-radius:16px 16px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:10.5px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">A receber</div>
+              <div style="width:32px;height:32px;border-radius:9px;background:#FFF7ED;display:flex;align-items:center;justify-content:center;">
+                <i class="ti ti-clock-dollar" style="font-size:15px;color:#D97706;"></i>
               </div>
             </div>
-            <div style="font-size:28px;font-weight:700;letter-spacing:-1px;color:#D97706;line-height:1;" id="dm-receber">—</div>
+            <div style="font-size:24px;font-weight:700;letter-spacing:-0.5px;color:#D97706;line-height:1;" id="dm-receber">—</div>
             <div style="font-size:11px;color:var(--t3);margin-top:6px;display:flex;align-items:center;gap:4px;" id="dm-receber-sub">carregando...</div>
-          </div>
-
-          <!-- Pacientes ativos -->
-          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#7C3AED,#A78BFA);border-radius:14px 14px 0 0;"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Pacientes ativos</div>
-              <div style="width:34px;height:34px;border-radius:10px;background:#F5F3FF;display:flex;align-items:center;justify-content:center;">
-                <i class="ti ti-users" style="font-size:16px;color:#7C3AED;"></i>
-              </div>
-            </div>
-            <div style="font-size:28px;font-weight:700;letter-spacing:-1px;color:var(--t1);line-height:1;" id="dm-pacs">—</div>
-            <div class="mc-sub" id="dm-pacs-sub">carregando...</div>
           </div>
         </div>
 
-        <!-- PROGRESSO DO MÊS -->
-        <div class="card mb16" style="padding:16px 18px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-            <span style="font-size:13px;font-weight:500;">Progresso financeiro do mês</span>
-            <span style="font-size:12px;color:var(--t3);" id="dash-prog-label">—</span>
+        <!-- SEGUNDA ROW: sessões hoje + pacientes + progresso -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:12px;margin-bottom:16px;">
+
+          <!-- Sessões hoje -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 20px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#5046E5,#818CF8);border-radius:16px 16px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:10.5px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Sessões hoje</div>
+              <div style="width:32px;height:32px;border-radius:9px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;">
+                <i class="ti ti-calendar-event" style="font-size:15px;color:#5046E5;"></i>
+              </div>
+            </div>
+            <div style="font-size:36px;font-weight:700;letter-spacing:-1px;color:var(--t1);line-height:1;" id="dm-sessoes">—</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:6px;display:flex;align-items:center;gap:4px;" id="dm-sessoes-sub">carregando...</div>
           </div>
-          <div style="background:var(--bg);border-radius:20px;height:8px;overflow:hidden;">
-            <div id="dash-prog-bar" style="height:100%;background:var(--brand);border-radius:20px;width:0%;transition:width 1s ease;"></div>
+
+          <!-- Pacientes ativos -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 20px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#7C3AED,#A78BFA);border-radius:16px 16px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:10.5px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Pacientes ativos</div>
+              <div style="width:32px;height:32px;border-radius:9px;background:#F5F3FF;display:flex;align-items:center;justify-content:center;">
+                <i class="ti ti-users" style="font-size:15px;color:#7C3AED;"></i>
+              </div>
+            </div>
+            <div style="font-size:36px;font-weight:700;letter-spacing:-1px;color:var(--t1);line-height:1;" id="dm-pacs">—</div>
+            <div class="mc-sub" id="dm-pacs-sub">carregando...</div>
           </div>
-          <div style="display:flex;justify-content:space-between;margin-top:6px;">
-            <span style="font-size:11px;color:var(--t3);" id="dash-prog-rec">Recebido: R$0</span>
-            <span style="font-size:11px;color:var(--t3);" id="dash-prog-prev">Previsto: R$0</span>
+
+          <!-- Progresso financeiro — ocupa 2 colunas -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 22px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--t1);">Meta do mês</div>
+                <div style="font-size:11px;color:var(--t3);margin-top:1px;" id="dash-prog-rec">Recebido: R$0</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:22px;font-weight:700;color:#5046E5;letter-spacing:-0.5px;" id="dash-prog-label">0%</div>
+                <div style="font-size:11px;color:var(--t3);" id="dash-prog-prev">de R$0 previsto</div>
+              </div>
+            </div>
+            <div style="background:var(--bg);border-radius:20px;height:10px;overflow:hidden;margin-bottom:6px;">
+              <div id="dash-prog-bar" style="height:100%;background:linear-gradient(90deg,#5046E5,#818CF8);border-radius:20px;width:0%;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="display:flex;gap:12px;">
+                <span style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#5046E5;display:inline-block;"></span>Recebido</span>
+                <span style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#E5E7EB;display:inline-block;"></span>Pendente</span>
+              </div>
+              <span class="card-link" onclick="irPara('relatorios',null)" style="font-size:11px;">Ver relatório →</span>
+            </div>
           </div>
         </div>
 
         <!-- ALERTAS -->
         <div id="dash-alertas" class="mb16"></div>
 
-        <!-- GRÁFICO + SESSÕES -->
+        <!-- SOLICITAÇÕES DE AGENDAMENTO -->
+        <div id="dash-solicitacoes-wrap" class="mb16" style="display:none;">
+          <div class="card" style="padding:0;overflow:hidden;border-color:#FDE68A;">
+            <div class="card-head" style="padding:12px 16px;background:linear-gradient(90deg,#FAEEDA,#FEF3C7);">
+              <span class="card-title" style="color:#92400E;display:flex;align-items:center;gap:6px;"><i class="ti ti-calendar-plus" style="font-size:15px;"></i> Pedidos de agendamento</span>
+              <span style="font-size:11px;font-weight:600;color:#92400E;background:#FDE68A;padding:2px 8px;border-radius:20px;" id="dash-sol-count">—</span>
+            </div>
+            <div id="dash-solicitacoes"></div>
+          </div>
+        </div>
+
+        <!-- GRÁFICOS ROW -->
         <div class="g32 mb16">
           <div class="card">
             <div class="card-head">
@@ -605,8 +630,8 @@ tr:hover td{background:#FAFAFF}
             </div>
             <div style="padding:14px 14px 0;">
               <div style="display:flex;gap:12px;margin-bottom:10px;font-size:11px;color:var(--t3);">
-                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--brand);display:inline-block;"></span> <span id="dash-pres-pct">Presencial</span></span>
-                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#1D9E75;display:inline-block;"></span> <span id="dash-onl-pct">Online</span></span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:#5046E5;display:inline-block;"></span> <span id="dash-pres-pct">Presencial</span></span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:#1D9E75;display:inline-block;"></span> <span id="dash-onl-pct">Online</span></span>
               </div>
             </div>
             <div style="padding:0 14px 14px;position:relative;height:160px;">
@@ -615,35 +640,24 @@ tr:hover td{background:#FAFAFF}
           </div>
         </div>
 
-        <!-- SOLICITAÇÕES DE AGENDAMENTO -->
-        <div id="dash-solicitacoes-wrap" class="mb16" style="display:none;">
-          <div class="card" style="padding:0;overflow:hidden;">
-            <div class="card-head" style="padding:12px 16px;background:#FAEEDA;">
-              <span class="card-title" style="color:#633806;"><i class="ti ti-calendar-plus" style="font-size:15px;"></i> Novos pedidos de agendamento</span>
-              <span style="font-size:11px;font-weight:500;color:#633806;" id="dash-sol-count">—</span>
-            </div>
-            <div id="dash-solicitacoes"></div>
-          </div>
-        </div>
-
         <!-- SESSÕES DE HOJE + PENDENTES -->
         <div class="g2">
           <div class="card" style="padding:0;overflow:hidden;">
-            <div class="card-head" style="padding:12px 16px;">
+            <div class="card-head" style="padding:14px 18px;">
               <span class="card-title">Sessões de hoje</span>
-              <span class="card-link" onclick="irPara('agenda',null)">Ver agenda</span>
+              <span class="card-link" onclick="irPara('agenda',null)">Ver agenda →</span>
             </div>
             <div id="dash-sessoes-hoje"><div class="loading">Carregando...</div></div>
           </div>
           <div class="card" style="padding:0;overflow:hidden;">
-            <div class="card-head" style="padding:12px 16px;">
+            <div class="card-head" style="padding:14px 18px;">
               <span class="card-title">Recebíveis pendentes</span>
-              <span style="font-size:11px;color:var(--amber);font-weight:500;" id="dash-total-pendente">—</span>
+              <span style="font-size:11px;color:var(--amber);font-weight:600;" id="dash-total-pendente">—</span>
             </div>
             <div id="dash-pendentes"><div class="loading">Carregando...</div></div>
-            <div style="padding:10px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;">
-              <button class="btn btn-sm btn-full" style="background:var(--brand-light);color:var(--brand-dark);border:none;" onclick="cobrarWhatsApp()">
-                <i class="ti ti-brand-whatsapp"></i> Cobrar todos via WhatsApp
+            <div style="padding:12px 16px;border-top:1px solid var(--border);">
+              <button class="btn btn-sm btn-full" style="background:linear-gradient(90deg,#ECFDF5,#D1FAE5);color:#065F46;border:1px solid #A7F3D0;font-weight:500;" onclick="cobrarWhatsApp()">
+                <i class="ti ti-brand-whatsapp" style="color:#059669;"></i> Cobrar todos via WhatsApp
               </button>
             </div>
           </div>
@@ -1927,9 +1941,9 @@ async function carregarDashboard() {
   document.getElementById('badge-sessoes').textContent = (sessoesHoje || []).length;
 
   // Progresso do mês
-  document.getElementById('dash-prog-label').textContent = progPct + '% recebido';
-  document.getElementById('dash-prog-rec').textContent = 'Recebido: R$' + recebido.toLocaleString('pt-BR');
-  document.getElementById('dash-prog-prev').textContent = 'Previsto: R$' + previsto.toLocaleString('pt-BR');
+  document.getElementById('dash-prog-label').textContent = progPct + '%';
+  document.getElementById('dash-prog-rec').textContent = 'Recebido: R$ ' + recebido.toLocaleString('pt-BR');
+  document.getElementById('dash-prog-prev').textContent = 'de R$ ' + previsto.toLocaleString('pt-BR') + ' previsto';
   setTimeout(() => {
     const bar = document.getElementById('dash-prog-bar');
     if (bar) bar.style.width = progPct + '%';
