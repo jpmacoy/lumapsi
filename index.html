@@ -3810,6 +3810,7 @@ IMPORTANTE:
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'apikey': SUPA_KEY,
       },
       body: JSON.stringify({
         model: GROQ_MODEL,
@@ -3960,7 +3961,7 @@ async function gerarIAPacienteAtual(tipo) {
 
     const res = await fetch(GROQ_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
       body: JSON.stringify({
         model: GROQ_MODEL,
         messages: [{ role: 'user', content: prompt }],
@@ -4905,7 +4906,7 @@ async function gerarConteudoMarketing() {
     var prompt = await MKT[mktTipo].buildPrompt(cfg);
     var r = await fetch(GROQ_URL, {
       method: "POST",
-      headers: {"Content-Type":"application/json"},
+      headers: {"Content-Type":"application/json","apikey":SUPA_KEY},
       body: JSON.stringify({model: GROQ_MODEL, messages:[{role:"user",content:prompt}], max_tokens:900, temperature:0.85})
     });
     var data = await r.json();
