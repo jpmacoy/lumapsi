@@ -1151,7 +1151,7 @@ tr:hover td{background:#FAFAFF}
         </div>
 
         <!-- Área de geração -->
-        <div id="mkt-area" style="display:none;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+        <div id="mkt-area" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
           <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;">
             <div id="mkt-icon" style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"></div>
             <div style="flex:1;">
@@ -5800,6 +5800,41 @@ var MKT = {
     }
   }
 };
+
+function abrirSugestao(tipo, tema) {
+  // Pre-fill the tema field and open the tool
+  abrirFerramentaMarketing(tipo);
+  setTimeout(() => {
+    const temaInput = document.getElementById('mkt-tema');
+    if (temaInput && tema) temaInput.value = tema;
+  }, 200);
+}
+
+async function gerarSugestoesMarketing() {
+  // Regenerate suggestions based on user profile
+  const cfg = await sb.from('configuracoes').select('abordagem,especialidades').eq('user_id',(await sb.auth.getUser()).data.user.id).single();
+  const esp = cfg?.data?.especialidades || 'ansiedade, relacionamentos';
+  const abord = cfg?.data?.abordagem || 'psicoterapia';
+  
+  const sugestoes = [
+    {tipo:'post', icon:'ti-brand-instagram', bg:'#EEEDFE', cor:'#5046E5', titulo:'3 sinais de que a terapia está funcionando', sub:'Post · Educativo'},
+    {tipo:'post', icon:'ti-heart', bg:'#FCE7F3', cor:'#DB2777', titulo:'Autocuidado: por onde começar?', sub:'Post · Feed'},
+    {tipo:'boasvindas', icon:'ti-brand-whatsapp', bg:'#D1FAE5', cor:'#059669', titulo:'Mensagem de confirmação de sessão', sub:'WhatsApp'},
+    {tipo:'calendario', icon:'ti-calendar-event', bg:'#CCFBF1', cor:'#0D9488', titulo:'Planejamento de conteúdo — ' + new Date().toLocaleDateString('pt-BR',{month:'long'}), sub:'Calendário mensal'},
+  ];
+  
+  const grid = document.getElementById('mkt-sugestoes-grid');
+  if (grid) {
+    grid.innerHTML = sugestoes.map(s => 
+      '<div style="background:var(--bg);border-radius:10px;padding:14px;cursor:pointer;" onclick="abrirSugestao(\''+s.tipo+'\',\''+s.titulo+'\')">'+
+      '<div style="width:28px;height:28px;border-radius:8px;background:'+s.bg+';display:flex;align-items:center;justify-content:center;margin-bottom:10px;"><i class="ti '+s.icon+'" style="font-size:14px;color:'+s.cor+';"></i></div>'+
+      '<div style="font-size:12.5px;font-weight:500;color:var(--t1);margin-bottom:4px;line-height:1.35;">'+s.titulo+'</div>'+
+      '<div style="font-size:10.5px;color:var(--t3);">'+s.sub+'</div>'+
+      '</div>'
+    ).join('');
+    toast('Sugestões atualizadas!', 'success');
+  }
+}
 
 async function abrirFerramentaMarketing(tipo) {
   mktTipo = tipo;
