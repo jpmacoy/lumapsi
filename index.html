@@ -1945,18 +1945,51 @@ async function carregarDashboard() {
     document.getElementById('dash-prox-sub').textContent = (proxima.tipo || 'Presencial') + ' · ' + diffTxt;
     document.getElementById('dash-prox-badge').textContent = proxima.status || 'Agendada';
   } else if ((sessoesHoje || []).length === 0) {
-    divProx.style.background = 'var(--bg)';
-    divProx.style.border = '1px solid var(--border)';
-    document.getElementById('dash-prox-titulo').textContent = 'Nenhuma sessão hoje';
-    document.getElementById('dash-prox-titulo').style.color = 'var(--t2)';
-    document.getElementById('dash-prox-sub').textContent = 'Aproveite para organizar sua semana';
-    document.getElementById('dash-prox-sub').style.color = 'var(--t3)';
-    document.getElementById('dash-prox-badge').style.display = 'none';
-    divProx.querySelector('i').style.color = 'var(--brand)';
+    // Buscar próxima sessão futura
+    const proxFutura = (todasSessoes || []).find(s => {
+      const dt = new Date(s.data_hora);
+      return dt > agora && (s.status === 'Agendada' || s.status === 'Confirmada');
+    });
+    if (proxFutura) {
+      const dtF = new Date(proxFutura.data_hora);
+      const diaF = dtF.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'short'});
+      const horaF = dtF.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+      const pacF = todosPacientes.find(p => p.id === proxFutura.paciente_id);
+      divProx.style.background = 'linear-gradient(135deg,#1E1B4B 0%,#3730A3 55%,#4F46E5 100%)';
+      divProx.style.border = 'none';
+      document.getElementById('dash-prox-titulo').textContent = (pacF?.nome || '—') + ' — ' + horaF;
+      document.getElementById('dash-prox-titulo').style.color = '#fff';
+      document.getElementById('dash-prox-sub').textContent = 'Próxima sessão · ' + diaF;
+      document.getElementById('dash-prox-sub').style.color = 'rgba(255,255,255,0.65)';
+      document.getElementById('dash-prox-badge').textContent = proxFutura.status || 'Agendada';
+      document.getElementById('dash-prox-badge').style.display = '';
+      const icon = divProx.querySelector('i');
+      if (icon) icon.style.color = '#fff';
+    } else {
+      divProx.style.background = 'linear-gradient(135deg,#1E1B4B,#2D2A6E)';
+      divProx.style.border = 'none';
+      document.getElementById('dash-prox-titulo').textContent = 'Sem sessões agendadas';
+      document.getElementById('dash-prox-titulo').style.color = 'rgba(255,255,255,0.85)';
+      document.getElementById('dash-prox-sub').textContent = 'Que tal agendar a próxima sessão?';
+      document.getElementById('dash-prox-sub').style.color = 'rgba(255,255,255,0.5)';
+      const badge = document.getElementById('dash-prox-badge');
+      badge.textContent = '+ Nova sessão';
+      badge.style.cursor = 'pointer';
+      badge.onclick = () => acaoPrincipal();
+      badge.style.display = '';
+    }
   } else {
-    document.getElementById('dash-prox-titulo').textContent = 'Todas as sessões de hoje já passaram';
-    document.getElementById('dash-prox-sub').textContent = 'Bom trabalho!';
-    document.getElementById('dash-prox-badge').textContent = '✓ Concluído';
+    divProx.style.background = 'linear-gradient(135deg,#065F46 0%,#047857 60%,#059669 100%)';
+    divProx.style.border = 'none';
+    document.getElementById('dash-prox-titulo').textContent = 'Todas as sessões de hoje concluídas';
+    document.getElementById('dash-prox-titulo').style.color = '#fff';
+    document.getElementById('dash-prox-sub').textContent = 'Bom trabalho! Descanse e cuide-se.';
+    document.getElementById('dash-prox-sub').style.color = 'rgba(255,255,255,0.7)';
+    const badge = document.getElementById('dash-prox-badge');
+    badge.textContent = '✓ Dia concluído';
+    badge.style.display = '';
+    const icon = divProx.querySelector('i');
+    if (icon) { icon.className = 'ti ti-circle-check'; icon.style.color = '#fff'; }
   }
 
   // Alertas
