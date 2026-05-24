@@ -456,6 +456,8 @@ tr:hover td{background:#FAFAFF}
       <div class="nav-lbl">Financeiro</div>
       <div class="nav-item" onclick="irPara('financeiro',this)"><i class="ti ti-building"></i><span class="nav-lbl-text">Consultório</span></div>
       <div class="nav-item" onclick="irPara('pessoal',this)"><i class="ti ti-wallet"></i><span class="nav-lbl-text">Pessoal</span></div>
+      <div class="nav-item" onclick="irPara('guia-fiscal',this)"><i class="ti ti-calculator"></i><span class="nav-lbl-text">Guia Fiscal</span></div>
+      <div class="nav-item" onclick="irPara('simulador',this)"><i class="ti ti-chart-arrows-vertical"></i><span class="nav-lbl-text">Simulador</span></div>
       <div class="nav-lbl">Crescimento</div>
       <div class="nav-item" onclick="irPara('marketing',this)"><i class="ti ti-sparkles"></i><span class="nav-lbl-text">Marketing IA</span></div>
       <div class="nav-lbl">Análise</div>
@@ -850,308 +852,12 @@ tr:hover td{background:#FAFAFF}
             <div class="tab active" onclick="filtrarFin(this,'')">Todos</div>
             <div class="tab" onclick="filtrarFin(this,'Receita')">Receitas</div>
             <div class="tab" onclick="filtrarFin(this,'Despesa')">Despesas</div>
-            <div class="tab" onclick="abrirGuiaFiscal(this)" style="color:#4F46E5;display:flex;align-items:center;gap:4px;"><i class="ti ti-calculator"></i> Guia Fiscal</div>
-            <div class="tab" onclick="abrirSimulador(this)" style="color:#059669;display:flex;align-items:center;gap:4px;"><i class="ti ti-chart-arrows-vertical"></i> Simulador</div>
+
           </div>
           <div style="flex:1;"></div>
           <input type="month" class="form-input" style="width:140px;" id="fin-mes" onchange="carregarFinanceiro()" id="fin-mes-input">
         </div>
 
-        <!-- ── GUIA FISCAL (oculto por padrão) ── -->
-        <div id="painel-fiscal" style="display:none;">
-
-          <!-- ALERTA VENCIMENTO -->
-          <div id="fiscal-alerta-venc" class="fiscal-alert" style="background:#FEF3C7;border:1px solid #FDE68A;margin-bottom:16px;display:none;">
-            <i class="ti ti-alert-triangle" style="font-size:20px;color:#D97706;flex-shrink:0;margin-top:1px;"></i>
-            <div>
-              <div style="font-size:13px;font-weight:600;color:#92400E;margin-bottom:2px;">Carnê-leão vence em breve</div>
-              <div style="font-size:12px;color:#92400E;" id="fiscal-alerta-txt">O carnê-leão de <b id="fiscal-mes-nome">—</b> vence dia 31. Não pague com atraso — a multa é de 0,33% ao dia.</div>
-            </div>
-          </div>
-
-          <!-- CARD PRINCIPAL — CARNÊ-LEÃO -->
-          <div class="fiscal-card" style="border-left:4px solid #4F46E5;">
-            <div class="fiscal-header">
-              <div class="fiscal-icon" style="background:#EEF2FF;"><i class="ti ti-calculator" style="font-size:20px;color:#4F46E5;"></i></div>
-              <div style="flex:1;">
-                <div style="font-size:15px;font-weight:600;color:var(--t1);">Carnê-leão estimado</div>
-                <div style="font-size:12px;color:var(--t3);" id="fiscal-periodo">Selecione um mês para calcular</div>
-              </div>
-              <div style="text-align:right;">
-                <div style="font-size:11px;color:var(--t3);margin-bottom:2px;">Imposto estimado</div>
-                <div style="font-size:28px;font-weight:700;color:#4F46E5;letter-spacing:-0.5px;" id="fiscal-imposto-val">R$ —</div>
-              </div>
-            </div>
-
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
-              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
-                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Recebido</div>
-                <div style="font-size:18px;font-weight:700;color:var(--t1);" id="fiscal-recebido">R$ —</div>
-              </div>
-              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
-                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Base de cálculo</div>
-                <div style="font-size:18px;font-weight:700;color:var(--t1);" id="fiscal-base">R$ —</div>
-              </div>
-              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
-                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Alíquota</div>
-                <div style="font-size:18px;font-weight:700;color:#4F46E5;" id="fiscal-aliquota">—%</div>
-              </div>
-              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
-                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Vencimento</div>
-                <div style="font-size:14px;font-weight:700;color:#D97706;" id="fiscal-venc">Dia 31</div>
-              </div>
-            </div>
-
-            <div style="background:#EEF2FF;border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
-              <i class="ti ti-info-circle" style="font-size:16px;color:#4F46E5;flex-shrink:0;"></i>
-              <div style="font-size:12px;color:#3730A3;line-height:1.5;" id="fiscal-obs">Preencha o mês para ver o cálculo.</div>
-            </div>
-
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <a href="https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/carne-leao" target="_blank" class="btn btn-primary" style="font-size:12px;">
-                <i class="ti ti-external-link"></i> Pagar no e-CAC
-              </a>
-              <a href="https://cav.receita.fazenda.gov.br/autenticacao/login" target="_blank" class="btn" style="font-size:12px;">
-                <i class="ti ti-external-link"></i> Receita Saúde
-              </a>
-              <button class="btn" style="font-size:12px;" onclick="gerarRelatorioFiscal()">
-                <i class="ti ti-download"></i> Exportar resumo
-              </button>
-            </div>
-          </div>
-
-          <!-- TABELA PROGRESSIVA -->
-          <div class="fiscal-card">
-            <div style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:4px;">Tabela progressiva do IR 2026</div>
-            <div style="font-size:12px;color:var(--t3);margin-bottom:14px;">Sua faixa está destacada em roxo com base no faturamento do mês selecionado.</div>
-            <table class="ir-table">
-              <thead><tr><th>Rendimento mensal (R$)</th><th>Alíquota</th><th>Parcela a deduzir</th><th>Imposto máximo na faixa</th></tr></thead>
-              <tbody id="fiscal-tabela-tbody">
-                <tr id="faixa-0"><td>Até R$ 2.428,80</td><td>Isento</td><td>—</td><td>R$ 0</td></tr>
-                <tr id="faixa-1"><td>R$ 2.428,81 a R$ 2.826,65</td><td>7,5%</td><td>R$ 182,16</td><td>R$ 29,82</td></tr>
-                <tr id="faixa-2"><td>R$ 2.826,66 a R$ 3.751,05</td><td>15%</td><td>R$ 394,16</td><td>R$ 167,98</td></tr>
-                <tr id="faixa-3"><td>R$ 3.751,06 a R$ 4.664,68</td><td>22,5%</td><td>R$ 675,49</td><td>R$ 373,46</td></tr>
-                <tr id="faixa-4"><td>Acima de R$ 4.664,68</td><td>27,5%</td><td>R$ 908,73</td><td>—</td></tr>
-              </tbody>
-            </table>
-            <div style="font-size:11px;color:var(--t3);margin-top:10px;">* Tabela vigente para 2026. Consulte sempre um contador para sua situação específica. O LumaPsi fornece apenas estimativas educativas.</div>
-          </div>
-
-          <!-- RECEITA SAÚDE -->
-          <div class="fiscal-card" style="border-left:4px solid #059669;">
-            <div class="fiscal-header" style="margin-bottom:12px;">
-              <div class="fiscal-icon" style="background:#D1FAE5;"><i class="ti ti-file-check" style="font-size:20px;color:#059669;"></i></div>
-              <div>
-                <div style="font-size:15px;font-weight:600;color:var(--t1);">Receita Saúde — passo a passo</div>
-                <div style="font-size:12px;color:var(--t3);">Obrigatório desde jan/2025 para psicólogos PF. Emita um recibo por atendimento.</div>
-              </div>
-            </div>
-            <div>
-              <div class="receita-step">
-                <div class="step-num">1</div>
-                <div><div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:2px;">Acesse o e-CAC</div><div style="font-size:12px;color:var(--t3);">Vá em <b>cav.receita.fazenda.gov.br</b> e faça login com sua conta Gov.br (precisa de nível prata ou ouro).</div></div>
-              </div>
-              <div class="receita-step">
-                <div class="step-num">2</div>
-                <div><div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:2px;">Acesse o Receita Saúde</div><div style="font-size:12px;color:var(--t3);">No e-CAC, busque por "Receita Saúde" ou acesse pelo menu Serviços → Saúde.</div></div>
-              </div>
-              <div class="receita-step">
-                <div class="step-num">3</div>
-                <div><div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:2px;">Emita o recibo de cada sessão</div><div style="font-size:12px;color:var(--t3);">Informe: data da sessão, CPF do paciente, valor recebido e descrição (Serviços de Psicologia — CBO 2515-40).</div></div>
-              </div>
-              <div class="receita-step">
-                <div class="step-num">4</div>
-                <div><div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:2px;">Guarde o comprovante por 5 anos</div><div style="font-size:12px;color:var(--t3);">A Receita Federal cruza os dados com o paciente. Inconsistências geram malha fina automaticamente.</div></div>
-              </div>
-            </div>
-            <div style="margin-top:14px;">
-              <div style="font-size:12.5px;font-weight:600;color:var(--t1);margin-bottom:10px;">Sessões do mês sem recibo emitido (confira):</div>
-              <div id="fiscal-sessoes-lista" style="font-size:12px;color:var(--t3);">Selecione um mês para ver as sessões realizadas.</div>
-            </div>
-          </div>
-
-          <!-- DICAS -->
-          <div class="fiscal-card" style="border-left:4px solid #D97706;">
-            <div class="fiscal-header" style="margin-bottom:12px;">
-              <div class="fiscal-icon" style="background:#FEF3C7;"><i class="ti ti-bulb" style="font-size:20px;color:#D97706;"></i></div>
-              <div>
-                <div style="font-size:15px;font-weight:600;color:var(--t1);">Como reduzir o imposto legalmente</div>
-                <div style="font-size:12px;color:var(--t3);">Deduções permitidas para psicólogos PF no IRPF 2026</div>
-              </div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <div style="background:#FEF3C7;border-radius:10px;padding:12px;">
-                <div style="font-size:12px;font-weight:600;color:#92400E;margin-bottom:6px;display:flex;align-items:center;gap:5px;"><i class="ti ti-check" style="font-size:14px;"></i>Dedutíveis</div>
-                <ul style="font-size:11.5px;color:#78350F;line-height:1.8;margin:0;padding-left:14px;">
-                  <li>Aluguel do consultório</li>
-                  <li>Contribuição ao INSS</li>
-                  <li>Cursos, supervisão e livros</li>
-                  <li>Testes psicológicos</li>
-                  <li>Internet e telefone (parcial)</li>
-                  <li>Dependentes (R$2.275,08/ano)</li>
-                  <li>Plano de saúde</li>
-                </ul>
-              </div>
-              <div style="background:#FEE2E2;border-radius:10px;padding:12px;">
-                <div style="font-size:12px;font-weight:600;color:#991B1B;margin-bottom:6px;display:flex;align-items:center;gap:5px;"><i class="ti ti-x" style="font-size:14px;"></i>Não dedutíveis</div>
-                <ul style="font-size:11.5px;color:#7F1D1D;line-height:1.8;margin:0;padding-left:14px;">
-                  <li>Alimentação e vestuário</li>
-                  <li>Academia e lazer</li>
-                  <li>Gastos pessoais misturados</li>
-                  <li>Despesas sem comprovante</li>
-                </ul>
-                <div style="font-size:11px;color:#991B1B;margin-top:8px;padding-top:8px;border-top:1px solid #FECACA;">
-                  <b>Dica:</b> Abrir CNPJ (Simples Nacional) pode reduzir a alíquota de até 27,5% para 6%. Vale consultar um contador.
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- ── SIMULADOR DE PRECIFICAÇÃO ── -->
-        <div id="painel-simulador" style="display:none;">
-
-          <div style="background:linear-gradient(135deg,#064E3B,#059669);border-radius:14px;padding:20px 24px;margin-bottom:16px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>
-            <div style="display:flex;align-items:center;gap:14px;">
-              <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <i class="ti ti-chart-arrows-vertical" style="font-size:22px;color:#fff;"></i>
-              </div>
-              <div>
-                <div style="font-size:16px;font-weight:600;color:#fff;">Simulador de Precificação</div>
-                <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:2px;">Descubra quanto você realmente ganha e qual o valor ideal por sessão</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="sim-card">
-            <div style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:18px;display:flex;align-items:center;gap:8px;"><i class="ti ti-adjustments" style="color:#059669;"></i> Ajuste os parâmetros</div>
-
-            <div class="sim-slider-wrap">
-              <div class="sim-slider-label">
-                <div><div class="sim-slider-name">Pacientes ativos</div><div style="font-size:11px;color:var(--t3);">Quantos pacientes você atende</div></div>
-                <div class="sim-slider-val" id="sim-val-pacs">10</div>
-              </div>
-              <input type="range" class="sim-slider" id="sim-pacs" min="1" max="40" value="10" step="1" oninput="atualizarSimulador()">
-              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>1</span><span>40</span></div>
-            </div>
-
-            <div class="sim-slider-wrap">
-              <div class="sim-slider-label">
-                <div><div class="sim-slider-name">Sessões por semana por paciente</div><div style="font-size:11px;color:var(--t3);">Em média, quantas sessões cada paciente faz por semana</div></div>
-                <div class="sim-slider-val" id="sim-val-freq">1×</div>
-              </div>
-              <input type="range" class="sim-slider" id="sim-freq" min="1" max="3" value="1" step="1" oninput="atualizarSimulador()">
-              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>1×/sem</span><span>3×/sem</span></div>
-            </div>
-
-            <div class="sim-slider-wrap">
-              <div class="sim-slider-label">
-                <div><div class="sim-slider-name">Valor por sessão (R$)</div><div style="font-size:11px;color:var(--t3);">Quanto você cobra por cada atendimento</div></div>
-                <div class="sim-slider-val" id="sim-val-preco">R$ 180</div>
-              </div>
-              <input type="range" class="sim-slider" id="sim-preco" min="80" max="600" value="180" step="10" oninput="atualizarSimulador()">
-              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>R$80</span><span>R$600</span></div>
-            </div>
-
-            <div class="sim-slider-wrap">
-              <div class="sim-slider-label">
-                <div><div class="sim-slider-name">Taxa de faltas / cancelamentos</div><div style="font-size:11px;color:var(--t3);">% de sessões que não acontecem sem cobrança</div></div>
-                <div class="sim-slider-val" id="sim-val-faltas">10%</div>
-              </div>
-              <input type="range" class="sim-slider" id="sim-faltas" min="0" max="40" value="10" step="5" oninput="atualizarSimulador()">
-              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>0%</span><span>40%</span></div>
-            </div>
-
-            <div class="sim-slider-wrap" style="margin-bottom:0;">
-              <div class="sim-slider-label">
-                <div><div class="sim-slider-name">Despesas mensais (R$)</div><div style="font-size:11px;color:var(--t3);">Aluguel, internet, supervisão, ferramentas...</div></div>
-                <div class="sim-slider-val" id="sim-val-desp">R$ 800</div>
-              </div>
-              <input type="range" class="sim-slider" id="sim-desp" min="0" max="5000" value="800" step="100" oninput="atualizarSimulador()">
-              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>R$0</span><span>R$5.000</span></div>
-            </div>
-          </div>
-
-          <div class="sim-card" style="border-left:4px solid #059669;">
-            <div style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:16px;display:flex;align-items:center;gap:8px;"><i class="ti ti-calculator" style="color:#059669;"></i> Resultado estimado — por mês</div>
-
-            <div class="sim-result-grid">
-              <div class="sim-result-card" style="background:#ECFDF5;">
-                <div class="sim-result-label" style="color:#065F46;">Receita bruta</div>
-                <div class="sim-result-val" style="color:#059669;" id="sim-r-bruta">—</div>
-              </div>
-              <div class="sim-result-card" style="background:#FEF3C7;">
-                <div class="sim-result-label" style="color:#92400E;">Impostos (IR est.)</div>
-                <div class="sim-result-val" style="color:#D97706;" id="sim-r-ir">—</div>
-              </div>
-              <div class="sim-result-card" style="background:#EEF2FF;">
-                <div class="sim-result-label" style="color:#3730A3;">Líquido real</div>
-                <div class="sim-result-val" style="color:#4F46E5;" id="sim-r-liquido">—</div>
-              </div>
-            </div>
-
-            <div style="margin-bottom:14px;">
-              <div style="font-size:11px;color:var(--t3);margin-bottom:6px;">Composição da receita bruta</div>
-              <div style="display:flex;gap:2px;border-radius:6px;overflow:hidden;height:10px;">
-                <div id="sim-bar-liquido" style="background:#059669;transition:width .4s ease;width:60%;"></div>
-                <div id="sim-bar-desp" style="background:#D97706;transition:width .4s ease;width:15%;"></div>
-                <div id="sim-bar-ir" style="background:#EF4444;transition:width .4s ease;width:15%;"></div>
-                <div id="sim-bar-faltas" style="background:#9CA3AF;transition:width .4s ease;width:10%;"></div>
-              </div>
-              <div style="display:flex;gap:14px;margin-top:6px;flex-wrap:wrap;">
-                <span style="font-size:10.5px;color:var(--t2);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#059669;display:inline-block;"></span>Líquido</span>
-                <span style="font-size:10.5px;color:var(--t2);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#D97706;display:inline-block;"></span>Despesas</span>
-                <span style="font-size:10.5px;color:var(--t2);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#EF4444;display:inline-block;"></span>IR estimado</span>
-                <span style="font-size:10.5px;color:var(--t2);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#9CA3AF;display:inline-block;"></span>Faltas</span>
-              </div>
-            </div>
-
-            <div id="sim-insights" style="margin-bottom:14px;"></div>
-
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
-              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
-                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Sessões/mês</div>
-                <div style="font-size:18px;font-weight:700;color:var(--t1);" id="sim-r-sessoes">—</div>
-              </div>
-              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
-                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Valor/hora efetivo</div>
-                <div style="font-size:18px;font-weight:700;color:var(--t1);" id="sim-r-hora">—</div>
-              </div>
-              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
-                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Faltas no mês</div>
-                <div style="font-size:18px;font-weight:700;" id="sim-r-pct-faltas">—</div>
-              </div>
-              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
-                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Horas/semana</div>
-                <div style="font-size:18px;font-weight:700;color:var(--t1);" id="sim-r-horas">—</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="sim-card" style="border-left:4px solid #7C3AED;">
-            <div style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:4px;display:flex;align-items:center;gap:8px;"><i class="ti ti-target" style="color:#7C3AED;"></i> Qual valor preciso cobrar?</div>
-            <div style="font-size:12px;color:var(--t3);margin-bottom:14px;">Para atingir um líquido mensal específico, usando os mesmos parâmetros acima:</div>
-            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size:13px;color:var(--t2);">Quero ganhar</span>
-                <input type="number" class="form-input" id="sim-meta-liquido" value="5000" min="1000" max="30000" step="500" style="width:120px;" oninput="calcularValorMinimo()">
-                <span style="font-size:13px;color:var(--t2);">líquido/mês</span>
-              </div>
-              <div style="background:#F5F3FF;border-radius:10px;padding:12px 18px;flex:1;min-width:180px;text-align:center;">
-                <div style="font-size:11px;color:#6D28D9;margin-bottom:4px;">Valor mínimo por sessão</div>
-                <div style="font-size:26px;font-weight:700;color:#7C3AED;" id="sim-r-minimo">—</div>
-              </div>
-              <div style="background:#EEF2FF;border-radius:10px;padding:12px 18px;flex:1;min-width:180px;text-align:center;">
-                <div style="font-size:11px;color:#4338CA;margin-bottom:4px;">Pacientes necessários (preço atual)</div>
-                <div style="font-size:26px;font-weight:700;color:#4F46E5;" id="sim-r-min-pacs">—</div>
-              </div>
-            </div>
-          </div>
-
-          <div style="font-size:11px;color:var(--t3);text-align:center;padding-bottom:8px;">* Simulação educativa. Valores são estimativas — consulte um contador para planejamento financeiro completo.</div>
-        </div>
 
         <div class="g3 mb16">
           <div class="mc" style="border-left:3px solid var(--green);">
@@ -1187,6 +893,20 @@ tr:hover td{background:#FAFAFF}
         <div class="card" style="padding:0;overflow:hidden;">
           <div class="card-head"><span class="card-title">Lançamentos pessoais</span><button class="btn btn-primary btn-sm" onclick="abrirModalPessoal()"><i class="ti ti-plus"></i> Adicionar</button></div>
           <div id="lista-pessoal" style="padding:0 16px;"><div class="loading">Carregando...</div></div>
+        </div>
+      </div>
+
+      <!-- ── GUIA FISCAL ── -->
+      <div class="screen" id="sc-guia-fiscal">
+        <div id="guia-fiscal-content">
+          <!-- conteúdo carregado dinamicamente pelo abrirGuiaFiscalScreen() -->
+        </div>
+      </div>
+
+      <!-- ── SIMULADOR ── -->
+      <div class="screen" id="sc-simulador">
+        <div id="simulador-content">
+          <!-- conteúdo carregado dinamicamente pelo abrirSimuladorScreen() -->
         </div>
       </div>
 
@@ -2144,7 +1864,9 @@ const paginasMeta = {
   financeiro: { title: 'Financeiro',         sub: () => 'Consultório',                 acao: 'Novo lançamento', modal: 'novo-lancamento' },
   pessoal:    { title: 'Financeiro Pessoal', sub: () => 'Suas finanças pessoais',      acao: 'Novo lançamento', modal: 'novo-lancamento' },
   relatorios: { title: 'Relatórios',         sub: () => 'Análise do período',          acao: null, modal: null },
-  marketing:  { title: 'Marketing com IA',     sub: () => 'Ferramentas para crescer',     acao: null, modal: null },
+  marketing:    { title: 'Marketing com IA',     sub: () => 'Ferramentas para crescer',     acao: null, modal: null },
+  'guia-fiscal': { title: 'Guia Fiscal',          sub: () => 'Carnê-leão, Receita Saúde e IR', acao: null, modal: null },
+  simulador:    { title: 'Simulador de Precificação', sub: () => 'Descubra quanto você realmente ganha', acao: null, modal: null },
   config:     { title: 'Configurações',      sub: () => 'Preferências do sistema',     acao: null, modal: null },
 };
 
@@ -2179,6 +1901,8 @@ function irPara(pag, el) {
   if (pag === 'agenda') carregarAgenda();
   if (pag === 'config') { carregarHorarios(); carregarSlug(); verificarStatusGoogleCalendar(); }
   if (pag === 'marketing') { mostrarMensagemDiaria(); }
+  if (pag === 'guia-fiscal') { renderGuiaFiscal(); setTimeout(calcularCarneleao, 100); }
+  if (pag === 'simulador') { renderSimulador(); setTimeout(atualizarSimulador, 100); }
 }
 
 function acaoPrincipal() {
@@ -3022,19 +2746,167 @@ function filtrarFin(el, tipo) {
 }
 
 function abrirGuiaFiscal(el) {
-  document.querySelectorAll('#sc-financeiro .tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('painel-fiscal').style.display = '';
-  document.getElementById('painel-simulador').style.display = 'none';
-  calcularCarneleao();
+  irPara('guia-fiscal', el);
 }
 
 function abrirSimulador(el) {
-  document.querySelectorAll('#sc-financeiro .tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('painel-fiscal').style.display = 'none';
-  document.getElementById('painel-simulador').style.display = '';
-  atualizarSimulador();
+  irPara('simulador', el);
+}
+
+function renderGuiaFiscal() {
+  var el = document.getElementById('guia-fiscal-content');
+  if (!el || el.innerHTML.trim()) return; // já renderizado
+  el.innerHTML = [
+    '<div id="fiscal-alerta-venc" class="fiscal-alert" style="background:#FEF3C7;border:1px solid #FDE68A;margin-bottom:16px;display:none;">',
+    '<i class="ti ti-alert-triangle" style="font-size:20px;color:#D97706;flex-shrink:0;margin-top:1px;"></i>',
+    '<div><div style="font-size:13px;font-weight:600;color:#92400E;margin-bottom:2px;">Carnê-leão vence em breve</div>',
+    '<div style="font-size:12px;color:#92400E;">O carnê-leão de <b id="fiscal-mes-nome">—</b> vence dia 31. Não pague com atraso — a multa é de 0,33% ao dia.</div></div></div>',
+
+    '<div class="fiscal-card" style="border-left:4px solid #4F46E5;">',
+    '<div class="fiscal-header">',
+    '<div class="fiscal-icon" style="background:#EEF2FF;"><i class="ti ti-calculator" style="font-size:20px;color:#4F46E5;"></i></div>',
+    '<div style="flex:1;"><div style="font-size:15px;font-weight:600;color:var(--t1);">Carnê-leão estimado</div>',
+    '<div style="font-size:12px;color:var(--t3);" id="fiscal-periodo">Selecione o mês</div></div>',
+    '<div style="text-align:right;">',
+    '<div style="font-size:11px;color:var(--t3);margin-bottom:2px;">Imposto estimado</div>',
+    '<div style="font-size:28px;font-weight:700;color:#4F46E5;letter-spacing:-0.5px;" id="fiscal-imposto-val">R$ —</div></div></div>',
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">',
+    '<label style="font-size:13px;font-weight:500;color:var(--t1);">Mês de referência:</label>',
+    '<input type="month" class="form-input" id="fiscal-mes-input" style="width:160px;" onchange="calcularCarneleao()">',
+    '</div>',
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">',
+    '<div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Recebido</div><div style="font-size:18px;font-weight:700;color:var(--t1);" id="fiscal-recebido">R$ —</div></div>',
+    '<div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Base de cálculo</div><div style="font-size:18px;font-weight:700;color:var(--t1);" id="fiscal-base">R$ —</div></div>',
+    '<div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Alíquota</div><div style="font-size:18px;font-weight:700;color:#4F46E5;" id="fiscal-aliquota">—%</div></div>',
+    '<div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Vencimento</div><div style="font-size:14px;font-weight:700;color:#D97706;" id="fiscal-venc">Dia 31</div></div>',
+    '</div>',
+    '<div style="background:#EEF2FF;border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">',
+    '<i class="ti ti-info-circle" style="font-size:16px;color:#4F46E5;flex-shrink:0;"></i>',
+    '<div style="font-size:12px;color:#3730A3;line-height:1.5;" id="fiscal-obs">Selecione o mês para calcular.</div></div>',
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;">',
+    '<a href="https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/carne-leao" target="_blank" class="btn btn-primary" style="font-size:12px;"><i class="ti ti-external-link"></i> Pagar no e-CAC</a>',
+    '<a href="https://cav.receita.fazenda.gov.br/autenticacao/login" target="_blank" class="btn" style="font-size:12px;"><i class="ti ti-external-link"></i> Receita Saúde</a>',
+    '<button class="btn" style="font-size:12px;" onclick="gerarRelatorioFiscal()"><i class="ti ti-download"></i> Exportar resumo</button>',
+    '</div></div>',
+
+    '<div class="fiscal-card">',
+    '<div style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:4px;">Tabela progressiva do IR 2026</div>',
+    '<div style="font-size:12px;color:var(--t3);margin-bottom:14px;">Sua faixa está destacada em roxo com base no mês selecionado.</div>',
+    '<table class="ir-table"><thead><tr><th>Rendimento mensal (R$)</th><th>Alíquota</th><th>Parcela a deduzir</th></tr></thead>',
+    '<tbody id="fiscal-tabela-tbody">',
+    '<tr id="faixa-0"><td>Até R$ 2.428,80</td><td>Isento</td><td>—</td></tr>',
+    '<tr id="faixa-1"><td>R$ 2.428,81 a R$ 2.826,65</td><td>7,5%</td><td>R$ 182,16</td></tr>',
+    '<tr id="faixa-2"><td>R$ 2.826,66 a R$ 3.751,05</td><td>15%</td><td>R$ 394,16</td></tr>',
+    '<tr id="faixa-3"><td>R$ 3.751,06 a R$ 4.664,68</td><td>22,5%</td><td>R$ 675,49</td></tr>',
+    '<tr id="faixa-4"><td>Acima de R$ 4.664,68</td><td>27,5%</td><td>R$ 908,73</td></tr>',
+    '</tbody></table>',
+    '<div style="font-size:11px;color:var(--t3);margin-top:10px;">* Consulte sempre um contador para sua situação específica.</div></div>',
+
+    '<div class="fiscal-card" style="border-left:4px solid #059669;">',
+    '<div class="fiscal-header" style="margin-bottom:12px;">',
+    '<div class="fiscal-icon" style="background:#D1FAE5;"><i class="ti ti-file-check" style="font-size:20px;color:#059669;"></i></div>',
+    '<div><div style="font-size:15px;font-weight:600;color:var(--t1);">Receita Saúde — passo a passo</div>',
+    '<div style="font-size:12px;color:var(--t3);">Obrigatório desde jan/2025 para psicólogos PF.</div></div></div>',
+    '<div>',
+    '<div class="receita-step"><div class="step-num">1</div><div><div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:2px;">Acesse o e-CAC</div><div style="font-size:12px;color:var(--t3);">Vá em <b>cav.receita.fazenda.gov.br</b> e faça login com conta Gov.br (nível prata ou ouro).</div></div></div>',
+    '<div class="receita-step"><div class="step-num">2</div><div><div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:2px;">Acesse o Receita Saúde</div><div style="font-size:12px;color:var(--t3);">No e-CAC, busque por "Receita Saúde" no menu Serviços → Saúde.</div></div></div>',
+    '<div class="receita-step"><div class="step-num">3</div><div><div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:2px;">Emita o recibo de cada sessão</div><div style="font-size:12px;color:var(--t3);">Informe: data, CPF do paciente, valor e descrição (Serviços de Psicologia — CBO 2515-40).</div></div></div>',
+    '<div class="receita-step"><div class="step-num">4</div><div><div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:2px;">Guarde por 5 anos</div><div style="font-size:12px;color:var(--t3);">A Receita cruza os dados com o paciente. Inconsistências geram malha fina automaticamente.</div></div></div>',
+    '</div>',
+    '<div style="margin-top:14px;"><div style="font-size:12.5px;font-weight:600;color:var(--t1);margin-bottom:10px;">Sessões do mês selecionado:</div>',
+    '<div id="fiscal-sessoes-lista" style="font-size:12px;color:var(--t3);">Selecione um mês acima.</div></div></div>',
+
+    '<div class="fiscal-card" style="border-left:4px solid #D97706;">',
+    '<div class="fiscal-header" style="margin-bottom:12px;">',
+    '<div class="fiscal-icon" style="background:#FEF3C7;"><i class="ti ti-bulb" style="font-size:20px;color:#D97706;"></i></div>',
+    '<div><div style="font-size:15px;font-weight:600;color:var(--t1);">Como reduzir o imposto legalmente</div>',
+    '<div style="font-size:12px;color:var(--t3);">Deduções permitidas no IRPF 2026</div></div></div>',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">',
+    '<div style="background:#FEF3C7;border-radius:10px;padding:12px;"><div style="font-size:12px;font-weight:600;color:#92400E;margin-bottom:6px;"><i class="ti ti-check" style="font-size:14px;"></i> Dedutíveis</div><ul style="font-size:11.5px;color:#78350F;line-height:1.8;margin:0;padding-left:14px;"><li>Aluguel do consultório</li><li>Contribuição ao INSS</li><li>Cursos, supervisão e livros</li><li>Testes psicológicos</li><li>Internet e telefone (parcial)</li><li>Dependentes (R$2.275,08/ano)</li><li>Plano de saúde</li></ul></div>',
+    '<div style="background:#FEE2E2;border-radius:10px;padding:12px;"><div style="font-size:12px;font-weight:600;color:#991B1B;margin-bottom:6px;"><i class="ti ti-x" style="font-size:14px;"></i> Não dedutíveis</div><ul style="font-size:11.5px;color:#7F1D1D;line-height:1.8;margin:0;padding-left:14px;"><li>Alimentação e vestuário</li><li>Academia e lazer</li><li>Gastos pessoais misturados</li><li>Despesas sem comprovante</li></ul><div style="font-size:11px;color:#991B1B;margin-top:8px;padding-top:8px;border-top:1px solid #FECACA;"><b>Dica:</b> Abrir CNPJ (Simples Nacional) pode reduzir a alíquota de até 27,5% para 6%.</div></div>',
+    '</div></div>'
+  ].join('');
+
+  // Setar mês atual
+  var hoje = new Date();
+  var mesAtual = hoje.toISOString().substring(0,7);
+  var inputMes = document.getElementById('fiscal-mes-input');
+  if (inputMes) inputMes.value = mesAtual;
+}
+
+function renderSimulador() {
+  var el = document.getElementById('simulador-content');
+  if (!el || el.innerHTML.trim()) return;
+  el.innerHTML = [
+    '<div style="background:linear-gradient(135deg,#064E3B,#059669);border-radius:14px;padding:20px 24px;margin-bottom:16px;position:relative;overflow:hidden;">',
+    '<div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>',
+    '<div style="display:flex;align-items:center;gap:14px;">',
+    '<div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-chart-arrows-vertical" style="font-size:22px;color:#fff;"></i></div>',
+    '<div><div style="font-size:16px;font-weight:600;color:#fff;">Simulador de Precificação</div>',
+    '<div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:2px;">Descubra quanto você realmente ganha e qual o valor ideal por sessão</div></div></div></div>',
+
+    '<div class="sim-card">',
+    '<div style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:18px;display:flex;align-items:center;gap:8px;"><i class="ti ti-adjustments" style="color:#059669;"></i> Ajuste os parâmetros</div>',
+
+    '<div class="sim-slider-wrap"><div class="sim-slider-label"><div><div class="sim-slider-name">Pacientes ativos</div><div style="font-size:11px;color:var(--t3);">Quantos pacientes você atende</div></div><div class="sim-slider-val" id="sim-val-pacs">10</div></div>',
+    '<input type="range" class="sim-slider" id="sim-pacs" min="1" max="40" value="10" step="1" oninput="atualizarSimulador()">',
+    '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>1</span><span>40</span></div></div>',
+
+    '<div class="sim-slider-wrap"><div class="sim-slider-label"><div><div class="sim-slider-name">Sessões por semana por paciente</div><div style="font-size:11px;color:var(--t3);">Frequência média por paciente</div></div><div class="sim-slider-val" id="sim-val-freq">1×</div></div>',
+    '<input type="range" class="sim-slider" id="sim-freq" min="1" max="3" value="1" step="1" oninput="atualizarSimulador()">',
+    '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>1×/sem</span><span>3×/sem</span></div></div>',
+
+    '<div class="sim-slider-wrap"><div class="sim-slider-label"><div><div class="sim-slider-name">Valor por sessão (R$)</div><div style="font-size:11px;color:var(--t3);">Quanto você cobra por atendimento</div></div><div class="sim-slider-val" id="sim-val-preco">R$ 180</div></div>',
+    '<input type="range" class="sim-slider" id="sim-preco" min="80" max="600" value="180" step="10" oninput="atualizarSimulador()">',
+    '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>R$80</span><span>R$600</span></div></div>',
+
+    '<div class="sim-slider-wrap"><div class="sim-slider-label"><div><div class="sim-slider-name">Taxa de faltas / cancelamentos</div><div style="font-size:11px;color:var(--t3);">% de sessões que não acontecem sem cobrança</div></div><div class="sim-slider-val" id="sim-val-faltas">10%</div></div>',
+    '<input type="range" class="sim-slider" id="sim-faltas" min="0" max="40" value="10" step="5" oninput="atualizarSimulador()">',
+    '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>0%</span><span>40%</span></div></div>',
+
+    '<div class="sim-slider-wrap" style="margin-bottom:0;"><div class="sim-slider-label"><div><div class="sim-slider-name">Despesas mensais (R$)</div><div style="font-size:11px;color:var(--t3);">Aluguel, internet, supervisão...</div></div><div class="sim-slider-val" id="sim-val-desp">R$ 800</div></div>',
+    '<input type="range" class="sim-slider" id="sim-desp" min="0" max="5000" value="800" step="100" oninput="atualizarSimulador()">',
+    '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>R$0</span><span>R$5.000</span></div></div></div>',
+
+    '<div class="sim-card" style="border-left:4px solid #059669;">',
+    '<div style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:16px;display:flex;align-items:center;gap:8px;"><i class="ti ti-calculator" style="color:#059669;"></i> Resultado estimado — por mês</div>',
+    '<div class="sim-result-grid">',
+    '<div class="sim-result-card" style="background:#ECFDF5;"><div class="sim-result-label" style="color:#065F46;">Receita bruta</div><div class="sim-result-val" style="color:#059669;" id="sim-r-bruta">—</div></div>',
+    '<div class="sim-result-card" style="background:#FEF3C7;"><div class="sim-result-label" style="color:#92400E;">Impostos (IR est.)</div><div class="sim-result-val" style="color:#D97706;" id="sim-r-ir">—</div></div>',
+    '<div class="sim-result-card" style="background:#EEF2FF;"><div class="sim-result-label" style="color:#3730A3;">Líquido real</div><div class="sim-result-val" style="color:#4F46E5;" id="sim-r-liquido">—</div></div>',
+    '</div>',
+    '<div style="margin-bottom:14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:6px;">Composição da receita bruta</div>',
+    '<div style="display:flex;gap:2px;border-radius:6px;overflow:hidden;height:10px;">',
+    '<div id="sim-bar-liquido" style="background:#059669;transition:width .4s ease;width:60%;"></div>',
+    '<div id="sim-bar-desp" style="background:#D97706;transition:width .4s ease;width:15%;"></div>',
+    '<div id="sim-bar-ir" style="background:#EF4444;transition:width .4s ease;width:15%;"></div>',
+    '<div id="sim-bar-faltas" style="background:#9CA3AF;transition:width .4s ease;width:10%;"></div></div>',
+    '<div style="display:flex;gap:14px;margin-top:6px;flex-wrap:wrap;">',
+    '<span style="font-size:10.5px;color:var(--t2);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#059669;display:inline-block;"></span>Líquido</span>',
+    '<span style="font-size:10.5px;color:var(--t2);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#D97706;display:inline-block;"></span>Despesas</span>',
+    '<span style="font-size:10.5px;color:var(--t2);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#EF4444;display:inline-block;"></span>IR estimado</span>',
+    '<span style="font-size:10.5px;color:var(--t2);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#9CA3AF;display:inline-block;"></span>Faltas</span></div></div>',
+    '<div id="sim-insights" style="margin-bottom:14px;"></div>',
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">',
+    '<div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Sessões/mês</div><div style="font-size:18px;font-weight:700;color:var(--t1);" id="sim-r-sessoes">—</div></div>',
+    '<div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Valor/hora efetivo</div><div style="font-size:18px;font-weight:700;color:var(--t1);" id="sim-r-hora">—</div></div>',
+    '<div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Faltas no mês</div><div style="font-size:18px;font-weight:700;" id="sim-r-pct-faltas">—</div></div>',
+    '<div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Horas/semana</div><div style="font-size:18px;font-weight:700;color:var(--t1);" id="sim-r-horas">—</div></div>',
+    '</div></div>',
+
+    '<div class="sim-card" style="border-left:4px solid #7C3AED;">',
+    '<div style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:4px;display:flex;align-items:center;gap:8px;"><i class="ti ti-target" style="color:#7C3AED;"></i> Qual valor preciso cobrar?</div>',
+    '<div style="font-size:12px;color:var(--t3);margin-bottom:14px;">Para atingir um líquido mensal específico, usando os mesmos parâmetros acima:</div>',
+    '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">',
+    '<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:13px;color:var(--t2);">Quero ganhar</span>',
+    '<input type="number" class="form-input" id="sim-meta-liquido" value="5000" min="1000" max="30000" step="500" style="width:120px;" oninput="calcularValorMinimo()">',
+    '<span style="font-size:13px;color:var(--t2);">líquido/mês</span></div>',
+    '<div style="background:#F5F3FF;border-radius:10px;padding:12px 18px;flex:1;min-width:180px;text-align:center;"><div style="font-size:11px;color:#6D28D9;margin-bottom:4px;">Valor mínimo por sessão</div><div style="font-size:26px;font-weight:700;color:#7C3AED;" id="sim-r-minimo">—</div></div>',
+    '<div style="background:#EEF2FF;border-radius:10px;padding:12px 18px;flex:1;min-width:180px;text-align:center;"><div style="font-size:11px;color:#4338CA;margin-bottom:4px;">Pacientes necessários (preço atual)</div><div style="font-size:26px;font-weight:700;color:#4F46E5;" id="sim-r-min-pacs">—</div></div>',
+    '</div></div>',
+
+    '<div style="font-size:11px;color:var(--t3);text-align:center;padding-bottom:8px;">* Simulação educativa. Valores são estimativas — consulte um contador para planejamento financeiro completo.</div>'
+  ].join('');
 }
 
 function atualizarSimulador() {
@@ -3169,7 +3041,7 @@ const TABELA_IR = [
 ];
 
 async function calcularCarneleao() {
-  const mesInput = document.getElementById('fin-mes');
+  const mesInput = document.getElementById('fiscal-mes-input') || document.getElementById('fin-mes');
   const mes = mesInput ? mesInput.value : '';
   if (!mes) {
     document.getElementById('fiscal-periodo').textContent = 'Selecione um mês acima para calcular';
