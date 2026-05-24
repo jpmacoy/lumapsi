@@ -477,12 +477,6 @@ tr:hover td{background:#FAFAFF}
       <!-- ── DASHBOARD ── -->
       <div class="screen active" id="sc-dashboard">
 
-        <!-- TABS -->
-        <div class="tabs mb20">
-          <div class="tab active" onclick="tabDash(this,'consultorio')">Consultório</div>
-          <div class="tab" onclick="tabDash(this,'pessoal')">Pessoal</div>
-        </div>
-
         <div id="dash-tab-consultorio">
 
         <!-- MENSAGEM DIÁRIA -->
@@ -628,14 +622,26 @@ tr:hover td{background:#FAFAFF}
               <span class="card-title">Tipo de sessões</span>
               <span style="font-size:11px;color:var(--t3);" id="dash-dist-mes">—</span>
             </div>
-            <div style="padding:14px 14px 0;">
-              <div style="display:flex;gap:12px;margin-bottom:10px;font-size:11px;color:var(--t3);">
-                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:#5046E5;display:inline-block;"></span> <span id="dash-pres-pct">Presencial</span></span>
-                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:#1D9E75;display:inline-block;"></span> <span id="dash-onl-pct">Online</span></span>
+            <div style="padding:0 14px 14px;display:flex;align-items:center;gap:16px;">
+              <div style="position:relative;height:160px;width:160px;flex-shrink:0;">
+                <canvas id="chart-dash-dist" role="img" aria-label="Distribuição presencial vs online"></canvas>
               </div>
-            </div>
-            <div style="padding:0 14px 14px;position:relative;height:160px;">
-              <canvas id="chart-dash-dist" role="img" aria-label="Distribuição presencial vs online"></canvas>
+              <div style="display:flex;flex-direction:column;gap:14px;flex:1;">
+                <div>
+                  <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;">
+                    <span style="width:10px;height:10px;border-radius:50%;background:#5046E5;display:inline-block;flex-shrink:0;"></span>
+                    <span style="font-size:11px;font-weight:500;color:var(--t2);">Presencial</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--t3);" id="dash-pres-pct">— sessões</div>
+                </div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;">
+                    <span style="width:10px;height:10px;border-radius:50%;background:#059669;display:inline-block;flex-shrink:0;"></span>
+                    <span style="font-size:11px;font-weight:500;color:var(--t2);">Online</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--t3);" id="dash-onl-pct">— sessões</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -666,33 +672,7 @@ tr:hover td{background:#FAFAFF}
         </div>
 
         <!-- ABA PESSOAL -->
-        <div id="dash-tab-pessoal" style="display:none;">
-          <div class="g4 mb16">
-            <div class="mc">
-              <div class="mc-lbl">Receita pessoal do mês</div>
-              <div class="mc-val" id="dp-receita" style="color:var(--purple)">—</div>
-            </div>
-            <div class="mc">
-              <div class="mc-lbl">Gastos do mês</div>
-              <div class="mc-val" id="dp-gastos" style="color:var(--red)">—</div>
-            </div>
-            <div class="mc">
-              <div class="mc-lbl">Saldo do mês</div>
-              <div class="mc-val" id="dp-saldo">—</div>
-            </div>
-            <div class="mc">
-              <div class="mc-lbl">Total acumulado</div>
-              <div class="mc-val" id="dp-total">—</div>
-            </div>
-          </div>
-          <div class="card mb16">
-            <div class="card-head">
-              <span class="card-title">Lançamentos pessoais</span>
-              <button class="btn btn-primary btn-sm" onclick="irPara('pessoal',null)"><i class="ti ti-external-link"></i> Ver tudo</button>
-            </div>
-            <div id="dp-lista" style="padding:0 16px 16px;"></div>
-          </div>
-        </div>
+
 
       </div>
 
@@ -2086,6 +2066,9 @@ async function renderGraficosDash() {
   const grid = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
   const tick = isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)';
 
+  // Calcular max para definir escala mínima
+  const maxFat = Math.max(...fats, 100);
+
   if (chartDashFat) chartDashFat.destroy();
   chartDashFat = new Chart(document.getElementById('chart-dash-fat'), {
     type: 'bar',
@@ -2093,38 +2076,116 @@ async function renderGraficosDash() {
       labels: meses,
       datasets: [{
         data: fats,
-        backgroundColor: fats.map((_, i) => i === fats.length - 1 ? '#5046E5' : '#C5C2F5'),
-        borderRadius: 5,
+        backgroundColor: fats.map((_, i) => i === fats.length - 1 ? '#5046E5' : '#C7D2FE'),
+        borderRadius: 7,
         borderSkipped: false,
+        borderWidth: 0,
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' R$' + c.raw.toLocaleString('pt-BR') } } },
+      layout: { padding: { top: 22 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => ' R$ ' + c.raw.toLocaleString('pt-BR') } },
+        datalabels: false
+      },
       scales: {
-        x: { grid: { display: false }, ticks: { color: tick, font: { size: 10 } } },
-        y: { grid: { color: grid }, border: { display: false }, ticks: { color: tick, font: { size: 10 }, callback: v => 'R$' + (v/1000).toFixed(0) + 'k' } }
+        x: {
+          grid: { display: false },
+          border: { display: false },
+          ticks: { color: tick, font: { size: 10.5 } }
+        },
+        y: {
+          grid: { color: grid, drawTicks: false },
+          border: { display: false },
+          min: 0,
+          suggestedMax: maxFat * 1.25,
+          ticks: {
+            color: tick,
+            font: { size: 10 },
+            padding: 6,
+            callback: v => v === 0 ? 'R$0' : 'R$' + (v >= 1000 ? (v/1000).toFixed(0) + 'k' : v)
+          }
+        }
+      },
+      animation: {
+        onComplete: function() {
+          const chart = this;
+          const ctx = chart.ctx;
+          ctx.save();
+          ctx.font = '600 10.5px system-ui, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          chart.data.datasets.forEach((dataset, di) => {
+            chart.getDatasetMeta(di).data.forEach((bar, i) => {
+              const val = dataset.data[i];
+              if (val > 0) {
+                ctx.fillStyle = i === dataset.data.length - 1 ? '#4338CA' : '#6366F1';
+                const label = val >= 1000 ? 'R$' + (val/1000).toFixed(1) + 'k' : 'R$' + val;
+                ctx.fillText(label, bar.x, bar.y - 4);
+              }
+            });
+          });
+          ctx.restore();
+        }
       }
     }
   });
 
-  // Gráfico distribuição
+  // Gráfico distribuição — com texto central e legenda rica
   const mesAtual = agora.toISOString().substring(0, 7);
   const { data: sessMes } = await sb.from('sessoes').select('tipo').gte('data_hora', mesAtual + '-01T00:00:00').lte('data_hora', mesAtual + '-31T23:59:59');
   const pres = (sessMes || []).filter(s => s.tipo === 'Presencial').length;
   const onl = (sessMes || []).filter(s => s.tipo === 'Online').length;
+  const totalSess = pres + onl;
+
+  // Atualizar legenda com números absolutos
+  document.getElementById('dash-pres-pct').textContent = 'Presencial ' + pres + ' (' + (totalSess > 0 ? Math.round(pres/totalSess*100) : 0) + '%)';
+  document.getElementById('dash-onl-pct').textContent = 'Online ' + onl + ' (' + (totalSess > 0 ? Math.round(onl/totalSess*100) : 0) + '%)';
+
+  // Plugin texto central
+  const centerTextPlugin = {
+    id: 'centerText',
+    afterDraw(chart) {
+      const { ctx, chartArea: { width, height, left, top } } = chart;
+      ctx.save();
+      const cx = left + width / 2;
+      const cy = top + height / 2;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#1F2937';
+      ctx.font = '700 20px system-ui, sans-serif';
+      ctx.fillText(String(totalSess), cx, cy - 9);
+      ctx.fillStyle = '#9CA3AF';
+      ctx.font = '500 10px system-ui, sans-serif';
+      ctx.fillText('sessões', cx, cy + 9);
+      ctx.restore();
+    }
+  };
 
   if (chartDashDist) chartDashDist.destroy();
   chartDashDist = new Chart(document.getElementById('chart-dash-dist'), {
     type: 'doughnut',
     data: {
       labels: ['Presencial', 'Online'],
-      datasets: [{ data: [pres || 1, onl || 1], backgroundColor: ['#5046E5', '#1D9E75'], borderWidth: 0, hoverOffset: 4 }]
+      datasets: [{
+        data: [pres || 0, onl || 0],
+        backgroundColor: ['#5046E5', '#059669'],
+        borderWidth: totalSess > 0 ? 2 : 0,
+        borderColor: '#ffffff',
+        hoverOffset: 5,
+        borderRadius: 4
+      }]
     },
     options: {
-      responsive: true, maintainAspectRatio: false, cutout: '68%',
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' ' + c.label + ': ' + c.raw } } }
-    }
+      responsive: true, maintainAspectRatio: false, cutout: '70%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => ' ' + c.label + ': ' + c.raw + ' sessões' } }
+      }
+    },
+    plugins: [centerTextPlugin]
   });
 }
 
