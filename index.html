@@ -306,6 +306,8 @@ tr:hover td{background:#FAFAFF}
 .ag-head-day{padding:10px 12px;text-align:center;border-left:1px solid var(--border);}
 .ag-grid-wrap{display:grid;}
 .ag-tab-active{background:#EEF2FF!important;color:#4F46E5!important;}
+
+@keyframes pulse-dot{0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,.4)}50%{box-shadow:0 0 0 5px rgba(74,222,128,0)}}
 </style>
 </head>
 <body>
@@ -316,130 +318,182 @@ tr:hover td{background:#FAFAFF}
 <div id="pg-login" style="display:flex;flex-direction:row;height:100vh;width:100%;overflow:hidden;">
 
   <!-- LADO ESQUERDO -->
-  <div style="width:52%;min-width:52%;background:#5046E5;padding:40px 48px;display:flex;flex-direction:column;gap:32px;overflow-y:auto;">
-    <div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:32px;">
-        <div style="width:34px;height:34px;background:rgba(255,255,255,0.15);border-radius:9px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.2);">
-          <i class="ti ti-sun" style="color:#fff;font-size:18px;"></i>
-        </div>
-        <div>
-          <div style="font-size:17px;font-weight:500;color:#fff;letter-spacing:-0.3px;">LumaPsi</div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.5);">Sistema clínico</div>
-        </div>
+  <div style="width:52%;min-width:52%;background:linear-gradient(160deg,#1E1B4B 0%,#2D2A8A 40%,#3730A3 70%,#4338CA 100%);padding:40px 48px;display:flex;flex-direction:column;overflow-y:auto;position:relative;">
+
+    <!-- Decoração de fundo -->
+    <div style="position:absolute;top:-60px;right:-60px;width:320px;height:320px;border-radius:50%;background:rgba(129,140,248,0.08);pointer-events:none;"></div>
+    <div style="position:absolute;bottom:-80px;left:-40px;width:250px;height:250px;border-radius:50%;background:rgba(99,102,241,0.07);pointer-events:none;"></div>
+    <div style="position:absolute;top:40%;right:10%;width:180px;height:180px;border-radius:50%;background:rgba(165,180,252,0.05);pointer-events:none;"></div>
+
+    <!-- Logo -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:36px;">
+      <div style="width:38px;height:38px;background:rgba(255,255,255,0.15);border-radius:11px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(4px);">
+        <i class="ti ti-brain" style="color:#fff;font-size:19px;"></i>
       </div>
-      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:4px 12px;font-size:11px;color:rgba(255,255,255,0.9);margin-bottom:20px;">
-        <span style="width:6px;height:6px;border-radius:50%;background:#4ADE80;display:inline-block;"></span>
-        Novo · Cobrança via WhatsApp disponível
+      <div>
+        <div style="font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.3px;">LumaPsi</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:.5px;text-transform:uppercase;">Sistema clínico</div>
       </div>
-      <div style="font-size:26px;font-weight:500;color:#fff;line-height:1.25;letter-spacing:-0.5px;margin-bottom:12px;">Seu consultório organizado.<br>Você focado no que importa.</div>
-      <div style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;max-width:300px;">Gestão completa para psicólogos autônomos — agenda, prontuário, financeiro e cobranças em um só lugar.</div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <div style="display:flex;align-items:flex-start;gap:10px;">
-        <div style="width:30px;height:30px;min-width:30px;background:rgba(255,255,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-          <i class="ti ti-calendar-event" style="font-size:14px;color:rgba(255,255,255,0.9);"></i>
-        </div>
-        <div>
-          <div style="font-size:12px;color:#fff;font-weight:500;">Agenda inteligente</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.6);">Agendamento em 30 segundos, lembretes automáticos</div>
-        </div>
+
+    <!-- Badge novo -->
+    <div style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:5px 14px;font-size:11.5px;color:rgba(255,255,255,0.9);margin-bottom:24px;width:fit-content;">
+      <span style="width:7px;height:7px;border-radius:50%;background:#4ADE80;display:inline-block;box-shadow:0 0 6px #4ADE80;animation:pulse-dot 2s infinite;"></span>
+      Novo · Cobrança via WhatsApp disponível
+    </div>
+
+    <!-- Headline -->
+    <div style="font-size:32px;font-weight:800;color:#fff;line-height:1.2;letter-spacing:-1px;margin-bottom:14px;">
+      Seu consultório organizado.<br>
+      Você focado <span style="color:#A5B4FC;">no que importa.</span>
+    </div>
+    <div style="font-size:13.5px;color:rgba(255,255,255,0.6);line-height:1.65;max-width:380px;margin-bottom:32px;">
+      Gestão completa para psicólogos autônomos — agenda, prontuário, financeiro e cobranças em um só lugar.
+    </div>
+
+    <!-- Features -->
+    <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
+      <style>.feat-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);cursor:default;transition:background .15s;}.feat-row:hover{background:rgba(255,255,255,0.1);}.feat-icon{width:32px;height:32px;min-width:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.12);}.feat-arrow{margin-left:auto;opacity:.35;}</style>
+      <div class="feat-row">
+        <div class="feat-icon"><i class="ti ti-calendar-event" style="font-size:15px;color:#A5B4FC;"></i></div>
+        <div><div style="font-size:12.5px;color:#fff;font-weight:600;">Agenda inteligente</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">Agendamentos em 30 segundos, lembretes automáticos</div></div>
+        <i class="ti ti-chevron-right feat-arrow" style="font-size:14px;color:#fff;"></i>
       </div>
-      <div style="display:flex;align-items:flex-start;gap:10px;">
-        <div style="width:30px;height:30px;min-width:30px;background:rgba(255,255,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-          <i class="ti ti-notes" style="font-size:14px;color:rgba(255,255,255,0.9);"></i>
-        </div>
-        <div>
-          <div style="font-size:12px;color:#fff;font-weight:500;">Prontuário digital</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.6);">Evoluções, técnicas e exportação em PDF</div>
-        </div>
+      <div class="feat-row">
+        <div class="feat-icon"><i class="ti ti-notes" style="font-size:15px;color:#A5B4FC;"></i></div>
+        <div><div style="font-size:12.5px;color:#fff;font-weight:600;">Prontuário digital</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">Evoluções, técnicas e exportação em PDF</div></div>
+        <i class="ti ti-chevron-right feat-arrow" style="font-size:14px;color:#fff;"></i>
       </div>
-      <div style="display:flex;align-items:flex-start;gap:10px;">
-        <div style="width:30px;height:30px;min-width:30px;background:rgba(255,255,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-          <i class="ti ti-chart-bar" style="font-size:14px;color:rgba(255,255,255,0.9);"></i>
-        </div>
-        <div>
-          <div style="font-size:12px;color:#fff;font-weight:500;">Financeiro completo</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.6);">Receitas, despesas e cobranças via WhatsApp</div>
-        </div>
+      <div class="feat-row">
+        <div class="feat-icon"><i class="ti ti-chart-bar" style="font-size:15px;color:#A5B4FC;"></i></div>
+        <div><div style="font-size:12.5px;color:#fff;font-weight:600;">Financeiro completo</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">Receitas, despesas e cobranças via WhatsApp</div></div>
+        <i class="ti ti-chevron-right feat-arrow" style="font-size:14px;color:#fff;"></i>
       </div>
-      <div style="display:flex;align-items:flex-start;gap:10px;">
-        <div style="width:30px;height:30px;min-width:30px;background:rgba(255,255,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-          <i class="ti ti-brand-google" style="font-size:14px;color:rgba(255,255,255,0.9);"></i>
-        </div>
-        <div>
-          <div style="font-size:12px;color:#fff;font-weight:500;">Google Calendar</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.6);">Sessões sincronizadas automaticamente no seu calendário</div>
-        </div>
+      <div class="feat-row">
+        <div class="feat-icon"><i class="ti ti-brand-google" style="font-size:15px;color:#A5B4FC;"></i></div>
+        <div><div style="font-size:12.5px;color:#fff;font-weight:600;">Google Calendar</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">Sessões sincronizadas automaticamente no seu calendário</div></div>
+        <i class="ti ti-chevron-right feat-arrow" style="font-size:14px;color:#fff;"></i>
       </div>
-      <div style="display:flex;align-items:flex-start;gap:10px;">
-        <div style="width:30px;height:30px;min-width:30px;background:rgba(255,255,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-          <i class="ti ti-brand-whatsapp" style="font-size:14px;color:rgba(255,255,255,0.9);"></i>
-        </div>
-        <div>
-          <div style="font-size:12px;color:#fff;font-weight:500;">WhatsApp automático</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.6);">Confirmações, lembretes 24h e cobranças com PIX</div>
-        </div>
+      <div class="feat-row">
+        <div class="feat-icon"><i class="ti ti-brand-whatsapp" style="font-size:15px;color:#4ADE80;"></i></div>
+        <div><div style="font-size:12.5px;color:#fff;font-weight:600;">WhatsApp automático</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">Confirmações, lembretes 24h e cobranças com PIX</div></div>
+        <i class="ti ti-chevron-right feat-arrow" style="font-size:14px;color:#fff;"></i>
       </div>
-      <div style="display:flex;align-items:flex-start;gap:10px;">
-        <div style="width:30px;height:30px;min-width:30px;background:rgba(255,255,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-          <i class="ti ti-file-certificate" style="font-size:14px;color:rgba(255,255,255,0.9);"></i>
-        </div>
-        <div>
-          <div style="font-size:12px;color:#fff;font-weight:500;">Documentos clínicos</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.6);">Laudos, atestados e declarações em PDF em segundos</div>
-        </div>
+      <div class="feat-row">
+        <div class="feat-icon"><i class="ti ti-file-certificate" style="font-size:15px;color:#A5B4FC;"></i></div>
+        <div><div style="font-size:12.5px;color:#fff;font-weight:600;">Documentos clínicos</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">Laudos, atestados e declarações em PDF em segundos</div></div>
+        <i class="ti ti-chevron-right feat-arrow" style="font-size:14px;color:#fff;"></i>
       </div>
-      <div style="display:flex;align-items:flex-start;gap:10px;">
-        <div style="width:30px;height:30px;min-width:30px;background:rgba(255,255,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-          <i class="ti ti-video" style="font-size:14px;color:rgba(255,255,255,0.9);"></i>
-        </div>
-        <div>
-          <div style="font-size:12px;color:#fff;font-weight:500;">Sala virtual própria</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.6);">Sessões online com link profissional e sala de espera</div>
-        </div>
+      <div class="feat-row">
+        <div class="feat-icon"><i class="ti ti-video" style="font-size:15px;color:#A5B4FC;"></i></div>
+        <div><div style="font-size:12.5px;color:#fff;font-weight:600;">Sala virtual própria</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">Sessões online com link profissional e sala de espera</div></div>
+        <i class="ti ti-chevron-right feat-arrow" style="font-size:14px;color:#fff;"></i>
+      </div>
+    </div>
+
+    <!-- Rodapé segurança -->
+    <div style="margin-top:24px;display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,0.07);border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
+      <i class="ti ti-shield-check" style="font-size:18px;color:#4ADE80;flex-shrink:0;"></i>
+      <div>
+        <div style="font-size:11.5px;color:#fff;font-weight:500;">Seus dados protegidos com segurança e privacidade</div>
+        <div style="font-size:10.5px;color:rgba(255,255,255,0.5);">Conformidade com a LGPD e criptografia de ponta a ponta.</div>
       </div>
     </div>
   </div>
 
   <!-- LADO DIREITO -->
-  <div style="flex:1;background:#fff;display:flex;align-items:center;justify-content:center;padding:40px;overflow-y:auto;">
-    <div style="width:100%;max-width:340px;">
-      <div style="font-size:20px;font-weight:500;letter-spacing:-0.3px;margin-bottom:5px;">Bem-vindo de volta</div>
-      <div style="font-size:13px;color:#8C8A85;margin-bottom:24px;">Entre com seu e-mail e senha para acessar</div>
+  <div style="flex:1;background:#FAFAFA;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;overflow-y:auto;">
 
-      <div id="login-err" style="background:#FCEBEB;color:#DC2626;font-size:12px;padding:8px 12px;border-radius:7px;margin-bottom:12px;display:none;align-items:center;gap:6px;">
+    <!-- Ilustração -->
+    <div style="margin-bottom:28px;">
+      <svg width="160" height="130" viewBox="0 0 160 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Poltrona -->
+        <ellipse cx="80" cy="115" rx="55" ry="8" fill="#E8E6F0" opacity=".5"/>
+        <!-- Assento -->
+        <rect x="30" y="75" width="100" height="35" rx="12" fill="#C4B8E8"/>
+        <!-- Encosto -->
+        <rect x="38" y="40" width="84" height="42" rx="14" fill="#9B8DD4"/>
+        <!-- Braços -->
+        <rect x="22" y="68" width="18" height="42" rx="9" fill="#B8AAE0"/>
+        <rect x="120" y="68" width="18" height="42" rx="9" fill="#B8AAE0"/>
+        <!-- Pernas -->
+        <rect x="42" y="108" width="10" height="16" rx="5" fill="#9B8DD4"/>
+        <rect x="108" y="108" width="10" height="16" rx="5" fill="#9B8DD4"/>
+        <!-- Almofada -->
+        <rect x="50" y="50" width="60" height="32" rx="10" fill="#B8AAE0" opacity=".7"/>
+        <!-- Planta vaso -->
+        <rect x="122" y="95" width="12" height="18" rx="4" fill="#C4B8E8"/>
+        <ellipse cx="128" cy="94" rx="10" ry="10" fill="#86D995" opacity=".8"/>
+        <ellipse cx="122" cy="88" rx="6" ry="6" fill="#5CBF72" opacity=".9"/>
+        <ellipse cx="134" cy="87" rx="5" ry="5" fill="#5CBF72" opacity=".8"/>
+        <!-- Lampada -->
+        <line x1="36" y1="0" x2="36" y2="30" stroke="#C4B8E8" stroke-width="2"/>
+        <path d="M20 30 Q36 22 52 30 L50 50 Q36 44 22 50 Z" fill="#E8E0F7"/>
+        <ellipse cx="36" cy="30" rx="16" ry="5" fill="#D4C8F0"/>
+        <!-- Estrelinhas decorativas -->
+        <circle cx="100" cy="15" r="2" fill="#A5B4FC" opacity=".6"/>
+        <circle cx="115" cy="8" r="1.5" fill="#A5B4FC" opacity=".5"/>
+        <circle cx="90" cy="5" r="1" fill="#C7D2FE" opacity=".7"/>
+        <circle cx="148" cy="25" r="2" fill="#A5B4FC" opacity=".4"/>
+      </svg>
+    </div>
+
+    <div style="width:100%;max-width:360px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <div style="font-size:22px;font-weight:700;letter-spacing:-0.5px;color:#1F2937;">Bem-vindo de volta</div>
+        <span style="font-size:20px;">🤍</span>
+      </div>
+      <div style="font-size:13px;color:#9CA3AF;margin-bottom:28px;">Entre com seu e-mail e senha para acessar sua conta</div>
+
+      <div id="login-err" style="background:#FCEBEB;color:#DC2626;font-size:12px;padding:10px 12px;border-radius:9px;margin-bottom:14px;display:none;align-items:center;gap:6px;border:1px solid #FECACA;">
         <i class="ti ti-alert-circle"></i> <span id="login-err-txt"></span>
       </div>
 
-      <div style="margin-bottom:14px;">
-        <label style="display:block;font-size:12px;font-weight:500;color:#555452;margin-bottom:5px;">E-mail profissional</label>
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:12.5px;font-weight:600;color:#374151;margin-bottom:6px;">E-mail profissional</label>
         <div style="position:relative;">
-          <input id="login-email" class="form-input" type="email" placeholder="seu@email.com" style="padding-right:36px;">
-          <i class="ti ti-mail" style="position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:15px;color:#8C8A85;"></i>
+          <i class="ti ti-mail" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;color:#9CA3AF;"></i>
+          <input id="login-email" class="form-input" type="email" placeholder="seu@email.com" style="padding-left:40px;" onkeydown="if(event.key==='Enter')document.getElementById('login-senha').focus()">
         </div>
       </div>
 
-      <div style="margin-bottom:14px;">
-        <label style="display:block;font-size:12px;font-weight:500;color:#555452;margin-bottom:5px;">Senha</label>
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:12.5px;font-weight:600;color:#374151;margin-bottom:6px;">Senha</label>
         <div style="position:relative;">
-          <input id="login-senha" class="form-input" type="password" placeholder="••••••••" style="padding-right:36px;">
-          <i class="ti ti-eye" style="position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:15px;color:#8C8A85;cursor:pointer;" onclick="toggleSenha()"></i>
+          <i class="ti ti-lock" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;color:#9CA3AF;"></i>
+          <input id="login-senha" class="form-input" type="password" placeholder="••••••••" style="padding-left:40px;padding-right:40px;" onkeydown="if(event.key==='Enter')fazerLogin()">
+          <i class="ti ti-eye" style="position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:16px;color:#9CA3AF;cursor:pointer;" onclick="toggleSenha()"></i>
         </div>
       </div>
 
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#555452;cursor:pointer;">
-          <input type="checkbox" checked style="accent-color:#5046E5;"> Manter conectado
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+        <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#374151;cursor:pointer;">
+          <input type="checkbox" checked style="accent-color:#5046E5;width:15px;height:15px;"> Manter conectado
         </label>
-        <span style="font-size:12px;color:#5046E5;cursor:pointer;">Esqueci a senha</span>
+        <span style="font-size:12.5px;color:#5046E5;cursor:pointer;font-weight:500;" onclick="">Esqueci a senha</span>
       </div>
 
-      <button id="btn-login" class="btn btn-primary btn-full" onclick="fazerLogin()">
-        <i class="ti ti-login"></i> Entrar no LumaPsi
+      <button id="btn-login" onclick="fazerLogin()" style="width:100%;padding:13px;background:linear-gradient(135deg,#4F46E5,#6366F1);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s;letter-spacing:-.1px;" onmouseenter="this.style.opacity='.9'" onmouseleave="this.style.opacity='1'">
+        <i class="ti ti-login" style="font-size:17px;"></i> Entrar no LumaPsi
       </button>
 
-      <div style="text-align:center;margin-top:16px;font-size:12px;color:#8C8A85;">
-        Não tem conta? <a style="color:#5046E5;cursor:pointer;font-weight:500;" href="https://www.lumapsi.com.br/cadastro">Criar conta grátis por 14 dias</a>
+      <div style="display:flex;align-items:center;gap:10px;margin:18px 0;">
+        <div style="flex:1;height:1px;background:#E5E7EB;"></div>
+        <span style="font-size:12px;color:#9CA3AF;">ou</span>
+        <div style="flex:1;height:1px;background:#E5E7EB;"></div>
+      </div>
+
+      <div style="text-align:center;font-size:13px;color:#6B7280;">
+        Não tem conta? <a href="https://www.lumapsi.com.br/cadastro" style="color:#5046E5;font-weight:600;text-decoration:none;">Criar conta grátis por 14 dias <i class="ti ti-arrow-right" style="font-size:12px;"></i></a>
+      </div>
+
+      <!-- Segurança -->
+      <div style="display:flex;align-items:center;gap:8px;margin-top:28px;padding:11px 14px;background:#F9FAFB;border-radius:10px;border:1px solid #E5E7EB;">
+        <i class="ti ti-lock" style="font-size:16px;color:#6B7280;flex-shrink:0;"></i>
+        <div>
+          <div style="font-size:11.5px;font-weight:600;color:#374151;">Ambiente seguro e confiável</div>
+          <div style="font-size:10.5px;color:#9CA3AF;">Seus dados estão protegidos com segurança de nível bancário.</div>
+        </div>
       </div>
     </div>
   </div>
