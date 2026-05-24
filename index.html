@@ -244,6 +244,21 @@ tr:hover td{background:#FAFAFF}
 .tb-title{font-size:15px;font-weight:600;color:var(--t1);letter-spacing:-0.3px}
 .tb-sub{font-size:11px;color:var(--t3);margin-top:1px}
 .topbar-sep-menu{display:block}
+
+/* ── MODAL IA PACIENTE ── */
+.ia-pac-header{background:linear-gradient(135deg,#1E1B4B,#3730A3);border-radius:14px 14px 0 0;padding:22px 24px 20px;}
+.ia-pac-tabs{display:flex;gap:6px;margin-top:16px;}
+.ia-pac-tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.15);transition:all .18s;}
+.ia-pac-tab.active{background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);}
+.ia-pac-tab:hover:not(.active){background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);}
+.ia-pac-body{padding:20px 24px;}
+.ia-result-box{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;font-size:13px;color:var(--t1);line-height:1.75;min-height:120px;white-space:pre-wrap;display:none;}
+.ia-result-box.visible{display:block;}
+.ia-skeleton{display:flex;flex-direction:column;gap:10px;padding:4px 0;}
+.ia-skeleton-line{height:13px;background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.ia-action-row{display:flex;gap:8px;margin-top:14px;align-items:center;}
+.ia-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;background:#EEF2FF;color:#4F46E5;border:1px solid #C7D2FE;}
 </style>
 </head>
 <body>
@@ -1298,6 +1313,113 @@ tr:hover td{background:#FAFAFF}
 <div class="modal-bd" id="modal-bd" onclick="fecharModal()">
 
 
+  <!-- MODAL IA PACIENTE -->
+  <div class="modal" id="m-ia-paciente" onclick="event.stopPropagation()" style="display:none;max-width:560px;padding:0;overflow:hidden;">
+    <div class="ia-pac-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;">
+            <i class="ti ti-brain" style="color:#A5B4FC;font-size:18px;"></i>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:600;color:#fff;" id="ia-pac-nome-titulo">Paciente</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.45);" id="ia-pac-meta-titulo">—</div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="fecharModal()" style="color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.08);border-radius:8px;"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="ia-pac-tabs">
+        <div class="ia-pac-tab active" onclick="trocarAbaIAPac(this,'resumo')"><i class="ti ti-file-analytics"></i> Resumo Clínico</div>
+        <div class="ia-pac-tab" onclick="trocarAbaIAPac(this,'intervencao')"><i class="ti ti-bulb"></i> Sugestão de Intervenção</div>
+        <div class="ia-pac-tab" onclick="trocarAbaIAPac(this,'recontato')"><i class="ti ti-message-circle"></i> Mensagem de Recontato</div>
+      </div>
+    </div>
+
+    <div class="ia-pac-body">
+      <!-- ABA RESUMO -->
+      <div id="ia-aba-resumo">
+        <div style="font-size:12px;color:var(--t3);margin-bottom:14px;">Síntese do progresso terapêutico com base nas últimas evoluções registradas.</div>
+        <div id="ia-resumo-loading" class="ia-skeleton" style="display:none;">
+          <div class="ia-skeleton-line" style="width:100%"></div>
+          <div class="ia-skeleton-line" style="width:88%"></div>
+          <div class="ia-skeleton-line" style="width:95%"></div>
+          <div class="ia-skeleton-line" style="width:75%"></div>
+          <div class="ia-skeleton-line" style="width:90%"></div>
+        </div>
+        <div class="ia-result-box" id="ia-resumo-resultado"></div>
+        <div id="ia-resumo-empty" style="text-align:center;padding:28px 0;color:var(--t3);">
+          <i class="ti ti-sparkles" style="font-size:28px;display:block;margin-bottom:8px;color:#818CF8;"></i>
+          <div style="font-size:13px;">Clique em gerar para criar o resumo clínico</div>
+        </div>
+        <div class="ia-action-row" id="ia-resumo-actions" style="display:none;">
+          <span class="ia-chip"><i class="ti ti-sparkles"></i> Gerado por IA</span>
+          <div style="flex:1;"></div>
+          <button class="btn btn-ghost btn-sm" onclick="copiarTextoIA('ia-resumo-resultado')"><i class="ti ti-copy"></i> Copiar</button>
+          <button class="btn btn-ghost btn-sm" onclick="gerarIAPacienteAtual('resumo')"><i class="ti ti-refresh"></i> Regerar</button>
+        </div>
+        <div id="ia-resumo-btn-area" style="margin-top:4px;">
+          <button class="btn btn-primary" style="width:100%;" onclick="gerarIAPacienteAtual('resumo')">
+            <i class="ti ti-brain"></i> Gerar Resumo Clínico
+          </button>
+        </div>
+      </div>
+
+      <!-- ABA INTERVENÇÃO -->
+      <div id="ia-aba-intervencao" style="display:none;">
+        <div style="font-size:12px;color:var(--t3);margin-bottom:14px;">Sugestões de técnicas e intervenções baseadas na abordagem terapêutica e no histórico do paciente.</div>
+        <div id="ia-int-loading" class="ia-skeleton" style="display:none;">
+          <div class="ia-skeleton-line" style="width:100%"></div>
+          <div class="ia-skeleton-line" style="width:82%"></div>
+          <div class="ia-skeleton-line" style="width:92%"></div>
+          <div class="ia-skeleton-line" style="width:70%"></div>
+        </div>
+        <div class="ia-result-box" id="ia-int-resultado"></div>
+        <div id="ia-int-empty" style="text-align:center;padding:28px 0;color:var(--t3);">
+          <i class="ti ti-bulb" style="font-size:28px;display:block;margin-bottom:8px;color:#D97706;"></i>
+          <div style="font-size:13px;">Gere sugestões de intervenção para a próxima sessão</div>
+        </div>
+        <div class="ia-action-row" id="ia-int-actions" style="display:none;">
+          <span class="ia-chip"><i class="ti ti-sparkles"></i> Gerado por IA</span>
+          <div style="flex:1;"></div>
+          <button class="btn btn-ghost btn-sm" onclick="copiarTextoIA('ia-int-resultado')"><i class="ti ti-copy"></i> Copiar</button>
+          <button class="btn btn-ghost btn-sm" onclick="gerarIAPacienteAtual('intervencao')"><i class="ti ti-refresh"></i> Regerar</button>
+        </div>
+        <div id="ia-int-btn-area" style="margin-top:4px;">
+          <button class="btn btn-primary" style="width:100%;background:linear-gradient(135deg,#D97706,#F59E0B);border:none;" onclick="gerarIAPacienteAtual('intervencao')">
+            <i class="ti ti-bulb"></i> Gerar Sugestões de Intervenção
+          </button>
+        </div>
+      </div>
+
+      <!-- ABA RECONTATO -->
+      <div id="ia-aba-recontato" style="display:none;">
+        <div style="font-size:12px;color:var(--t3);margin-bottom:14px;">Mensagem acolhedora para enviar via WhatsApp a pacientes que não retornaram.</div>
+        <div id="ia-rec-loading" class="ia-skeleton" style="display:none;">
+          <div class="ia-skeleton-line" style="width:100%"></div>
+          <div class="ia-skeleton-line" style="width:85%"></div>
+          <div class="ia-skeleton-line" style="width:90%"></div>
+        </div>
+        <div class="ia-result-box" id="ia-rec-resultado"></div>
+        <div id="ia-rec-empty" style="text-align:center;padding:28px 0;color:var(--t3);">
+          <i class="ti ti-message-circle" style="font-size:28px;display:block;margin-bottom:8px;color:#059669;"></i>
+          <div style="font-size:13px;">Gere uma mensagem personalizada de recontato</div>
+        </div>
+        <div class="ia-action-row" id="ia-rec-actions" style="display:none;">
+          <span class="ia-chip"><i class="ti ti-sparkles"></i> Gerado por IA</span>
+          <div style="flex:1;"></div>
+          <button class="btn btn-ghost btn-sm" onclick="copiarTextoIA('ia-rec-resultado')"><i class="ti ti-copy"></i> Copiar</button>
+          <button class="btn btn-ghost btn-sm" onclick="enviarWhatsAppIAPac()"><i class="ti ti-brand-whatsapp" style="color:#25D366;"></i> Enviar WA</button>
+          <button class="btn btn-ghost btn-sm" onclick="gerarIAPacienteAtual('recontato')"><i class="ti ti-refresh"></i> Regerar</button>
+        </div>
+        <div id="ia-rec-btn-area" style="margin-top:4px;">
+          <button class="btn btn-primary" style="width:100%;background:linear-gradient(135deg,#059669,#10B981);border:none;" onclick="gerarIAPacienteAtual('recontato')">
+            <i class="ti ti-message-circle"></i> Gerar Mensagem de Recontato
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL DOCUMENTOS -->
   <div class="modal" id="m-documentos" onclick="event.stopPropagation()" style="display:none;max-width:500px;">
     <div class="modal-hd"><span class="modal-title"><i class="ti ti-file-certificate"></i> Gerar Documento</span><button class="modal-close" onclick="fecharModal()"><i class="ti ti-x"></i></button></div>
@@ -2109,6 +2231,7 @@ function renderPacientes(pacs) {
         '<div class="pat-freq">por sessão</div>' +
         '<div style="display:flex;gap:4px;margin-top:6px;justify-content:flex-end;">' +
           '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirPaciente(' + p.id + ')" title="Ver prontuário"><i class="ti ti-notes"></i></button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirIAPaciente(' + p.id + ')" title="IA do paciente" style="color:#818CF8;"><i class="ti ti-sparkles"></i></button>' +
           '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirEditarPaciente(' + p.id + ')" title="Editar"><i class="ti ti-edit"></i></button>' +
         '</div>' +
       '</div>' +
@@ -3717,66 +3840,170 @@ IMPORTANTE:
   }
 }
 
+// ════════════════════════════════════════
+// IA DO PACIENTE
+// ════════════════════════════════════════
+let iaPacAtualId = null;
+
+async function abrirIAPaciente(pacId) {
+  const pac = todosPacientes.find(p => p.id == pacId);
+  if (!pac) return;
+  iaPacAtualId = pacId;
+
+  // Preencher header
+  document.getElementById('ia-pac-nome-titulo').textContent = pac.nome || 'Paciente';
+  const meta = [pac.abordagem, pac.queixa_principal].filter(Boolean).join(' · ') || 'Sem dados adicionais';
+  document.getElementById('ia-pac-meta-titulo').textContent = meta;
+
+  // Reset todas as abas
+  ['resumo','intervencao','recontato'].forEach(aba => resetAbaIA(aba));
+
+  // Abrir modal na aba resumo
+  trocarAbaIAPac(document.querySelector('.ia-pac-tab'), 'resumo');
+  abrirModal('ia-paciente');
+}
+
+// Alias para o botão do prontuário (compatibilidade)
 async function gerarResumoProntuarioIA(pacId) {
+  await abrirIAPaciente(pacId || document.getElementById('sel-pac-pront').value);
+}
+
+function trocarAbaIAPac(el, aba) {
+  document.querySelectorAll('.ia-pac-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  ['resumo','intervencao','recontato'].forEach(a => {
+    const abaNome = a === 'intervencao' ? 'intervencao' : a;
+    const div = document.getElementById('ia-aba-' + a);
+    if (div) div.style.display = a === aba ? '' : 'none';
+  });
+}
+
+function resetAbaIA(aba) {
+  const prefix = aba === 'intervencao' ? 'ia-int' : aba === 'recontato' ? 'ia-rec' : 'ia-resumo';
+  const res = document.getElementById(prefix + '-resultado');
+  const empty = document.getElementById(prefix + '-empty');
+  const actions = document.getElementById(prefix + '-actions');
+  const btnArea = document.getElementById(prefix + '-btn-area');
+  const loading = document.getElementById(prefix + '-loading');
+  if (res) { res.textContent = ''; res.classList.remove('visible'); }
+  if (empty) empty.style.display = '';
+  if (actions) actions.style.display = 'none';
+  if (btnArea) btnArea.style.display = '';
+  if (loading) loading.style.display = 'none';
+}
+
+async function gerarIAPacienteAtual(tipo) {
+  const pacId = iaPacAtualId;
+  if (!pacId) return;
   const pac = todosPacientes.find(p => p.id == pacId);
   if (!pac) return;
 
-  const { data: evolucoes } = await sb.from('evolucoes')
-    .select('*')
-    .eq('paciente_id', pacId)
-    .order('data_sessao', { ascending: false })
-    .limit(10);
+  const prefix = tipo === 'intervencao' ? 'ia-int' : tipo === 'recontato' ? 'ia-rec' : 'ia-resumo';
+  const loadingEl = document.getElementById(prefix + '-loading');
+  const resEl = document.getElementById(prefix + '-resultado');
+  const emptyEl = document.getElementById(prefix + '-empty');
+  const actionsEl = document.getElementById(prefix + '-actions');
+  const btnAreaEl = document.getElementById(prefix + '-btn-area');
 
-  if (!evolucoes || !evolucoes.length) {
-    toast('Nenhuma evolução encontrada para resumir', 'error');
-    return;
-  }
-
-  toast('Gerando resumo clínico com IA...', 'success');
-
-  const textos = evolucoes.map((e, i) =>
-    'Sessão ' + (i + 1) + ' (' + (e.data_sessao || '—') + '): ' + (e.texto || '')
-  ).join('\n\n');
-
-  const prompt = `Você é um assistente especializado em psicologia clínica. Com base nas evoluções clínicas abaixo, gere um resumo consolidado do progresso terapêutico do paciente.
-
-Abordagem: ${pac.abordagem || 'psicoterapia'}
-Queixa: ${pac.queixa_principal || 'não informada'}
-
-Evoluções:
-${textos}
-
-Escreva um resumo clínico em 3 parágrafos sobre:
-1. Estado geral e evolução do paciente
-2. Principais temas e padrões identificados
-3. Progresso terapêutico e próximos objetivos
-
-Use linguagem clínica profissional em português brasileiro.`;
+  // Mostrar skeleton
+  if (loadingEl) loadingEl.style.display = 'flex';
+  if (emptyEl) emptyEl.style.display = 'none';
+  if (resEl) resEl.classList.remove('visible');
+  if (actionsEl) actionsEl.style.display = 'none';
+  if (btnAreaEl) btnAreaEl.style.display = 'none';
 
   try {
+    // Buscar evoluções
+    const { data: evolucoes } = await sb.from('evolucoes')
+      .select('*')
+      .eq('paciente_id', pacId)
+      .order('data_sessao', { ascending: false })
+      .limit(12);
+
+    const textos = evolucoes && evolucoes.length
+      ? evolucoes.map((e, i) => 'Sessao ' + (i+1) + ' (' + (e.data_sessao||'—') + '): ' + (e.texto||'')).join('\n\n')
+      : 'Sem evoluções registradas ainda.';
+
+    const nome = pac.nome || 'paciente';
+    const abordagem = pac.abordagem || 'psicoterapia';
+    const queixa = pac.queixa_principal || 'não informada';
+    const numSessoes = evolucoes ? evolucoes.length : 0;
+
+    let prompt = '';
+
+    if (tipo === 'resumo') {
+      prompt = 'Voce e um assistente especializado em psicologia clinica. Gere um resumo clinico consolidado em 3 paragrafos curtos e objetivos.' +
+        '\n\nDados do paciente:\n- Nome: ' + nome +
+        '\n- Abordagem: ' + abordagem +
+        '\n- Queixa principal: ' + queixa +
+        '\n- Sessoes registradas: ' + numSessoes +
+        '\n\nUltimas evolucoes:\n' + textos +
+        '\n\nEscreva exatamente 3 paragrafos:' +
+        '\n1. Estado atual e evolucao geral do paciente' +
+        '\n2. Principais temas, padroes e dinamicas identificadas' +
+        '\n3. Progresso terapeutico e objetivos para proximas sessoes' +
+        '\n\nUse linguagem clinica profissional em portugues brasileiro. Seja especifico com base nas evolucoes reais. Sem titulos ou marcadores.';
+    } else if (tipo === 'intervencao') {
+      prompt = 'Voce e um supervisor clinico especializado em psicologia. Com base no historico abaixo, sugira 3 a 4 tecnicas e intervencoes especificas para a proxima sessao.' +
+        '\n\nDados do paciente:\n- Abordagem do terapeuta: ' + abordagem +
+        '\n- Queixa principal: ' + queixa +
+        '\n\nUltimas evolucoes:\n' + textos +
+        '\n\nPara cada sugestao, indique: o nome da tecnica, como aplicar brevemente, e o objetivo terapeutico esperado.' +
+        '\nSeja especifico para a abordagem ' + abordagem + '. Use linguagem clinica em portugues brasileiro.';
+    } else if (tipo === 'recontato') {
+      prompt = 'Voce e um assistente para psicologos. Gere uma mensagem de recontato acolhedora e nao invasiva para enviar via WhatsApp ao paciente ' + nome + ' que nao retornou as sessoes.' +
+        '\n\nContexto do paciente:\n- Abordagem: ' + abordagem +
+        '\n- Queixa inicial: ' + queixa +
+        '\n- Ultima sessao registrada: ' + (evolucoes && evolucoes[0] ? evolucoes[0].data_sessao : 'nao informada') +
+        '\n\nA mensagem deve: ser breve (3 a 4 linhas), ser acolhedora e respeitosa, demonstrar cuidado genuino, nao ser pressionar o retorno, e ter um convite gentil.' +
+        '\nEscreva APENAS o texto da mensagem, sem aspas, sem introducao, pronto para copiar e enviar.';
+    }
+
     const res = await fetch(GROQ_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + GROQ_KEY
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: GROQ_MODEL,
         messages: [{ role: 'user', content: prompt }],
-        temperature: 0.5,
-        max_tokens: 600
+        temperature: tipo === 'recontato' ? 0.75 : 0.5,
+        max_tokens: tipo === 'intervencao' ? 800 : 600
       })
     });
 
-    const data = await res.json();
-    const texto = data.choices?.[0]?.message?.content;
-    if (!texto) throw new Error('Resposta vazia');
+    const dataRes = await res.json();
+    const texto = dataRes.choices?.[0]?.message?.content;
+    if (!texto) throw new Error('Resposta vazia da IA');
 
-    // Mostrar resumo em modal de alerta
-    alert('RESUMO CLÍNICO GERADO POR IA:\n\n' + texto);
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (resEl) { resEl.textContent = texto; resEl.classList.add('visible'); }
+    if (actionsEl) actionsEl.style.display = 'flex';
+    if (btnAreaEl) btnAreaEl.style.display = 'none';
 
-  } catch (e) {
-    toast('Erro ao gerar resumo: ' + e.message, 'error');
+  } catch(e) {
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (emptyEl) emptyEl.style.display = '';
+    if (btnAreaEl) btnAreaEl.style.display = '';
+    toast('Erro ao gerar com IA: ' + e.message, 'error');
+  }
+}
+
+function copiarTextoIA(elId) {
+  const el = document.getElementById(elId);
+  if (!el || !el.textContent) return;
+  navigator.clipboard.writeText(el.textContent);
+  toast('Copiado para a area de transferencia!', 'success');
+}
+
+function enviarWhatsAppIAPac() {
+  const texto = document.getElementById('ia-rec-resultado')?.textContent;
+  if (!texto) return;
+  const pac = todosPacientes.find(p => p.id == iaPacAtualId);
+  const tel = pac?.telefone?.replace(/\D/g,'');
+  if (tel) {
+    window.open('https://wa.me/55' + tel + '?text=' + encodeURIComponent(texto), '_blank');
+  } else {
+    navigator.clipboard.writeText(texto);
+    toast('Telefone nao encontrado. Mensagem copiada!', 'success');
   }
 }
 
