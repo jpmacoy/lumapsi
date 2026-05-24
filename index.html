@@ -287,6 +287,25 @@ tr:hover td{background:#FAFAFF}
 .sim-result-val{font-size:22px;font-weight:700;letter-spacing:-0.5px;}
 .sim-insight{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;margin-bottom:8px;font-size:12.5px;line-height:1.5;}
 .sim-faixa-bar{height:10px;border-radius:5px;transition:width .4s ease;}
+
+/* ── AGENDA NOVA ── */
+.ag-event{border-radius:6px;padding:4px 7px;font-size:11px;font-weight:500;cursor:pointer;border-left:3px solid;margin-bottom:2px;overflow:hidden;transition:opacity .15s;}
+.ag-event:hover{opacity:.85;}
+.ag-event-pres{background:#EEF2FF;border-color:#4F46E5;color:#3730A3;}
+.ag-event-onl{background:#ECFDF5;border-color:#059669;color:#065F46;}
+.ag-event-falta{background:#FEE2E2;border-color:#DC2626;color:#991B1B;}
+.ag-event-realiz{background:#F0FDF4;border-color:#16A34A;color:#15803D;}
+.mini-cal-day{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;margin:0 auto;transition:background .15s,color .15s;}
+.mini-cal-day:hover{background:var(--bg);}
+.mini-cal-day.hoje{background:#4F46E5;color:#fff;font-weight:600;}
+.mini-cal-day.tem-sessao::after{content:'';display:block;width:4px;height:4px;border-radius:50%;background:#4F46E5;position:absolute;bottom:1px;left:50%;transform:translateX(-50%);}
+.mini-cal-day.tem-sessao{position:relative;}
+.mini-cal-day.selecionado{background:#EEF2FF;color:#4F46E5;font-weight:600;}
+.ag-hora-col{padding:8px;font-size:10px;color:var(--t3);text-align:right;padding-right:10px;flex-shrink:0;width:52px;line-height:1;}
+.ag-cell{border-left:1px solid var(--border);border-bottom:1px solid var(--border);padding:2px 4px;min-height:52px;}
+.ag-head-day{padding:10px 12px;text-align:center;border-left:1px solid var(--border);}
+.ag-grid-wrap{display:grid;}
+.ag-tab-active{background:#EEF2FF!important;color:#4F46E5!important;}
 </style>
 </head>
 <body>
@@ -1308,34 +1327,132 @@ tr:hover td{background:#FAFAFF}
 
       <!-- ── AGENDA ── -->
       <div class="screen" id="sc-agenda">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <div class="tabs">
-            <div class="tab active" onclick="mudarViewAgenda(this,'semana')">Semana</div>
-            <div class="tab" onclick="mudarViewAgenda(this,'mes')">Mês</div>
-            <div class="tab" onclick="mudarViewAgenda(this,'lista')">Lista</div>
+
+        <!-- CARDS DE MÉTRICAS -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;" onclick="irPara('agenda',null)">
+            <div style="width:42px;height:42px;border-radius:12px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="ti ti-calendar-event" style="font-size:20px;color:#4F46E5;"></i>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Hoje</div>
+              <div style="font-size:18px;font-weight:700;color:var(--t1);" id="ag-metric-hoje">—</div>
+              <div style="font-size:11px;color:var(--t3);" id="ag-metric-hoje-sub">sessões</div>
+            </div>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <button class="icon-btn" onclick="semanaAnterior()"><i class="ti ti-chevron-left"></i></button>
-            <span style="font-size:13px;font-weight:500;" id="agenda-periodo">—</span>
-            <button class="icon-btn" onclick="proximaSemana()"><i class="ti ti-chevron-right"></i></button>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px;">
+            <div style="width:42px;height:42px;border-radius:12px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="ti ti-users" style="font-size:20px;color:#059669;"></i>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Esta semana</div>
+              <div style="font-size:18px;font-weight:700;color:var(--t1);" id="ag-metric-semana">—</div>
+              <div style="font-size:11px;color:var(--t3);" id="ag-metric-semana-sub">sessões</div>
+            </div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px;">
+            <div style="width:42px;height:42px;border-radius:12px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="ti ti-clock" style="font-size:20px;color:#D97706;"></i>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Tempo total</div>
+              <div style="font-size:18px;font-weight:700;color:var(--t1);" id="ag-metric-tempo">—</div>
+              <div style="font-size:11px;color:var(--t3);">de atendimentos</div>
+            </div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px;">
+            <div style="width:42px;height:42px;border-radius:12px;background:#CCFBF1;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="ti ti-chart-pie" style="font-size:20px;color:#0D9488;"></i>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Taxa de comparecimento</div>
+              <div style="font-size:18px;font-weight:700;color:var(--t1);" id="ag-metric-taxa">—</div>
+              <div style="font-size:11px;color:var(--t3);">últimos 30 dias</div>
+            </div>
           </div>
         </div>
-        <div class="card mb16" style="padding:0;overflow:hidden;">
-          <div id="agenda-grid"></div>
-          <div id="agenda-mes" style="display:none;padding:14px;"></div>
-          <div id="agenda-lista" style="display:none;"></div>
+
+        <!-- LAYOUT PRINCIPAL: mini-cal + filtros | grade -->
+        <div style="display:grid;grid-template-columns:220px 1fr;gap:14px;margin-bottom:14px;">
+
+          <!-- COLUNA ESQUERDA: mini calendário + filtros -->
+          <div style="display:flex;flex-direction:column;gap:12px;">
+
+            <!-- Mini calendário -->
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <button class="icon-btn" style="width:28px;height:28px;" onclick="mesAnteriorMini()"><i class="ti ti-chevron-left" style="font-size:13px;"></i></button>
+                <span style="font-size:13px;font-weight:600;color:var(--t1);" id="mini-cal-titulo">—</span>
+                <button class="icon-btn" style="width:28px;height:28px;" onclick="mesProximoMini()"><i class="ti ti-chevron-right" style="font-size:13px;"></i></button>
+              </div>
+              <div id="mini-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;"></div>
+            </div>
+
+            <!-- Filtros -->
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <span style="font-size:12px;font-weight:600;color:var(--t1);">Filtros</span>
+                <button onclick="limparFiltrosAgenda()" style="font-size:11px;color:#4F46E5;background:none;border:none;cursor:pointer;padding:0;">Limpar</button>
+              </div>
+              <div style="margin-bottom:10px;">
+                <label style="font-size:11px;color:var(--t3);display:block;margin-bottom:4px;">Tipo de sessão</label>
+                <select class="form-input" id="ag-fil-tipo" style="font-size:12px;height:34px;" onchange="aplicarFiltrosAgenda()">
+                  <option value="">Todos</option>
+                  <option value="Presencial">Presencial</option>
+                  <option value="Online">Online</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px;color:var(--t3);display:block;margin-bottom:4px;">Situação</label>
+                <select class="form-input" id="ag-fil-status" style="font-size:12px;height:34px;" onchange="aplicarFiltrosAgenda()">
+                  <option value="">Todos</option>
+                  <option value="Agendada">Agendada</option>
+                  <option value="Confirmada">Confirmada</option>
+                  <option value="Realizada">Realizada</option>
+                  <option value="Falta">Falta</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- COLUNA DIREITA: tabs + grade -->
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;">
+            <!-- Topbar da grade -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;">
+              <div style="display:flex;gap:4px;">
+                <button id="ag-tab-semana" onclick="mudarViewAgenda(this,'semana')" style="font-size:12px;font-weight:500;padding:6px 14px;border-radius:8px;border:none;cursor:pointer;background:#EEF2FF;color:#4F46E5;">Semana</button>
+                <button id="ag-tab-mes" onclick="mudarViewAgenda(this,'mes')" style="font-size:12px;font-weight:500;padding:6px 14px;border-radius:8px;border:none;cursor:pointer;background:none;color:var(--t2);">Mês</button>
+                <button id="ag-tab-lista" onclick="mudarViewAgenda(this,'lista')" style="font-size:12px;font-weight:500;padding:6px 14px;border-radius:8px;border:none;cursor:pointer;background:none;color:var(--t2);">Agenda</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <button style="background:#EEF2FF;color:#4F46E5;border:none;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;" onclick="irParaHoje()"><i class="ti ti-calendar"></i> Hoje</button>
+                <button class="icon-btn" onclick="semanaAnterior()"><i class="ti ti-chevron-left"></i></button>
+                <span style="font-size:12px;font-weight:500;color:var(--t1);min-width:160px;text-align:center;" id="agenda-periodo">—</span>
+                <button class="icon-btn" onclick="proximaSemana()"><i class="ti ti-chevron-right"></i></button>
+              </div>
+            </div>
+            <!-- Grade -->
+            <div style="flex:1;overflow:auto;">
+              <div id="agenda-grid"></div>
+              <div id="agenda-mes" style="display:none;padding:14px;"></div>
+              <div id="agenda-lista" style="display:none;"></div>
+            </div>
+          </div>
         </div>
-        <div class="card" style="padding:0;overflow:hidden;">
-          <div class="card-head"><span class="card-title">Próximas sessões</span></div>
+
+        <!-- PRÓXIMAS SESSÕES -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);">
+            <span style="font-size:13px;font-weight:600;color:var(--t1);">Próximas sessões</span>
+            <button onclick="irPara('sessoes',null)" style="font-size:12px;color:#4F46E5;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;">Ver todas <i class="ti ti-arrow-right" style="font-size:13px;"></i></button>
+          </div>
           <div class="tbl-wrap">
             <table>
-              <thead><tr><th>Data / Hora</th><th>Paciente</th><th>Tipo</th><th>Valor</th><th>Status</th><th></th></tr></thead>
-              <tbody id="agenda-proximas"><tr><td colspan="6" class="loading">Carregando...</td></tr></tbody>
+              <thead><tr><th>Data / Hora</th><th>Paciente</th><th>Tipo</th><th>Duração</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
+              <tbody id="agenda-proximas"><tr><td colspan="7" class="loading">Carregando...</td></tr></tbody>
             </table>
           </div>
         </div>
-
-
 
       </div>
 
@@ -3282,73 +3399,212 @@ function obterDiasSemana(base) {
   });
 }
 
-function renderAgendaGrid(dias, sessoes) {
-  const nomes = ['SEG','TER','QUA','QUI','SEX'];
-  const horas = ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00'];
-  const hoje = new Date().toDateString();
+var agSessoesCache = [];
+var miniCalBase = new Date();
+var agFilTipo = '';
+var agFilStatus = '';
 
-  let html = '<div style="display:grid;grid-template-columns:60px repeat(5,1fr);border-bottom:1px solid var(--border);">';
-  html += '<div style="padding:10px;"></div>';
+function renderAgendaGrid(dias, sessoes) {
+  agSessoesCache = sessoes;
+  const nomes = ['SEG','TER','QUA','QUI','SEX'];
+  const horas = ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
+  const hoje = new Date().toDateString();
+  const filtradas = sessoes.filter(s => {
+    if (agFilTipo && s.tipo !== agFilTipo) return false;
+    if (agFilStatus && s.status !== agFilStatus) return false;
+    return true;
+  });
+
+  let html = '<div style="display:grid;grid-template-columns:52px repeat(5,1fr);border-bottom:1px solid var(--border);background:var(--bg);">';
+  html += '<div style="padding:8px;"></div>';
   dias.forEach((d, i) => {
     const isHoje = d.toDateString() === hoje;
-    html += '<div style="padding:10px 12px;text-align:center;border-left:1px solid var(--border);">' +
-      '<div style="font-size:11px;color:var(--t3);">' + nomes[i] + '</div>' +
-      '<div style="font-size:15px;font-weight:500;' + (isHoje ? 'color:var(--brand);' : '') + '">' + d.getDate() + '</div>' +
+    const numSess = filtradas.filter(s => s.data_hora && new Date(s.data_hora).toDateString() === d.toDateString()).length;
+    html += '<div class="ag-head-day" style="' + (isHoje ? 'background:#EEF2FF;' : '') + '">' +
+      '<div style="font-size:10px;color:' + (isHoje ? '#4F46E5' : 'var(--t3)') + ';font-weight:600;letter-spacing:.5px;">' + nomes[i] + '</div>' +
+      '<div style="font-size:18px;font-weight:700;' + (isHoje ? 'color:#4F46E5;' : 'color:var(--t1);') + 'line-height:1.2;">' + d.getDate() + '</div>' +
+      (numSess > 0 ? '<div style="font-size:9px;color:#4F46E5;margin-top:2px;">' + numSess + ' sess.</div>' : '') +
     '</div>';
   });
   html += '</div>';
 
-  html += '<div style="display:grid;grid-template-columns:60px repeat(5,1fr);max-height:360px;overflow-y:auto;">';
+  html += '<div style="display:grid;grid-template-columns:52px repeat(5,1fr);max-height:420px;overflow-y:auto;">';
   horas.forEach(h => {
-    html += '<div style="height:56px;padding:4px 8px;font-size:10px;color:var(--t3);border-bottom:1px solid var(--border);">' + h + '</div>';
-    dias.forEach((d, di) => {
+    const hNum = parseInt(h);
+    html += '<div class="ag-hora-col" style="height:60px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:flex-end;padding:6px 8px 0 0;">' + h + '</div>';
+    dias.forEach(d => {
       const dStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-      const sessDia = sessoes.filter(s => {
+      const isHojeCol = d.toDateString() === hoje;
+      const sessDia = filtradas.filter(s => {
         if (!s.data_hora) return false;
         const sh = new Date(s.data_hora);
-        const shDate = sh.getFullYear() + '-' + String(sh.getMonth()+1).padStart(2,'0') + '-' + String(sh.getDate()).padStart(2,'0');
-        return shDate === dStr && sh.getHours() === parseInt(h.split(':')[0]);
+        return sh.getFullYear() + '-' + String(sh.getMonth()+1).padStart(2,'0') + '-' + String(sh.getDate()).padStart(2,'0') === dStr
+          && sh.getHours() === hNum;
       });
       let inner = '';
       sessDia.forEach(s => {
         const pacAg = todosPacientes.find(p => p.id === s.paciente_id);
-        const nome = pacAg?.nome?.split(' ')[0] || '—';
-        const bg = s.tipo === 'Online' ? 'var(--teal-light)' : 'var(--brand-light)';
-        const cor = s.tipo === 'Online' ? 'var(--teal)' : 'var(--brand)';
-        inner += '<div style="background:' + bg + ';border-radius:5px;padding:2px 5px;font-size:10px;font-weight:500;color:' + cor + ';margin-bottom:2px;border-left:2px solid ' + cor + ';cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + nome + '</div>';
+        const nome = pacAg?.nome || '—';
+        const primeiroNome = nome.split(' ')[0];
+        const hora = new Date(s.data_hora).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+        let cls = 'ag-event ag-event-pres';
+        if (s.tipo === 'Online') cls = 'ag-event ag-event-onl';
+        if (s.status === 'Falta') cls = 'ag-event ag-event-falta';
+        if (s.status === 'Realizada') cls = 'ag-event ag-event-realiz';
+        inner += '<div class="' + cls + '" onclick="abrirEditarSessaoAgenda(' + s.id + ')" title="' + nome + ' — ' + hora + '">' +
+          '<div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + primeiroNome + '</div>' +
+          '<div style="font-size:9.5px;opacity:.75;">' + hora + ' · ' + (s.tipo === 'Online' ? 'Online' : 'Presencial') + '</div>' +
+        '</div>';
       });
-      html += '<div style="height:56px;border-left:1px solid var(--border);border-bottom:1px solid var(--border);padding:2px 3px;">' + inner + '</div>';
+      html += '<div class="ag-cell" style="' + (isHojeCol ? 'background:rgba(79,70,229,0.015);' : '') + '">' + inner + '</div>';
     });
   });
   html += '</div>';
   document.getElementById('agenda-grid').innerHTML = html;
+  renderMiniCal(sessoes);
+  atualizarMetricasAgenda(sessoes);
+}
+
+function renderMiniCal(sessoes) {
+  const ano = miniCalBase.getFullYear();
+  const mes = miniCalBase.getMonth();
+  const hoje = new Date();
+  const titulo = new Date(ano, mes, 1).toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+  const tituloEl = document.getElementById('mini-cal-titulo');
+  if (tituloEl) tituloEl.textContent = titulo.charAt(0).toUpperCase() + titulo.slice(1);
+
+  const grid = document.getElementById('mini-cal-grid');
+  if (!grid) return;
+
+  const diasSemana = ['D','S','T','Q','Q','S','S'];
+  let html = diasSemana.map(d => '<div style="font-size:9.5px;font-weight:600;color:var(--t3);padding:2px 0;">' + d + '</div>').join('');
+
+  const primeiroDia = new Date(ano, mes, 1).getDay();
+  for (let i = 0; i < primeiroDia; i++) html += '<div></div>';
+
+  const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+  const diasComSessao = new Set((sessoes || []).map(s => s.data_hora ? new Date(s.data_hora).getDate() + '-' + new Date(s.data_hora).getMonth() : null).filter(Boolean));
+
+  for (let d = 1; d <= diasNoMes; d++) {
+    const isHoje = d === hoje.getDate() && mes === hoje.getMonth() && ano === hoje.getFullYear();
+    const temSessao = diasComSessao.has(d + '-' + mes);
+    let cls = 'mini-cal-day';
+    if (isHoje) cls += ' hoje';
+    if (temSessao && !isHoje) cls += ' tem-sessao';
+    html += '<div class="' + cls + '" onclick="irParaDia(' + ano + ',' + mes + ',' + d + ')">' + d + '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function mesAnteriorMini() {
+  miniCalBase = new Date(miniCalBase.getFullYear(), miniCalBase.getMonth() - 1, 1);
+  renderMiniCal(agSessoesCache);
+}
+
+function mesProximoMini() {
+  miniCalBase = new Date(miniCalBase.getFullYear(), miniCalBase.getMonth() + 1, 1);
+  renderMiniCal(agSessoesCache);
+}
+
+function irParaDia(ano, mes, dia) {
+  semanaBase = new Date(ano, mes, dia);
+  viewAgenda = 'semana';
+  carregarAgenda();
+}
+
+function irParaHoje() {
+  semanaBase = new Date();
+  carregarAgenda();
+}
+
+function aplicarFiltrosAgenda() {
+  agFilTipo = document.getElementById('ag-fil-tipo')?.value || '';
+  agFilStatus = document.getElementById('ag-fil-status')?.value || '';
+  renderAgendaGrid(obterDiasSemana(semanaBase), agSessoesCache);
+}
+
+function limparFiltrosAgenda() {
+  agFilTipo = ''; agFilStatus = '';
+  const t = document.getElementById('ag-fil-tipo'); if(t) t.value='';
+  const s = document.getElementById('ag-fil-status'); if(s) s.value='';
+  renderAgendaGrid(obterDiasSemana(semanaBase), agSessoesCache);
+}
+
+function atualizarMetricasAgenda(sessoes) {
+  const hoje = new Date().toDateString();
+  const sessoesHoje = sessoes.filter(s => s.data_hora && new Date(s.data_hora).toDateString() === hoje);
+  const prox = sessoesHoje.find(s => new Date(s.data_hora) > new Date() && (s.status === 'Agendada' || s.status === 'Confirmada'));
+
+  const mH = document.getElementById('ag-metric-hoje');
+  const mHs = document.getElementById('ag-metric-hoje-sub');
+  if (mH) mH.textContent = sessoesHoje.length;
+  if (mHs) mHs.textContent = prox ? 'Próxima: ' + new Date(prox.data_hora).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : 'sessões hoje';
+
+  const mS = document.getElementById('ag-metric-semana');
+  const mSs = document.getElementById('ag-metric-semana-sub');
+  if (mS) mS.textContent = sessoes.length;
+  if (mSs) {
+    const metaSem = Math.round(20 * sessoes.length / Math.max(sessoes.length,1));
+    mSs.textContent = '80% da meta semanal';
+  }
+
+  const totalMin = sessoes.length * 50;
+  const mT = document.getElementById('ag-metric-tempo');
+  if (mT) {
+    const h = Math.floor(totalMin/60), m = totalMin%60;
+    mT.textContent = h + 'h' + (m > 0 ? ' ' + m + 'min' : '');
+  }
+
+  // Taxa de comparecimento (realizadas / (realizadas + faltas))
+  const realizadas = sessoes.filter(s => s.status === 'Realizada').length;
+  const faltas = sessoes.filter(s => s.status === 'Falta').length;
+  const taxa = realizadas + faltas > 0 ? Math.round(realizadas / (realizadas + faltas) * 100) : 100;
+  const mTx = document.getElementById('ag-metric-taxa');
+  if (mTx) mTx.textContent = taxa + '%';
 }
 
 function renderProximasSessoes(sessoes) {
   const tbody = document.getElementById('agenda-proximas');
+  if (!tbody) return;
   const agora = new Date();
-  const futuras = sessoes.filter(s => s.data_hora && new Date(s.data_hora) >= agora).slice(0, 5);
+  const futuras = sessoes.filter(s => s.data_hora && new Date(s.data_hora) >= agora).slice(0, 8);
   if (!futuras.length) {
-    tbody.innerHTML = '<tr><td colspan="6"><div class="empty" style="padding:20px;"><p>Nenhuma sessão futura esta semana</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty" style="padding:24px;"><p>Nenhuma sessão futura esta semana</p></div></td></tr>';
     return;
   }
   const cores = ['av-purple','av-teal','av-amber','av-coral','av-blue'];
   tbody.innerHTML = futuras.map((s, i) => {
     const pac = todosPacientes.find(p => p.id === s.paciente_id);
     const nome = pac?.nome || '—';
-    const ini = nome.split(' ').map(n=>n[0]).slice(0,2).join('');
+    const ini = nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
     const cor = cores[i % cores.length];
     const dt = new Date(s.data_hora);
-    const dtStr = dt.toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'2-digit'}) + ' · ' + dt.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
-    const tagTipo = s.tipo === 'Online' ? 'tag-teal' : 'tag-brand';
-    const tagSt = {Realizada:'tag-green',Confirmada:'tag-teal',Agendada:'tag-brand'}[s.status] || 'tag-amber';
+    const isHoje = dt.toDateString() === agora.toDateString();
+    const dtLabel = isHoje ? 'Hoje' : dt.toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'short'});
+    const hora = dt.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+    const tagTipo = s.tipo === 'Online'
+      ? '<span class="tag" style="background:#ECFDF5;color:#059669;">' + (s.tipo||'—') + '</span>'
+      : '<span class="tag" style="background:#EEF2FF;color:#4F46E5;">' + (s.tipo||'Presencial') + '</span>';
+    const stColors = {
+      Realizada: 'background:#F0FDF4;color:#16A34A;',
+      Confirmada: 'background:#ECFDF5;color:#059669;',
+      Agendada: 'background:#EEF2FF;color:#4F46E5;',
+      Falta: 'background:#FEE2E2;color:#DC2626;',
+      Pendente: 'background:#FEF3C7;color:#D97706;'
+    };
+    const stStyle = stColors[s.status] || 'background:#F3F4F6;color:#6B7280;';
     return '<tr>' +
-      '<td style="color:var(--t2);">' + dtStr + '</td>' +
-      '<td><div class="tc-pat"><div class="av av-xs ' + cor + '">' + ini + '</div> ' + nome + '</div></td>' +
-      '<td><span class="tag ' + tagTipo + '">' + (s.tipo||'—') + '</span></td>' +
-      '<td style="font-weight:500;">R$' + (s.valor||'—') + '</td>' +
-      '<td><span class="tag ' + tagSt + '">' + (s.status||'—') + '</span></td>' +
-      '<td><button class="btn btn-ghost btn-sm" onclick="abrirEditarSessaoAgenda(' + s.id + ')"><i class="ti ti-edit" style="font-size:14px;"></i></button></td>' +
+      '<td><div style="font-weight:500;color:var(--t1);">' + dtLabel + ', ' + hora + '</div></td>' +
+      '<td><div style="display:flex;align-items:center;gap:8px;"><div class="av av-xs ' + cor + '">' + ini + '</div><span style="font-size:13px;">' + nome + '</span></div></td>' +
+      '<td>' + tagTipo + '</td>' +
+      '<td style="color:var(--t2);">50 min</td>' +
+      '<td style="font-weight:500;color:var(--t1);">R$ ' + (s.valor ? Number(s.valor).toLocaleString('pt-BR', {minimumFractionDigits:2}) : '—') + '</td>' +
+      '<td><span class="tag" style="' + stStyle + '">' + (s.status||'—') + '</span></td>' +
+      '<td><div style="display:flex;gap:4px;">' +
+        '<button class="btn btn-ghost btn-sm" title="WhatsApp" onclick="enviarLembrete(' + s.id + ')"><i class="ti ti-brand-whatsapp" style="font-size:14px;color:#25D366;"></i></button>' +
+        '<button class="btn btn-ghost btn-sm" title="Editar" onclick="abrirEditarSessaoAgenda(' + s.id + ')"><i class="ti ti-edit" style="font-size:14px;"></i></button>' +
+        '<button class="btn btn-ghost btn-sm" title="Mais"><i class="ti ti-dots-vertical" style="font-size:14px;"></i></button>' +
+      '</div></td>' +
     '</tr>';
   }).join('');
 }
