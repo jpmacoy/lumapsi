@@ -3718,8 +3718,8 @@ async function renderAgendaLista(sessoes) {
 // ════════════════════════════════════
 // IA — GEMINI PARA EVOLUÇÕES
 // ════════════════════════════════════
-const GROQ_KEY = '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';
-const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+// IA via proxy seguro (chave nunca exposta no frontend)
+const GROQ_URL = 'https://pbqvfokpounurzmmlcor.supabase.co/functions/v1/groq-proxy';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 async function gerarEvolucaoIA() {
@@ -3810,7 +3810,6 @@ IMPORTANTE:
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + GROQ_KEY
       },
       body: JSON.stringify({
         model: GROQ_MODEL,
@@ -3961,7 +3960,7 @@ async function gerarIAPacienteAtual(tipo) {
 
     const res = await fetch(GROQ_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: GROQ_MODEL,
         messages: [{ role: 'user', content: prompt }],
@@ -4906,7 +4905,7 @@ async function gerarConteudoMarketing() {
     var prompt = await MKT[mktTipo].buildPrompt(cfg);
     var r = await fetch(GROQ_URL, {
       method: "POST",
-      headers: {"Content-Type":"application/json","Authorization":"Bearer " + GROQ_KEY},
+      headers: {"Content-Type":"application/json"},
       body: JSON.stringify({model: GROQ_MODEL, messages:[{role:"user",content:prompt}], max_tokens:900, temperature:0.85})
     });
     var data = await r.json();
