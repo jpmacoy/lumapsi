@@ -259,6 +259,20 @@ tr:hover td{background:#FAFAFF}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .ia-action-row{display:flex;gap:8px;margin-top:14px;align-items:center;}
 .ia-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;background:#EEF2FF;color:#4F46E5;border:1px solid #C7D2FE;}
+
+.fiscal-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:14px;}
+.fiscal-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.fiscal-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.fiscal-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
+.ir-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.ir-table th{background:#F3F4F6;padding:8px 12px;text-align:left;font-weight:600;color:var(--t2);font-size:11px;text-transform:uppercase;letter-spacing:.4px;}
+.ir-table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--t1);}
+.ir-table tr.active-row td{background:#EEF2FF;font-weight:600;color:#4F46E5;}
+.ir-table tr.active-row td:first-child::before{content:"→ ";color:#4F46E5;}
+.fiscal-alert{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-radius:12px;margin-bottom:10px;}
+.receita-step{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.receita-step:last-child{border-bottom:none;}
+.step-num{width:26px;height:26px;border-radius:50%;background:#4F46E5;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 </style>
 </head>
 <body>
@@ -817,14 +831,167 @@ tr:hover td{background:#FAFAFF}
 
       <!-- ── FINANCEIRO ── -->
       <div class="screen" id="sc-financeiro">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
           <div class="tabs">
             <div class="tab active" onclick="filtrarFin(this,'')">Todos</div>
             <div class="tab" onclick="filtrarFin(this,'Receita')">Receitas</div>
             <div class="tab" onclick="filtrarFin(this,'Despesa')">Despesas</div>
+            <div class="tab" onclick="abrirGuiaFiscal(this)" style="color:#4F46E5;display:flex;align-items:center;gap:4px;"><i class="ti ti-calculator"></i> Guia Fiscal</div>
           </div>
           <div style="flex:1;"></div>
-          <input type="month" class="form-input" style="width:140px;" id="fin-mes" onchange="carregarFinanceiro()">
+          <input type="month" class="form-input" style="width:140px;" id="fin-mes" onchange="carregarFinanceiro()" id="fin-mes-input">
+        </div>
+
+        <!-- ── GUIA FISCAL (oculto por padrão) ── -->
+        <div id="painel-fiscal" style="display:none;">
+
+          <!-- ALERTA VENCIMENTO -->
+          <div id="fiscal-alerta-venc" class="fiscal-alert" style="background:#FEF3C7;border:1px solid #FDE68A;margin-bottom:16px;display:none;">
+            <i class="ti ti-alert-triangle" style="font-size:20px;color:#D97706;flex-shrink:0;margin-top:1px;"></i>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#92400E;margin-bottom:2px;">Carnê-leão vence em breve</div>
+              <div style="font-size:12px;color:#92400E;" id="fiscal-alerta-txt">O carnê-leão de <b id="fiscal-mes-nome">—</b> vence dia 31. Não pague com atraso — a multa é de 0,33% ao dia.</div>
+            </div>
+          </div>
+
+          <!-- CARD PRINCIPAL — CARNÊ-LEÃO -->
+          <div class="fiscal-card" style="border-left:4px solid #4F46E5;">
+            <div class="fiscal-header">
+              <div class="fiscal-icon" style="background:#EEF2FF;"><i class="ti ti-calculator" style="font-size:20px;color:#4F46E5;"></i></div>
+              <div style="flex:1;">
+                <div style="font-size:15px;font-weight:600;color:var(--t1);">Carnê-leão estimado</div>
+                <div style="font-size:12px;color:var(--t3);" id="fiscal-periodo">Selecione um mês para calcular</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:11px;color:var(--t3);margin-bottom:2px;">Imposto estimado</div>
+                <div style="font-size:28px;font-weight:700;color:#4F46E5;letter-spacing:-0.5px;" id="fiscal-imposto-val">R$ —</div>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
+              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Recebido</div>
+                <div style="font-size:18px;font-weight:700;color:var(--t1);" id="fiscal-recebido">R$ —</div>
+              </div>
+              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Base de cálculo</div>
+                <div style="font-size:18px;font-weight:700;color:var(--t1);" id="fiscal-base">R$ —</div>
+              </div>
+              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Alíquota</div>
+                <div style="font-size:18px;font-weight:700;color:#4F46E5;" id="fiscal-aliquota">—%</div>
+              </div>
+              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Vencimento</div>
+                <div style="font-size:14px;font-weight:700;color:#D97706;" id="fiscal-venc">Dia 31</div>
+              </div>
+            </div>
+
+            <div style="background:#EEF2FF;border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
+              <i class="ti ti-info-circle" style="font-size:16px;color:#4F46E5;flex-shrink:0;"></i>
+              <div style="font-size:12px;color:#3730A3;line-height:1.5;" id="fiscal-obs">Preencha o mês para ver o cálculo.</div>
+            </div>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <a href="https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/carne-leao" target="_blank" class="btn btn-primary" style="font-size:12px;">
+                <i class="ti ti-external-link"></i> Pagar no e-CAC
+              </a>
+              <a href="https://cav.receita.fazenda.gov.br/autenticacao/login" target="_blank" class="btn" style="font-size:12px;">
+                <i class="ti ti-external-link"></i> Receita Saúde
+              </a>
+              <button class="btn" style="font-size:12px;" onclick="gerarRelatorioFiscal()">
+                <i class="ti ti-download"></i> Exportar resumo
+              </button>
+            </div>
+          </div>
+
+          <!-- TABELA PROGRESSIVA -->
+          <div class="fiscal-card">
+            <div style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:4px;">Tabela progressiva do IR 2026</div>
+            <div style="font-size:12px;color:var(--t3);margin-bottom:14px;">Sua faixa está destacada em roxo com base no faturamento do mês selecionado.</div>
+            <table class="ir-table">
+              <thead><tr><th>Rendimento mensal (R$)</th><th>Alíquota</th><th>Parcela a deduzir</th><th>Imposto máximo na faixa</th></tr></thead>
+              <tbody id="fiscal-tabela-tbody">
+                <tr id="faixa-0"><td>Até R$ 2.428,80</td><td>Isento</td><td>—</td><td>R$ 0</td></tr>
+                <tr id="faixa-1"><td>R$ 2.428,81 a R$ 2.826,65</td><td>7,5%</td><td>R$ 182,16</td><td>R$ 29,82</td></tr>
+                <tr id="faixa-2"><td>R$ 2.826,66 a R$ 3.751,05</td><td>15%</td><td>R$ 394,16</td><td>R$ 167,98</td></tr>
+                <tr id="faixa-3"><td>R$ 3.751,06 a R$ 4.664,68</td><td>22,5%</td><td>R$ 675,49</td><td>R$ 373,46</td></tr>
+                <tr id="faixa-4"><td>Acima de R$ 4.664,68</td><td>27,5%</td><td>R$ 908,73</td><td>—</td></tr>
+              </tbody>
+            </table>
+            <div style="font-size:11px;color:var(--t3);margin-top:10px;">* Tabela vigente para 2026. Consulte sempre um contador para sua situação específica. O LumaPsi fornece apenas estimativas educativas.</div>
+          </div>
+
+          <!-- RECEITA SAÚDE -->
+          <div class="fiscal-card" style="border-left:4px solid #059669;">
+            <div class="fiscal-header" style="margin-bottom:12px;">
+              <div class="fiscal-icon" style="background:#D1FAE5;"><i class="ti ti-file-check" style="font-size:20px;color:#059669;"></i></div>
+              <div>
+                <div style="font-size:15px;font-weight:600;color:var(--t1);">Receita Saúde — passo a passo</div>
+                <div style="font-size:12px;color:var(--t3);">Obrigatório desde jan/2025 para psicólogos PF. Emita um recibo por atendimento.</div>
+              </div>
+            </div>
+            <div>
+              <div class="receita-step">
+                <div class="step-num">1</div>
+                <div><div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:2px;">Acesse o e-CAC</div><div style="font-size:12px;color:var(--t3);">Vá em <b>cav.receita.fazenda.gov.br</b> e faça login com sua conta Gov.br (precisa de nível prata ou ouro).</div></div>
+              </div>
+              <div class="receita-step">
+                <div class="step-num">2</div>
+                <div><div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:2px;">Acesse o Receita Saúde</div><div style="font-size:12px;color:var(--t3);">No e-CAC, busque por "Receita Saúde" ou acesse pelo menu Serviços → Saúde.</div></div>
+              </div>
+              <div class="receita-step">
+                <div class="step-num">3</div>
+                <div><div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:2px;">Emita o recibo de cada sessão</div><div style="font-size:12px;color:var(--t3);">Informe: data da sessão, CPF do paciente, valor recebido e descrição (Serviços de Psicologia — CBO 2515-40).</div></div>
+              </div>
+              <div class="receita-step">
+                <div class="step-num">4</div>
+                <div><div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:2px;">Guarde o comprovante por 5 anos</div><div style="font-size:12px;color:var(--t3);">A Receita Federal cruza os dados com o paciente. Inconsistências geram malha fina automaticamente.</div></div>
+              </div>
+            </div>
+            <div style="margin-top:14px;">
+              <div style="font-size:12.5px;font-weight:600;color:var(--t1);margin-bottom:10px;">Sessões do mês sem recibo emitido (confira):</div>
+              <div id="fiscal-sessoes-lista" style="font-size:12px;color:var(--t3);">Selecione um mês para ver as sessões realizadas.</div>
+            </div>
+          </div>
+
+          <!-- DICAS -->
+          <div class="fiscal-card" style="border-left:4px solid #D97706;">
+            <div class="fiscal-header" style="margin-bottom:12px;">
+              <div class="fiscal-icon" style="background:#FEF3C7;"><i class="ti ti-bulb" style="font-size:20px;color:#D97706;"></i></div>
+              <div>
+                <div style="font-size:15px;font-weight:600;color:var(--t1);">Como reduzir o imposto legalmente</div>
+                <div style="font-size:12px;color:var(--t3);">Deduções permitidas para psicólogos PF no IRPF 2026</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div style="background:#FEF3C7;border-radius:10px;padding:12px;">
+                <div style="font-size:12px;font-weight:600;color:#92400E;margin-bottom:6px;display:flex;align-items:center;gap:5px;"><i class="ti ti-check" style="font-size:14px;"></i>Dedutíveis</div>
+                <ul style="font-size:11.5px;color:#78350F;line-height:1.8;margin:0;padding-left:14px;">
+                  <li>Aluguel do consultório</li>
+                  <li>Contribuição ao INSS</li>
+                  <li>Cursos, supervisão e livros</li>
+                  <li>Testes psicológicos</li>
+                  <li>Internet e telefone (parcial)</li>
+                  <li>Dependentes (R$2.275,08/ano)</li>
+                  <li>Plano de saúde</li>
+                </ul>
+              </div>
+              <div style="background:#FEE2E2;border-radius:10px;padding:12px;">
+                <div style="font-size:12px;font-weight:600;color:#991B1B;margin-bottom:6px;display:flex;align-items:center;gap:5px;"><i class="ti ti-x" style="font-size:14px;"></i>Não dedutíveis</div>
+                <ul style="font-size:11.5px;color:#7F1D1D;line-height:1.8;margin:0;padding-left:14px;">
+                  <li>Alimentação e vestuário</li>
+                  <li>Academia e lazer</li>
+                  <li>Gastos pessoais misturados</li>
+                  <li>Despesas sem comprovante</li>
+                </ul>
+                <div style="font-size:11px;color:#991B1B;margin-top:8px;padding-top:8px;border-top:1px solid #FECACA;">
+                  <b>Dica:</b> Abrir CNPJ (Simples Nacional) pode reduzir a alíquota de até 27,5% para 6%. Vale consultar um contador.
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
         <div class="g3 mb16">
           <div class="mc" style="border-left:3px solid var(--green);">
@@ -2661,7 +2828,155 @@ function filtrarFin(el, tipo) {
   filtroFinTipo = tipo;
   document.querySelectorAll('#sc-financeiro .tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
+  document.getElementById('painel-fiscal').style.display = 'none';
   carregarFinanceiro();
+}
+
+function abrirGuiaFiscal(el) {
+  document.querySelectorAll('#sc-financeiro .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('painel-fiscal').style.display = '';
+  calcularCarneleao();
+}
+
+// Tabela IRPF 2026
+const TABELA_IR = [
+  { ate: 2428.80, aliquota: 0,     deducao: 0,      label: 'Isento' },
+  { ate: 2826.65, aliquota: 0.075, deducao: 182.16, label: '7,5%' },
+  { ate: 3751.05, aliquota: 0.15,  deducao: 394.16, label: '15%' },
+  { ate: 4664.68, aliquota: 0.225, deducao: 675.49, label: '22,5%' },
+  { ate: Infinity, aliquota: 0.275, deducao: 908.73, label: '27,5%' },
+];
+
+async function calcularCarneleao() {
+  const mesInput = document.getElementById('fin-mes');
+  const mes = mesInput ? mesInput.value : '';
+  if (!mes) {
+    document.getElementById('fiscal-periodo').textContent = 'Selecione um mês acima para calcular';
+    return;
+  }
+
+  const [ano, m] = mes.split('-');
+  const nomeMes = new Date(parseInt(ano), parseInt(m)-1, 1)
+    .toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  document.getElementById('fiscal-periodo').textContent = 'Cálculo para ' + nomeMes;
+  document.getElementById('fiscal-mes-nome').textContent = nomeMes;
+  document.getElementById('fiscal-venc').textContent = '31/' + m + '/' + ano;
+
+  // Buscar receitas do mês do financeiro
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+
+  const ini = mes + '-01T00:00:00';
+  const fim = mes + '-31T23:59:59';
+
+  const { data: lancamentos } = await sb.from('lancamentos')
+    .select('valor,tipo')
+    .eq('user_id', user.id)
+    .eq('tipo', 'Receita')
+    .gte('data', mes + '-01')
+    .lte('data', mes + '-31');
+
+  const recebido = (lancamentos || []).reduce((s, l) => s + (l.valor || 0), 0);
+
+  // Calcular IR
+  const isencao = 528; // desconto simplificado 2026
+  const base = Math.max(0, recebido - isencao);
+  let faixa = TABELA_IR.find(f => base <= f.ate) || TABELA_IR[TABELA_IR.length-1];
+  const imposto = Math.max(0, base * faixa.aliquota - faixa.deducao);
+  const faixaIdx = TABELA_IR.indexOf(faixa);
+
+  // Atualizar UI
+  const fmt = v => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('fiscal-recebido').textContent = fmt(recebido);
+  document.getElementById('fiscal-base').textContent = fmt(base);
+  document.getElementById('fiscal-aliquota').textContent = faixa.label;
+  document.getElementById('fiscal-imposto-val').textContent = faixa.aliquota === 0 ? 'Isento' : fmt(imposto);
+
+  // Destacar faixa na tabela
+  document.querySelectorAll('.ir-table tr[id^="faixa-"]').forEach(tr => tr.classList.remove('active-row'));
+  const faixaTr = document.getElementById('faixa-' + faixaIdx);
+  if (faixaTr) faixaTr.classList.add('active-row');
+
+  // Observação contextual
+  let obs = '';
+  if (faixa.aliquota === 0) {
+    obs = 'Ótima notícia: seu faturamento deste mês está dentro da faixa de isenção. Você não precisa pagar carnê-leão este mês.';
+  } else if (faixa.aliquota <= 0.075) {
+    obs = 'Você está na faixa de 7,5%. O imposto estimado é de ' + fmt(imposto) + '. Pague até o dia 31 pelo e-CAC para evitar multa de 0,33% ao dia.';
+  } else if (faixa.aliquota <= 0.15) {
+    obs = 'Você está na faixa de 15%. Imposto estimado: ' + fmt(imposto) + '. Considere abrir CNPJ no Simples Nacional — pode reduzir para ~6%.';
+  } else {
+    obs = 'Alíquota alta (' + faixa.label + '). Imposto estimado: ' + fmt(imposto) + '. Vale muito a pena consultar um contador sobre abertura de CNPJ para reduzir essa carga.';
+  }
+  document.getElementById('fiscal-obs').textContent = obs;
+
+  // Alerta de vencimento (se estiver no mês atual)
+  const hoje = new Date();
+  const mesAtual = hoje.toISOString().substring(0,7);
+  const alertaEl = document.getElementById('fiscal-alerta-venc');
+  if (mes === mesAtual && hoje.getDate() >= 20) {
+    alertaEl.style.display = 'flex';
+  } else {
+    alertaEl.style.display = 'none';
+  }
+
+  // Listar sessões realizadas no mês para Receita Saúde
+  const { data: sessoes } = await sb.from('sessoes')
+    .select('data_hora,paciente_id,valor,status')
+    .eq('user_id', user.id)
+    .eq('status', 'Realizada')
+    .gte('data_hora', ini)
+    .lte('data_hora', fim)
+    .order('data_hora');
+
+  const listaEl = document.getElementById('fiscal-sessoes-lista');
+  if (!sessoes || !sessoes.length) {
+    listaEl.innerHTML = '<div style="color:var(--t3);font-size:12px;padding:8px 0;">Nenhuma sessão realizada neste mês.</div>';
+  } else {
+    const rows = sessoes.map(s => {
+      const dt = new Date(s.data_hora).toLocaleDateString('pt-BR');
+      const pac = todosPacientes.find(p => p.id === s.paciente_id);
+      const nome = pac ? pac.nome : '—';
+      const cpf = pac ? (pac.cpf || '<span style="color:#D97706">CPF não cadastrado</span>') : '—';
+      const val = s.valor ? 'R$ ' + s.valor.toLocaleString('pt-BR') : '—';
+      return '<tr>' +
+        '<td style="padding:7px 10px;font-size:12px;border-bottom:1px solid var(--border);">' + dt + '</td>' +
+        '<td style="padding:7px 10px;font-size:12px;border-bottom:1px solid var(--border);">' + nome + '</td>' +
+        '<td style="padding:7px 10px;font-size:12px;border-bottom:1px solid var(--border);">' + cpf + '</td>' +
+        '<td style="padding:7px 10px;font-size:12px;border-bottom:1px solid var(--border);">' + val + '</td>' +
+        '<td style="padding:7px 10px;font-size:12px;border-bottom:1px solid var(--border);"><a href="https://cav.receita.fazenda.gov.br" target="_blank" style="color:#4F46E5;font-size:11px;">Emitir recibo →</a></td>' +
+      '</tr>';
+    }).join('');
+    listaEl.innerHTML = '<table style="width:100%;border-collapse:collapse;">' +
+      '<thead><tr style="background:#F3F4F6;">' +
+      '<th style="padding:7px 10px;font-size:11px;text-align:left;color:var(--t2);">Data</th>' +
+      '<th style="padding:7px 10px;font-size:11px;text-align:left;color:var(--t2);">Paciente</th>' +
+      '<th style="padding:7px 10px;font-size:11px;text-align:left;color:var(--t2);">CPF</th>' +
+      '<th style="padding:7px 10px;font-size:11px;text-align:left;color:var(--t2);">Valor</th>' +
+      '<th style="padding:7px 10px;font-size:11px;text-align:left;color:var(--t2);">Recibo</th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+}
+
+function gerarRelatorioFiscal() {
+  const mes = document.getElementById('fin-mes')?.value || '—';
+  const recebido = document.getElementById('fiscal-recebido')?.textContent || '—';
+  const imposto = document.getElementById('fiscal-imposto-val')?.textContent || '—';
+  const aliquota = document.getElementById('fiscal-aliquota')?.textContent || '—';
+  const texto = 'RESUMO FISCAL — LumaPsi\n' +
+    'Mês: ' + mes + '\n' +
+    'Receita bruta: ' + recebido + '\n' +
+    'Alíquota IR: ' + aliquota + '\n' +
+    'Carnê-leão estimado: ' + imposto + '\n\n' +
+    'Gerado em: ' + new Date().toLocaleString('pt-BR') + '\n' +
+    'ATENÇÃO: Este é apenas um cálculo estimativo. Consulte um contador.';
+  const blob = new Blob([texto], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'fiscal-lumapsi-' + mes + '.txt';
+  a.click(); URL.revokeObjectURL(url);
+  toast('Resumo fiscal exportado!', 'success');
 }
 
 async function salvarLancamento() {
