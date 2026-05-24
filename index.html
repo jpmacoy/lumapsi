@@ -1075,83 +1075,189 @@ tr:hover td{background:#FAFAFF}
       <!-- ── MARKETING ── -->
       <div class="screen" id="sc-marketing">
 
-        <!-- Header hero -->
-        <div style="background:linear-gradient(135deg,#3730A3,#5046E5);border-radius:14px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden;">
-          <div style="position:absolute;top:-30px;right:-30px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.06);"></div>
-          <div style="position:absolute;bottom:-40px;right:60px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.04);"></div>
-          <div style="position:relative;">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-              <i class="ti ti-sparkles" style="color:#A5B4FC;font-size:18px;"></i>
-              <span style="font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#A5B4FC;">Inteligência Artificial</span>
+        <!-- HERO BANNER -->
+        <div style="background:linear-gradient(135deg,#1E1B4B 0%,#3730A3 50%,#4F46E5 100%);border-radius:16px;padding:28px 32px;margin-bottom:22px;position:relative;overflow:hidden;display:flex;align-items:center;gap:24px;">
+          <div style="position:absolute;top:-40px;right:280px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.05);pointer-events:none;"></div>
+          <div style="position:absolute;bottom:-60px;right:180px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none;"></div>
+
+          <!-- Texto esquerdo -->
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
+              <i class="ti ti-sparkles" style="color:#A5B4FC;font-size:16px;"></i>
+              <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#A5B4FC;">Inteligência Artificial</span>
             </div>
-            <h2 style="font-size:22px;font-weight:600;color:#fff;margin:0 0 6px;">Marketing com IA</h2>
-            <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0;max-width:480px;line-height:1.5;">Crie conteúdo profissional para o Instagram, mensagens acolhedoras e muito mais — em segundos.</p>
+            <div style="font-size:24px;font-weight:700;color:#fff;line-height:1.25;letter-spacing:-0.5px;margin-bottom:10px;">
+              Crie conteúdo profissional<br>em segundos com a <span style="color:#A5B4FC;">IA</span>
+            </div>
+            <div style="font-size:12.5px;color:rgba(255,255,255,0.65);line-height:1.6;max-width:380px;">
+              Gere posts, mensagens acolhedoras, bios e muito mais para se conectar com seus pacientes e fortalecer seu posicionamento profissional.
+            </div>
+          </div>
+
+          <!-- Robô SVG -->
+          <div style="flex-shrink:0;">
+            <svg width="100" height="100" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="25" y="42" width="60" height="50" rx="14" fill="#6366F1"/>
+              <rect x="32" y="14" width="46" height="36" rx="12" fill="#818CF8"/>
+              <line x1="55" y1="14" x2="55" y2="6" stroke="#A5B4FC" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="55" cy="4" r="3" fill="#C7D2FE"/>
+              <rect x="38" y="24" width="14" height="10" rx="5" fill="#1E1B4B"/>
+              <rect x="58" y="24" width="14" height="10" rx="5" fill="#1E1B4B"/>
+              <circle cx="44" cy="29" r="3" fill="#60A5FA"/>
+              <circle cx="64" cy="29" r="3" fill="#60A5FA"/>
+              <circle cx="45" cy="28" r="1" fill="#fff"/>
+              <circle cx="65" cy="28" r="1" fill="#fff"/>
+              <path d="M44 38 Q55 44 66 38" stroke="#C7D2FE" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <rect x="8" y="50" width="18" height="28" rx="9" fill="#818CF8"/>
+              <rect x="84" y="50" width="18" height="28" rx="9" fill="#818CF8"/>
+              <rect x="38" y="56" width="34" height="18" rx="8" fill="rgba(255,255,255,0.12)"/>
+              <circle cx="47" cy="65" r="4" fill="#4ADE80" opacity=".8"/>
+              <circle cx="55" cy="65" r="4" fill="#FBBF24" opacity=".8"/>
+              <circle cx="63" cy="65" r="4" fill="#F87171" opacity=".8"/>
+              <rect x="36" y="90" width="16" height="16" rx="6" fill="#6366F1"/>
+              <rect x="58" y="90" width="16" height="16" rx="6" fill="#6366F1"/>
+            </svg>
+          </div>
+
+          <!-- Benefícios -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex-shrink:0;min-width:320px;">
+            <div style="display:flex;align-items:flex-start;gap:9px;">
+              <div style="width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-clock" style="font-size:15px;color:#A5B4FC;"></i></div>
+              <div><div style="font-size:11.5px;font-weight:600;color:#fff;margin-bottom:2px;">Economize tempo</div><div style="font-size:10.5px;color:rgba(255,255,255,0.55);line-height:1.4;">Conteúdos em segundos com sugestões inteligentes</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:9px;">
+              <div style="width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-target" style="font-size:15px;color:#A5B4FC;"></i></div>
+              <div><div style="font-size:11.5px;font-weight:600;color:#fff;margin-bottom:2px;">Conteúdo estratégico</div><div style="font-size:10.5px;color:rgba(255,255,255,0.55);line-height:1.4;">Ideias alinhadas com temas da psicologia</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:9px;">
+              <div style="width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-heart" style="font-size:15px;color:#F9A8D4;"></i></div>
+              <div><div style="font-size:11.5px;font-weight:600;color:#fff;margin-bottom:2px;">Mais conexão</div><div style="font-size:10.5px;color:rgba(255,255,255,0.55);line-height:1.4;">Mensagens que acolhem seus pacientes</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:9px;">
+              <div style="width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-calendar-event" style="font-size:15px;color:#A5B4FC;"></i></div>
+              <div><div style="font-size:11.5px;font-weight:600;color:#fff;margin-bottom:2px;">Organize sua rotina</div><div style="font-size:10.5px;color:rgba(255,255,255,0.55);line-height:1.4;">Planeje sua presença online com facilidade</div></div>
+            </div>
           </div>
         </div>
 
-        <!-- 4 ferramentas -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+        <!-- ESCOLHA O QUE CRIAR -->
+        <div style="font-size:16px;font-weight:600;color:var(--t1);margin-bottom:14px;">Escolha o que você deseja criar</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;">
 
-          <div onclick="abrirFerramentaMarketing('post')" class="mkt-tool-card" onmouseenter="this.classList.add('mkt-card-hover')" onmouseleave="this.classList.remove('mkt-card-hover')">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;">
-              <div style="width:44px;height:44px;border-radius:12px;background:#EEEDFE;display:flex;align-items:center;justify-content:center;">
-                <i class="ti ti-brand-instagram" style="color:#5046E5;font-size:20px;"></i>
+          <div onclick="abrirFerramentaMarketing('post')" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:all .18s;" onmouseenter="this.style.borderColor='rgba(124,58,237,0.4)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(124,58,237,0.1)'" onmouseleave="this.style.borderColor='var(--border)';this.style.transform='';this.style.boxShadow=''">
+            <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#FCDFFF,#E0D0FF);display:flex;align-items:center;justify-content:center;margin-bottom:14px;"><i class="ti ti-brand-instagram" style="font-size:24px;color:#C026D3;"></i></div>
+            <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:6px;">Post para Instagram</div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.55;margin-bottom:12px;">Legenda completa com tema, tom e hashtags — pronta para publicar.</div>
+            <div style="background:#F9F5FF;border-radius:9px;padding:9px 11px;margin-bottom:12px;">
+              <div style="font-size:10px;font-weight:700;color:#7C3AED;margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;">Inclui sugestões de:</div>
+              <div style="font-size:11px;color:var(--t2);display:flex;flex-direction:column;gap:3px;">
+                <span style="display:flex;align-items:center;gap:5px;"><i class="ti ti-check" style="font-size:11px;color:#7C3AED;"></i>Legenda</span>
+                <span style="display:flex;align-items:center;gap:5px;"><i class="ti ti-check" style="font-size:11px;color:#7C3AED;"></i>Hashtags relevantes</span>
+                <span style="display:flex;align-items:center;gap:5px;"><i class="ti ti-check" style="font-size:11px;color:#7C3AED;"></i>Call to action</span>
               </div>
-              <i class="ti ti-arrow-up-right mkt-arrow" style="font-size:15px;color:var(--t3);opacity:0;transition:opacity .15s,transform .15s;"></i>
             </div>
-            <div style="font-size:13.5px;font-weight:500;color:var(--t1);margin-bottom:5px;">Post para Instagram</div>
-            <div style="font-size:12px;color:var(--t2);line-height:1.65;">Legenda completa com tema, tom e hashtags — pronta para publicar.</div>
-            <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
-              <span style="font-size:11px;font-weight:500;color:#5046E5;background:#EEEDFE;padding:3px 10px;border-radius:20px;">Instagram</span>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:11px;border-top:1px solid var(--border);">
+              <span style="font-size:12.5px;font-weight:600;color:#7C3AED;">Criar post</span>
+              <i class="ti ti-arrow-right" style="font-size:15px;color:#7C3AED;"></i>
             </div>
           </div>
 
-          <div onclick="abrirFerramentaMarketing('calendario')" class="mkt-tool-card" onmouseenter="this.classList.add('mkt-card-hover')" onmouseleave="this.classList.remove('mkt-card-hover')">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;">
-              <div style="width:44px;height:44px;border-radius:12px;background:#CCFBF1;display:flex;align-items:center;justify-content:center;">
-                <i class="ti ti-calendar-event" style="color:#0D9488;font-size:20px;"></i>
+          <div onclick="abrirFerramentaMarketing('calendario')" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:all .18s;" onmouseenter="this.style.borderColor='rgba(13,148,136,0.4)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(13,148,136,0.1)'" onmouseleave="this.style.borderColor='var(--border)';this.style.transform='';this.style.boxShadow=''">
+            <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#CCFBF1,#99F6E4);display:flex;align-items:center;justify-content:center;margin-bottom:14px;"><i class="ti ti-calendar-event" style="font-size:24px;color:#0D9488;"></i></div>
+            <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:6px;">Calendário de conteúdo</div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.55;margin-bottom:12px;">12 ideias de posts para o mês, com datas e temas variados.</div>
+            <div style="background:#F0FDFA;border-radius:9px;padding:9px 11px;margin-bottom:12px;">
+              <div style="font-size:10px;font-weight:700;color:#0D9488;margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;">Inclui sugestões de:</div>
+              <div style="font-size:11px;color:var(--t2);display:flex;flex-direction:column;gap:3px;">
+                <span style="display:flex;align-items:center;gap:5px;"><i class="ti ti-check" style="font-size:11px;color:#0D9488;"></i>Temas do mês</span>
+                <span style="display:flex;align-items:center;gap:5px;"><i class="ti ti-check" style="font-size:11px;color:#0D9488;"></i>Datas importantes</span>
+                <span style="display:flex;align-items:center;gap:5px;"><i class="ti ti-check" style="font-size:11px;color:#0D9488;"></i>Tipos de conteúdo</span>
               </div>
-              <i class="ti ti-arrow-up-right mkt-arrow" style="font-size:15px;color:var(--t3);opacity:0;transition:opacity .15s,transform .15s;"></i>
             </div>
-            <div style="font-size:13.5px;font-weight:500;color:var(--t1);margin-bottom:5px;">Calendário de conteúdo</div>
-            <div style="font-size:12px;color:var(--t2);line-height:1.65;">12 ideias de posts para o mês, com datas e temas variados.</div>
-            <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
-              <span style="font-size:11px;font-weight:500;color:#0D9488;background:#CCFBF1;padding:3px 10px;border-radius:20px;">Planejamento</span>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:11px;border-top:1px solid var(--border);">
+              <span style="font-size:12.5px;font-weight:600;color:#0D9488;">Gerar calendário</span>
+              <i class="ti ti-arrow-right" style="font-size:15px;color:#0D9488;"></i>
             </div>
           </div>
 
-          <div onclick="abrirFerramentaMarketing('boasvindas')" class="mkt-tool-card" onmouseenter="this.classList.add('mkt-card-hover')" onmouseleave="this.classList.remove('mkt-card-hover')">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;">
-              <div style="width:44px;height:44px;border-radius:12px;background:#D1FAE5;display:flex;align-items:center;justify-content:center;">
-                <i class="ti ti-brand-whatsapp" style="color:#059669;font-size:20px;"></i>
+          <div onclick="abrirFerramentaMarketing('boasvindas')" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:all .18s;" onmouseenter="this.style.borderColor='rgba(5,150,105,0.4)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(5,150,105,0.1)'" onmouseleave="this.style.borderColor='var(--border)';this.style.transform='';this.style.boxShadow=''">
+            <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#D1FAE5,#A7F3D0);display:flex;align-items:center;justify-content:center;margin-bottom:14px;"><i class="ti ti-brand-whatsapp" style="font-size:24px;color:#059669;"></i></div>
+            <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:6px;">Mensagem de boas-vindas</div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.55;margin-bottom:12px;">Texto acolhedor e personalizado para enviar ao novo paciente.</div>
+            <div style="background:#ECFDF5;border-radius:9px;padding:9px 11px;margin-bottom:12px;">
+              <div style="font-size:10px;font-weight:700;color:#059669;margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;">Inclui sugestões de:</div>
+              <div style="font-size:11px;color:var(--t2);display:flex;flex-direction:column;gap:3px;">
+                <span style="display:flex;align-items:center;gap:5px;"><i class="ti ti-check" style="font-size:11px;color:#059669;"></i>Mensagem personalizada</span>
+                <span style="display:flex;align-items:center;gap:5px;"><i class="ti ti-check" style="font-size:11px;color:#059669;"></i>Orientações iniciais</span>
+                <span style="display:flex;align-items:center;gap:5px;"><i class="ti ti-check" style="font-size:11px;color:#059669;"></i>Tom acolhedor</span>
               </div>
-              <i class="ti ti-arrow-up-right mkt-arrow" style="font-size:15px;color:var(--t3);opacity:0;transition:opacity .15s,transform .15s;"></i>
             </div>
-            <div style="font-size:13.5px;font-weight:500;color:var(--t1);margin-bottom:5px;">Mensagem de boas-vindas</div>
-            <div style="font-size:12px;color:var(--t2);line-height:1.65;">Texto acolhedor e personalizado para enviar ao novo paciente.</div>
-            <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
-              <span style="font-size:11px;font-weight:500;color:#059669;background:#D1FAE5;padding:3px 10px;border-radius:20px;">WhatsApp</span>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:11px;border-top:1px solid var(--border);">
+              <span style="font-size:12.5px;font-weight:600;color:#059669;">Criar mensagem</span>
+              <i class="ti ti-arrow-right" style="font-size:15px;color:#059669;"></i>
             </div>
           </div>
 
-          <div onclick="abrirFerramentaMarketing('bio')" class="mkt-tool-card" onmouseenter="this.classList.add('mkt-card-hover')" onmouseleave="this.classList.remove('mkt-card-hover')">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;">
-              <div style="width:44px;height:44px;border-radius:12px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;">
-                <i class="ti ti-user-circle" style="color:#D97706;font-size:20px;"></i>
+          <div onclick="abrirFerramentaMarketing('bio')" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:all .18s;" onmouseenter="this.style.borderColor='rgba(217,119,6,0.4)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(217,119,6,0.1)'" onmouseleave="this.style.borderColor='var(--border)';this.style.transform='';this.style.boxShadow=''">
+            <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);display:flex;align-items:center;justify-content:center;margin-bottom:14px;"><i class="ti ti-user-circle" style="font-size:24px;color:#D97706;"></i></div>
+            <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:6px;">Bio para Instagram</div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.55;margin-bottom:12px;">Apresentação profissional de 150 caracteres baseada no seu perfil.</div>
+            <div style="background:#FFFBEB;border-radius:9px;padding:9px 11px;margin-bottom:12px;">
+              <div style="font-size:10px;font-weight:700;color:#D97706;margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;">Inclui sugestões de:</div>
+              <div style="font-size:11px;color:var(--t2);display:flex;flex-direction:column;gap:3px;">
+                <span style="display:flex;align-items:center;gap:5px;"><i class="ti ti-check" style="font-size:11px;color:#D97706;"></i>Bio otimizada</span>
+                <span style="display:flex;align-items:center;gap:5px;"><i class="ti ti-check" style="font-size:11px;color:#D97706;"></i>Destaque de diferenciais</span>
+                <span style="display:flex;align-items:center;gap:5px;"><i class="ti ti-check" style="font-size:11px;color:#D97706;"></i>Tom profissional</span>
               </div>
-              <i class="ti ti-arrow-up-right mkt-arrow" style="font-size:15px;color:var(--t3);opacity:0;transition:opacity .15s,transform .15s;"></i>
             </div>
-            <div style="font-size:13.5px;font-weight:500;color:var(--t1);margin-bottom:5px;">Bio para Instagram</div>
-            <div style="font-size:12px;color:var(--t2);line-height:1.65;">Apresentação profissional de 150 caracteres baseada no seu perfil.</div>
-            <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
-              <span style="font-size:11px;font-weight:500;color:#D97706;background:#FEF3C7;padding:3px 10px;border-radius:20px;">Perfil</span>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:11px;border-top:1px solid var(--border);">
+              <span style="font-size:12.5px;font-weight:600;color:#D97706;">Criar bio</span>
+              <i class="ti ti-arrow-right" style="font-size:15px;color:#D97706;"></i>
             </div>
           </div>
 
+        </div>
+
+        <!-- SUGESTÕES PARA VOCÊ -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:34px;height:34px;border-radius:10px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;"><i class="ti ti-sparkles" style="font-size:16px;color:#4F46E5;"></i></div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--t1);">Sugestões para você</div>
+                <div style="font-size:11.5px;color:var(--t3);">Ideias personalizadas com base no seu perfil e na sua prática clínica.</div>
+              </div>
+            </div>
+            <button onclick="gerarSugestoesMarketing()" style="font-size:12px;font-weight:500;color:#4F46E5;background:#EEF2FF;border:none;border-radius:8px;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:6px;" onmouseenter="this.style.background='#E0E7FF'" onmouseleave="this.style.background='#EEF2FF'">
+              <i class="ti ti-refresh" style="font-size:13px;"></i> Ver todas as sugestões
+            </button>
+          </div>
+          <div id="mkt-sugestoes-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+            <div style="background:var(--bg);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s;" onclick="abrirFerramentaMarketing('post')" onmouseenter="this.style.background='#EEF2FF'" onmouseleave="this.style.background='var(--bg)'">
+              <div style="width:28px;height:28px;border-radius:8px;background:#EEEDFE;display:flex;align-items:center;justify-content:center;margin-bottom:9px;"><i class="ti ti-brand-instagram" style="font-size:13px;color:#5046E5;"></i></div>
+              <div style="font-size:12.5px;font-weight:500;color:var(--t1);margin-bottom:3px;line-height:1.35;">5 sinais de que você precisa de apoio psicológico</div>
+              <div style="font-size:10.5px;color:var(--t3);">Post · Carrossel</div>
+            </div>
+            <div style="background:var(--bg);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s;" onclick="abrirFerramentaMarketing('post')" onmouseenter="this.style.background='#FCE7F3'" onmouseleave="this.style.background='var(--bg)'">
+              <div style="width:28px;height:28px;border-radius:8px;background:#FCE7F3;display:flex;align-items:center;justify-content:center;margin-bottom:9px;"><i class="ti ti-heart" style="font-size:13px;color:#DB2777;"></i></div>
+              <div style="font-size:12.5px;font-weight:500;color:var(--t1);margin-bottom:3px;line-height:1.35;">Como lidar com a ansiedade no dia a dia</div>
+              <div style="font-size:10.5px;color:var(--t3);">Post · Feed</div>
+            </div>
+            <div style="background:var(--bg);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s;" onclick="abrirFerramentaMarketing('boasvindas')" onmouseenter="this.style.background='#D1FAE5'" onmouseleave="this.style.background='var(--bg)'">
+              <div style="width:28px;height:28px;border-radius:8px;background:#D1FAE5;display:flex;align-items:center;justify-content:center;margin-bottom:9px;"><i class="ti ti-brand-whatsapp" style="font-size:13px;color:#059669;"></i></div>
+              <div style="font-size:12.5px;font-weight:500;color:var(--t1);margin-bottom:3px;line-height:1.35;">Mensagem de acolhimento para novos pacientes</div>
+              <div style="font-size:10.5px;color:var(--t3);">WhatsApp</div>
+            </div>
+            <div style="background:var(--bg);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s;" onclick="abrirFerramentaMarketing('calendario')" onmouseenter="this.style.background='#CCFBF1'" onmouseleave="this.style.background='var(--bg)'">
+              <div style="width:28px;height:28px;border-radius:8px;background:#CCFBF1;display:flex;align-items:center;justify-content:center;margin-bottom:9px;"><i class="ti ti-calendar-event" style="font-size:13px;color:#0D9488;"></i></div>
+              <div style="font-size:12.5px;font-weight:500;color:var(--t1);margin-bottom:3px;line-height:1.35;">Junho: mês de conscientização sobre o luto</div>
+              <div style="font-size:10.5px;color:var(--t3);">Post · Data especial</div>
+            </div>
+          </div>
         </div>
 
         <!-- Área de geração -->
-        <div id="mkt-area" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+        <div id="mkt-area" style="display:none;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;">
           <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;">
             <div id="mkt-icon" style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"></div>
             <div style="flex:1;">
@@ -5801,39 +5907,22 @@ var MKT = {
   }
 };
 
-function abrirSugestao(tipo, tema) {
-  // Pre-fill the tema field and open the tool
-  abrirFerramentaMarketing(tipo);
-  setTimeout(() => {
-    const temaInput = document.getElementById('mkt-tema');
-    if (temaInput && tema) temaInput.value = tema;
-  }, 200);
-}
-
 async function gerarSugestoesMarketing() {
-  // Regenerate suggestions based on user profile
-  const cfg = await sb.from('configuracoes').select('abordagem,especialidades').eq('user_id',(await sb.auth.getUser()).data.user.id).single();
-  const esp = cfg?.data?.especialidades || 'ansiedade, relacionamentos';
-  const abord = cfg?.data?.abordagem || 'psicoterapia';
-  
   const sugestoes = [
-    {tipo:'post', icon:'ti-brand-instagram', bg:'#EEEDFE', cor:'#5046E5', titulo:'3 sinais de que a terapia está funcionando', sub:'Post · Educativo'},
-    {tipo:'post', icon:'ti-heart', bg:'#FCE7F3', cor:'#DB2777', titulo:'Autocuidado: por onde começar?', sub:'Post · Feed'},
-    {tipo:'boasvindas', icon:'ti-brand-whatsapp', bg:'#D1FAE5', cor:'#059669', titulo:'Mensagem de confirmação de sessão', sub:'WhatsApp'},
-    {tipo:'calendario', icon:'ti-calendar-event', bg:'#CCFBF1', cor:'#0D9488', titulo:'Planejamento de conteúdo — ' + new Date().toLocaleDateString('pt-BR',{month:'long'}), sub:'Calendário mensal'},
+    {tipo:'post', icon:'ti-brand-instagram', bg:'#EEEDFE', cor:'#5046E5', titulo:'3 sinais de que a terapia esta funcionando', sub:'Post - Educativo'},
+    {tipo:'post', icon:'ti-heart', bg:'#FCE7F3', cor:'#DB2777', titulo:'Autocuidado: por onde comecar?', sub:'Post - Feed'},
+    {tipo:'boasvindas', icon:'ti-brand-whatsapp', bg:'#D1FAE5', cor:'#059669', titulo:'Mensagem de confirmacao de sessao', sub:'WhatsApp'},
+    {tipo:'calendario', icon:'ti-calendar-event', bg:'#CCFBF1', cor:'#0D9488', titulo:'Planejamento do mes', sub:'Calendario mensal'},
   ];
-  
   const grid = document.getElementById('mkt-sugestoes-grid');
-  if (grid) {
-    grid.innerHTML = sugestoes.map(s => 
-      '<div style="background:var(--bg);border-radius:10px;padding:14px;cursor:pointer;" onclick="abrirSugestao(\''+s.tipo+'\',\''+s.titulo+'\')">'+
-      '<div style="width:28px;height:28px;border-radius:8px;background:'+s.bg+';display:flex;align-items:center;justify-content:center;margin-bottom:10px;"><i class="ti '+s.icon+'" style="font-size:14px;color:'+s.cor+';"></i></div>'+
-      '<div style="font-size:12.5px;font-weight:500;color:var(--t1);margin-bottom:4px;line-height:1.35;">'+s.titulo+'</div>'+
-      '<div style="font-size:10.5px;color:var(--t3);">'+s.sub+'</div>'+
-      '</div>'
-    ).join('');
-    toast('Sugestões atualizadas!', 'success');
-  }
+  if (!grid) return;
+  grid.innerHTML = sugestoes.map(s =>
+    '<div style="background:var(--bg);border-radius:10px;padding:14px;cursor:pointer;" onclick="abrirFerramentaMarketing(' + "'" + s.tipo + "'" + ')">' +
+    '<div style="width:28px;height:28px;border-radius:8px;background:' + s.bg + ';display:flex;align-items:center;justify-content:center;margin-bottom:9px;"><i class="ti ' + s.icon + '" style="font-size:13px;color:' + s.cor + ';"></i></div>' +
+    '<div style="font-size:12.5px;font-weight:500;color:var(--t1);margin-bottom:3px;line-height:1.35;">' + s.titulo + '</div>' +
+    '<div style="font-size:10.5px;color:var(--t3);">' + s.sub + '</div></div>'
+  ).join('');
+  toast('Sugestoes atualizadas!', 'success');
 }
 
 async function abrirFerramentaMarketing(tipo) {
