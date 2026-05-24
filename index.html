@@ -273,6 +273,20 @@ tr:hover td{background:#FAFAFF}
 .receita-step{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
 .receita-step:last-child{border-bottom:none;}
 .step-num{width:26px;height:26px;border-radius:50%;background:#4F46E5;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
+.sim-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:14px;}
+.sim-slider-wrap{margin-bottom:20px;}
+.sim-slider-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.sim-slider-name{font-size:13px;font-weight:500;color:var(--t1);}
+.sim-slider-val{font-size:15px;font-weight:700;color:#4F46E5;min-width:80px;text-align:right;}
+.sim-slider{width:100%;height:6px;border-radius:3px;outline:none;-webkit-appearance:none;appearance:none;background:linear-gradient(90deg,#4F46E5 var(--pct,50%),#E5E7EB var(--pct,50%));cursor:pointer;}
+.sim-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#4F46E5;border:3px solid #fff;box-shadow:0 1px 4px rgba(79,70,229,.35);cursor:pointer;}
+.sim-result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
+.sim-result-card{border-radius:12px;padding:16px;text-align:center;}
+.sim-result-label{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.sim-result-val{font-size:22px;font-weight:700;letter-spacing:-0.5px;}
+.sim-insight{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;margin-bottom:8px;font-size:12.5px;line-height:1.5;}
+.sim-faixa-bar{height:10px;border-radius:5px;transition:width .4s ease;}
 </style>
 </head>
 <body>
@@ -837,6 +851,7 @@ tr:hover td{background:#FAFAFF}
             <div class="tab" onclick="filtrarFin(this,'Receita')">Receitas</div>
             <div class="tab" onclick="filtrarFin(this,'Despesa')">Despesas</div>
             <div class="tab" onclick="abrirGuiaFiscal(this)" style="color:#4F46E5;display:flex;align-items:center;gap:4px;"><i class="ti ti-calculator"></i> Guia Fiscal</div>
+            <div class="tab" onclick="abrirSimulador(this)" style="color:#059669;display:flex;align-items:center;gap:4px;"><i class="ti ti-chart-arrows-vertical"></i> Simulador</div>
           </div>
           <div style="flex:1;"></div>
           <input type="month" class="form-input" style="width:140px;" id="fin-mes" onchange="carregarFinanceiro()" id="fin-mes-input">
@@ -993,6 +1008,151 @@ tr:hover td{background:#FAFAFF}
           </div>
 
         </div>
+
+        <!-- ── SIMULADOR DE PRECIFICAÇÃO ── -->
+        <div id="painel-simulador" style="display:none;">
+
+          <div style="background:linear-gradient(135deg,#064E3B,#059669);border-radius:14px;padding:20px 24px;margin-bottom:16px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="ti ti-chart-arrows-vertical" style="font-size:22px;color:#fff;"></i>
+              </div>
+              <div>
+                <div style="font-size:16px;font-weight:600;color:#fff;">Simulador de Precificação</div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:2px;">Descubra quanto você realmente ganha e qual o valor ideal por sessão</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sim-card">
+            <div style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:18px;display:flex;align-items:center;gap:8px;"><i class="ti ti-adjustments" style="color:#059669;"></i> Ajuste os parâmetros</div>
+
+            <div class="sim-slider-wrap">
+              <div class="sim-slider-label">
+                <div><div class="sim-slider-name">Pacientes ativos</div><div style="font-size:11px;color:var(--t3);">Quantos pacientes você atende</div></div>
+                <div class="sim-slider-val" id="sim-val-pacs">10</div>
+              </div>
+              <input type="range" class="sim-slider" id="sim-pacs" min="1" max="40" value="10" step="1" oninput="atualizarSimulador()">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>1</span><span>40</span></div>
+            </div>
+
+            <div class="sim-slider-wrap">
+              <div class="sim-slider-label">
+                <div><div class="sim-slider-name">Sessões por semana por paciente</div><div style="font-size:11px;color:var(--t3);">Em média, quantas sessões cada paciente faz por semana</div></div>
+                <div class="sim-slider-val" id="sim-val-freq">1×</div>
+              </div>
+              <input type="range" class="sim-slider" id="sim-freq" min="1" max="3" value="1" step="1" oninput="atualizarSimulador()">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>1×/sem</span><span>3×/sem</span></div>
+            </div>
+
+            <div class="sim-slider-wrap">
+              <div class="sim-slider-label">
+                <div><div class="sim-slider-name">Valor por sessão (R$)</div><div style="font-size:11px;color:var(--t3);">Quanto você cobra por cada atendimento</div></div>
+                <div class="sim-slider-val" id="sim-val-preco">R$ 180</div>
+              </div>
+              <input type="range" class="sim-slider" id="sim-preco" min="80" max="600" value="180" step="10" oninput="atualizarSimulador()">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>R$80</span><span>R$600</span></div>
+            </div>
+
+            <div class="sim-slider-wrap">
+              <div class="sim-slider-label">
+                <div><div class="sim-slider-name">Taxa de faltas / cancelamentos</div><div style="font-size:11px;color:var(--t3);">% de sessões que não acontecem sem cobrança</div></div>
+                <div class="sim-slider-val" id="sim-val-faltas">10%</div>
+              </div>
+              <input type="range" class="sim-slider" id="sim-faltas" min="0" max="40" value="10" step="5" oninput="atualizarSimulador()">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>0%</span><span>40%</span></div>
+            </div>
+
+            <div class="sim-slider-wrap" style="margin-bottom:0;">
+              <div class="sim-slider-label">
+                <div><div class="sim-slider-name">Despesas mensais (R$)</div><div style="font-size:11px;color:var(--t3);">Aluguel, internet, supervisão, ferramentas...</div></div>
+                <div class="sim-slider-val" id="sim-val-desp">R$ 800</div>
+              </div>
+              <input type="range" class="sim-slider" id="sim-desp" min="0" max="5000" value="800" step="100" oninput="atualizarSimulador()">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;"><span>R$0</span><span>R$5.000</span></div>
+            </div>
+          </div>
+
+          <div class="sim-card" style="border-left:4px solid #059669;">
+            <div style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:16px;display:flex;align-items:center;gap:8px;"><i class="ti ti-calculator" style="color:#059669;"></i> Resultado estimado — por mês</div>
+
+            <div class="sim-result-grid">
+              <div class="sim-result-card" style="background:#ECFDF5;">
+                <div class="sim-result-label" style="color:#065F46;">Receita bruta</div>
+                <div class="sim-result-val" style="color:#059669;" id="sim-r-bruta">—</div>
+              </div>
+              <div class="sim-result-card" style="background:#FEF3C7;">
+                <div class="sim-result-label" style="color:#92400E;">Impostos (IR est.)</div>
+                <div class="sim-result-val" style="color:#D97706;" id="sim-r-ir">—</div>
+              </div>
+              <div class="sim-result-card" style="background:#EEF2FF;">
+                <div class="sim-result-label" style="color:#3730A3;">Líquido real</div>
+                <div class="sim-result-val" style="color:#4F46E5;" id="sim-r-liquido">—</div>
+              </div>
+            </div>
+
+            <div style="margin-bottom:14px;">
+              <div style="font-size:11px;color:var(--t3);margin-bottom:6px;">Composição da receita bruta</div>
+              <div style="display:flex;gap:2px;border-radius:6px;overflow:hidden;height:10px;">
+                <div id="sim-bar-liquido" style="background:#059669;transition:width .4s ease;width:60%;"></div>
+                <div id="sim-bar-desp" style="background:#D97706;transition:width .4s ease;width:15%;"></div>
+                <div id="sim-bar-ir" style="background:#EF4444;transition:width .4s ease;width:15%;"></div>
+                <div id="sim-bar-faltas" style="background:#9CA3AF;transition:width .4s ease;width:10%;"></div>
+              </div>
+              <div style="display:flex;gap:14px;margin-top:6px;flex-wrap:wrap;">
+                <span style="font-size:10.5px;color:var(--t2);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#059669;display:inline-block;"></span>Líquido</span>
+                <span style="font-size:10.5px;color:var(--t2);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#D97706;display:inline-block;"></span>Despesas</span>
+                <span style="font-size:10.5px;color:var(--t2);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#EF4444;display:inline-block;"></span>IR estimado</span>
+                <span style="font-size:10.5px;color:var(--t2);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#9CA3AF;display:inline-block;"></span>Faltas</span>
+              </div>
+            </div>
+
+            <div id="sim-insights" style="margin-bottom:14px;"></div>
+
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Sessões/mês</div>
+                <div style="font-size:18px;font-weight:700;color:var(--t1);" id="sim-r-sessoes">—</div>
+              </div>
+              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Valor/hora efetivo</div>
+                <div style="font-size:18px;font-weight:700;color:var(--t1);" id="sim-r-hora">—</div>
+              </div>
+              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Faltas no mês</div>
+                <div style="font-size:18px;font-weight:700;" id="sim-r-pct-faltas">—</div>
+              </div>
+              <div style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Horas/semana</div>
+                <div style="font-size:18px;font-weight:700;color:var(--t1);" id="sim-r-horas">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sim-card" style="border-left:4px solid #7C3AED;">
+            <div style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:4px;display:flex;align-items:center;gap:8px;"><i class="ti ti-target" style="color:#7C3AED;"></i> Qual valor preciso cobrar?</div>
+            <div style="font-size:12px;color:var(--t3);margin-bottom:14px;">Para atingir um líquido mensal específico, usando os mesmos parâmetros acima:</div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:13px;color:var(--t2);">Quero ganhar</span>
+                <input type="number" class="form-input" id="sim-meta-liquido" value="5000" min="1000" max="30000" step="500" style="width:120px;" oninput="calcularValorMinimo()">
+                <span style="font-size:13px;color:var(--t2);">líquido/mês</span>
+              </div>
+              <div style="background:#F5F3FF;border-radius:10px;padding:12px 18px;flex:1;min-width:180px;text-align:center;">
+                <div style="font-size:11px;color:#6D28D9;margin-bottom:4px;">Valor mínimo por sessão</div>
+                <div style="font-size:26px;font-weight:700;color:#7C3AED;" id="sim-r-minimo">—</div>
+              </div>
+              <div style="background:#EEF2FF;border-radius:10px;padding:12px 18px;flex:1;min-width:180px;text-align:center;">
+                <div style="font-size:11px;color:#4338CA;margin-bottom:4px;">Pacientes necessários (preço atual)</div>
+                <div style="font-size:26px;font-weight:700;color:#4F46E5;" id="sim-r-min-pacs">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size:11px;color:var(--t3);text-align:center;padding-bottom:8px;">* Simulação educativa. Valores são estimativas — consulte um contador para planejamento financeiro completo.</div>
+        </div>
+
         <div class="g3 mb16">
           <div class="mc" style="border-left:3px solid var(--green);">
             <div class="mc-lbl"><i class="ti ti-arrow-up"></i> Receitas</div>
@@ -2865,7 +3025,138 @@ function abrirGuiaFiscal(el) {
   document.querySelectorAll('#sc-financeiro .tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('painel-fiscal').style.display = '';
+  document.getElementById('painel-simulador').style.display = 'none';
   calcularCarneleao();
+}
+
+function abrirSimulador(el) {
+  document.querySelectorAll('#sc-financeiro .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('painel-fiscal').style.display = 'none';
+  document.getElementById('painel-simulador').style.display = '';
+  atualizarSimulador();
+}
+
+function atualizarSimulador() {
+  var pacs   = parseInt(document.getElementById('sim-pacs').value) || 10;
+  var freq   = parseInt(document.getElementById('sim-freq').value) || 1;
+  var preco  = parseInt(document.getElementById('sim-preco').value) || 180;
+  var faltas = parseInt(document.getElementById('sim-faltas').value) || 10;
+  var desp   = parseInt(document.getElementById('sim-desp').value) || 800;
+
+  // Labels
+  document.getElementById('sim-val-pacs').textContent = pacs;
+  document.getElementById('sim-val-freq').textContent = freq + 'x';
+  document.getElementById('sim-val-preco').textContent = 'R$ ' + preco.toLocaleString('pt-BR');
+  document.getElementById('sim-val-faltas').textContent = faltas + '%';
+  document.getElementById('sim-val-desp').textContent = 'R$ ' + desp.toLocaleString('pt-BR');
+
+  // Atualizar gradiente dos sliders
+  ['sim-pacs','sim-freq','sim-preco','sim-faltas','sim-desp'].forEach(id => {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
+    var pct = ((val - min) / (max - min) * 100).toFixed(1);
+    el.style.setProperty('--pct', pct + '%');
+  });
+
+  // Cálculos
+  var semanas = 4.33;
+  var sessoesTotal = Math.round(pacs * freq * semanas);
+  var sessoesPerdidas = Math.round(sessoesTotal * faltas / 100);
+  var sessoesEfetivas = sessoesTotal - sessoesPerdidas;
+  var bruta = sessoesEfetivas * preco;
+
+  // IR (tabela progressiva 2026)
+  var base = Math.max(0, bruta - 528);
+  var faixas = [
+    {ate:2428.80, al:0,     ded:0},
+    {ate:2826.65, al:0.075, ded:182.16},
+    {ate:3751.05, al:0.15,  ded:394.16},
+    {ate:4664.68, al:0.225, ded:675.49},
+    {ate:Infinity,al:0.275, ded:908.73}
+  ];
+  var f = faixas.find(function(x){ return base <= x.ate; }) || faixas[4];
+  var ir = Math.max(0, base * f.al - f.ded);
+  var liquido = bruta - ir - desp;
+  var valorHora = sessoesEfetivas > 0 ? Math.round(liquido / (sessoesEfetivas * 0.833)) : 0;
+  var horasSem = pacs * freq;
+
+  var fmt = function(v) { return 'R$ ' + Math.round(v).toLocaleString('pt-BR'); };
+
+  document.getElementById('sim-r-bruta').textContent    = fmt(bruta);
+  document.getElementById('sim-r-ir').textContent       = ir < 1 ? 'Isento' : fmt(ir);
+  document.getElementById('sim-r-liquido').textContent  = fmt(Math.max(0, liquido));
+  document.getElementById('sim-r-sessoes').textContent  = sessoesEfetivas;
+  document.getElementById('sim-r-hora').textContent     = fmt(Math.max(0, valorHora));
+  document.getElementById('sim-r-pct-faltas').textContent = sessoesPerdidas + ' sess.';
+  document.getElementById('sim-r-pct-faltas').style.color = faltas > 20 ? '#DC2626' : faltas > 10 ? '#D97706' : '#059669';
+  document.getElementById('sim-r-horas').textContent    = horasSem + 'h';
+
+  // Barra de composição
+  if (bruta > 0) {
+    var pLiq   = Math.max(0, Math.min(100, liquido / bruta * 100));
+    var pDesp  = Math.min(100, desp / bruta * 100);
+    var pIr    = Math.min(100, ir / bruta * 100);
+    var pFalta = Math.min(100, (sessoesPerdidas * preco) / (sessoesTotal * preco) * 100);
+    document.getElementById('sim-bar-liquido').style.width = pLiq.toFixed(1) + '%';
+    document.getElementById('sim-bar-desp').style.width    = pDesp.toFixed(1) + '%';
+    document.getElementById('sim-bar-ir').style.width      = pIr.toFixed(1) + '%';
+    document.getElementById('sim-bar-faltas').style.width  = pFalta.toFixed(1) + '%';
+  }
+
+  // Insights automáticos
+  var insights = [];
+  if (liquido < 3000) {
+    insights.push({icon:'ti-alert-triangle', cor:'#92400E', bg:'#FEF3C7', txt:'Seu líquido estimado está abaixo de R$3.000. Considere aumentar o valor por sessão ou reduzir despesas.'});
+  } else if (liquido > 10000) {
+    insights.push({icon:'ti-star', cor:'#065F46', bg:'#ECFDF5', txt:'Excelente! Seu consultório tem potencial de gerar mais de R$10.000 líquido por mês com essa configuração.'});
+  }
+  if (faltas > 20) {
+    insights.push({icon:'ti-calendar-off', cor:'#991B1B', bg:'#FEE2E2', txt:'Taxa de faltas acima de 20% — isso representa R$' + Math.round(sessoesPerdidas * preco).toLocaleString('pt-BR') + ' perdidos por mês. Considere lembretes automáticos via WhatsApp.'});
+  }
+  if (f.al >= 0.225) {
+    insights.push({icon:'ti-receipt-tax', cor:'#92400E', bg:'#FEF3C7', txt:'Alíquota de IR alta (' + (f.al * 100) + '%). Abrir CNPJ no Simples Nacional pode reduzir para ~6% — economia de R$' + Math.round(ir * 0.75).toLocaleString('pt-BR') + '/mês.'});
+  }
+  if (horasSem > 30) {
+    insights.push({icon:'ti-heart-broken', cor:'#7C3AED', bg:'#F5F3FF', txt:'Mais de 30 horas de atendimento por semana pode levar ao burnout. O CFP recomenda no máximo 8 sessões por dia.'});
+  }
+  var insEl = document.getElementById('sim-insights');
+  insEl.innerHTML = insights.map(function(i) {
+    return '<div class="sim-insight" style="background:' + i.bg + ';margin-bottom:8px;">' +
+      '<i class="ti ' + i.icon + '" style="font-size:16px;color:' + i.cor + ';flex-shrink:0;margin-top:1px;"></i>' +
+      '<span style="font-size:12.5px;color:' + i.cor + ';">' + i.txt + '</span></div>';
+  }).join('');
+
+  calcularValorMinimo();
+}
+
+function calcularValorMinimo() {
+  var pacs   = parseInt(document.getElementById('sim-pacs').value) || 10;
+  var freq   = parseInt(document.getElementById('sim-freq').value) || 1;
+  var faltas = parseInt(document.getElementById('sim-faltas').value) || 10;
+  var desp   = parseInt(document.getElementById('sim-desp').value) || 800;
+  var meta   = parseInt(document.getElementById('sim-meta-liquido').value) || 5000;
+  var preco  = parseInt(document.getElementById('sim-preco').value) || 180;
+
+  var sessoesEfetivas = Math.round(pacs * freq * 4.33 * (1 - faltas / 100));
+  if (sessoesEfetivas <= 0) return;
+
+  // Calcular valor por sessão para atingir meta
+  // liquido = bruta - ir - desp => meta + desp + ir = bruta
+  // bruta = sessoes * valor => valor = (meta + desp + ir_estimado) / sessoes
+  // Aproximação iterativa simples
+  var valorMin = Math.round((meta + desp) / sessoesEfetivas * 1.30); // +30% para cobrir IR
+  var precoPorSessao = valorMin;
+
+  var elMin = document.getElementById('sim-r-minimo');
+  if (elMin) elMin.textContent = 'R$ ' + precoPorSessao.toLocaleString('pt-BR');
+
+  // Pacientes necessários com preço atual
+  var brutaNecessaria = meta + desp; // simplificado
+  var pacsMin = Math.ceil(brutaNecessaria * 1.30 / (preco * freq * 4.33 * (1 - faltas / 100)));
+  var elPacs = document.getElementById('sim-r-min-pacs');
+  if (elPacs) elPacs.textContent = pacsMin + ' pac.';
 }
 
 // Tabela IRPF 2026
