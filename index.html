@@ -898,16 +898,12 @@ tr:hover td{background:#FAFAFF}
 
       <!-- ── GUIA FISCAL ── -->
       <div class="screen" id="sc-guia-fiscal">
-        <div id="guia-fiscal-content">
-          <!-- conteúdo carregado dinamicamente pelo abrirGuiaFiscalScreen() -->
-        </div>
+        <div id="guia-fiscal-content"></div>
       </div>
 
       <!-- ── SIMULADOR ── -->
       <div class="screen" id="sc-simulador">
-        <div id="simulador-content">
-          <!-- conteúdo carregado dinamicamente pelo abrirSimuladorScreen() -->
-        </div>
+        <div id="simulador-content"></div>
       </div>
 
       <!-- ── RELATÓRIOS ── -->
@@ -2755,7 +2751,8 @@ function abrirSimulador(el) {
 
 function renderGuiaFiscal() {
   var el = document.getElementById('guia-fiscal-content');
-  if (!el || el.innerHTML.trim()) return; // já renderizado
+  if (!el) return;
+  if (el.children.length > 0) return; // já renderizado
   el.innerHTML = [
     '<div id="fiscal-alerta-venc" class="fiscal-alert" style="background:#FEF3C7;border:1px solid #FDE68A;margin-bottom:16px;display:none;">',
     '<i class="ti ti-alert-triangle" style="font-size:20px;color:#D97706;flex-shrink:0;margin-top:1px;"></i>',
@@ -2836,7 +2833,8 @@ function renderGuiaFiscal() {
 
 function renderSimulador() {
   var el = document.getElementById('simulador-content');
-  if (!el || el.innerHTML.trim()) return;
+  if (!el) return;
+  if (el.children.length > 0) return; // já renderizado
   el.innerHTML = [
     '<div style="background:linear-gradient(135deg,#064E3B,#059669);border-radius:14px;padding:20px 24px;margin-bottom:16px;position:relative;overflow:hidden;">',
     '<div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>',
