@@ -509,141 +509,115 @@ tr:hover td{background:#FAFAFF}
 
         <div id="dash-tab-consultorio">
 
-        <!-- SAUDAÇÃO + HERO -->
-        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:12px;margin-bottom:14px;align-items:stretch;">
+        <!-- MENSAGEM DIÁRIA -->
+        <div id="msg-diaria" style="margin-bottom:16px;border-radius:14px;overflow:hidden;display:none;border:1px solid rgba(80,70,229,0.15);">
+          <div style="padding:14px 18px;display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(238,237,254,0.9),rgba(238,237,254,0.4));position:relative;">
+            <div id="msg-diaria-icon" style="width:36px;height:36px;border-radius:10px;background:rgba(80,70,229,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;"></div>
+            <div style="flex:1;">
+              <div id="msg-diaria-label" style="font-size:9.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;color:#5046E5;"></div>
+              <div id="msg-diaria-texto" style="font-size:12.5px;line-height:1.5;color:var(--t1);"></div>
+            </div>
+            <button onclick="this.parentElement.parentElement.style.display='none'" style="background:none;border:none;cursor:pointer;opacity:.35;padding:4px;flex-shrink:0;transition:opacity .15s;" onmouseenter="this.style.opacity='.7'" onmouseleave="this.style.opacity='.35'">
+              <i class="ti ti-x" style="font-size:13px;"></i>
+            </button>
+          </div>
+        </div>
 
-          <!-- Hero card roxo -->
-          <div style="background:linear-gradient(135deg,#3730A3 0%,#4F46E5 60%,#6366F1 100%);border-radius:16px;padding:22px 24px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;min-height:130px;">
-            <div style="position:absolute;right:-20px;top:-20px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>
-            <div style="position:absolute;right:60px;bottom:-30px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none;"></div>
-            <div style="position:absolute;right:20px;top:50%;transform:translateY(-50%);opacity:0.12;pointer-events:none;">
-              <i class="ti ti-target" style="font-size:80px;color:#fff;"></i>
+        <!-- HERO ROW: próxima sessão + mini stats -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+
+          <!-- Próxima sessão — card maior -->
+          <div id="dash-proxima" style="grid-column:span 2;background:linear-gradient(135deg,#1E1B4B 0%,#3730A3 55%,#4F46E5 100%);border-radius:16px;padding:20px 22px;display:flex;align-items:center;gap:16px;position:relative;overflow:hidden;min-height:100px;">
+            <div style="position:absolute;top:-24px;right:-24px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>
+            <div style="position:absolute;bottom:-20px;right:70px;width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none;"></div>
+            <div style="width:46px;height:46px;background:rgba(255,255,255,0.14);border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(255,255,255,0.18);">
+              <i class="ti ti-clock" style="color:#fff;font-size:22px;"></i>
             </div>
-            <div>
-              <div style="font-size:10px;color:rgba(255,255,255,0.55);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px;">SEU FOCO DE HOJE</div>
-              <div style="font-size:20px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:4px;" id="dash-hero-titulo">Bom dia!</div>
-              <div style="font-size:12px;color:rgba(255,255,255,0.65);" id="dash-hero-sub">Carregando suas sessões...</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:10px;color:rgba(255,255,255,0.55);letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px;">PRÓXIMA SESSÃO</div>
+              <div style="font-size:15px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="dash-prox-titulo">Carregando...</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:2px;" id="dash-prox-sub"></div>
             </div>
-            <div style="margin-top:14px;">
-              <button onclick="irPara('agenda',null)" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:12px;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s;" onmouseenter="this.style.background='rgba(255,255,255,0.22)'" onmouseleave="this.style.background='rgba(255,255,255,0.15)'">
-                <i class="ti ti-calendar-event" style="font-size:13px;"></i> Ver agenda do dia
-              </button>
-            </div>
+            <div id="dash-prox-badge" style="background:rgba(255,255,255,0.14);color:#fff;font-size:11px;font-weight:500;padding:5px 12px;border-radius:20px;white-space:nowrap;border:1px solid rgba(255,255,255,0.18);flex-shrink:0;"></div>
           </div>
 
-          <!-- Faturamento -->
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between;">
-            <div>
-              <div style="font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">FATURAMENTO DO MÊS</div>
-              <div style="font-size:22px;font-weight:700;letter-spacing:-0.5px;color:var(--t1);line-height:1;" id="dm-fat">—</div>
+          <!-- Faturamento do mês -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 20px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#059669,#34D399);border-radius:16px 16px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:10.5px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Faturamento</div>
+              <div style="width:32px;height:32px;border-radius:9px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;">
+                <i class="ti ti-trending-up" style="font-size:15px;color:#059669;"></i>
+              </div>
             </div>
-            <div style="font-size:11px;color:#059669;margin-top:8px;display:flex;align-items:center;gap:4px;" id="dm-fat-sub">
-              <i class="ti ti-trending-up" style="font-size:13px;"></i> carregando...
-            </div>
+            <div style="font-size:24px;font-weight:700;letter-spacing:-0.5px;color:var(--t1);line-height:1;" id="dm-fat">—</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:6px;display:flex;align-items:center;gap:4px;" id="dm-fat-sub">carregando...</div>
           </div>
 
           <!-- A receber -->
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between;">
-            <div>
-              <div style="font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">A RECEBER</div>
-              <div style="font-size:22px;font-weight:700;letter-spacing:-0.5px;color:#D97706;line-height:1;" id="dm-receber">—</div>
-            </div>
-            <div style="font-size:11px;color:var(--t3);margin-top:8px;display:flex;align-items:center;gap:4px;" id="dm-receber-sub">
-              <i class="ti ti-clock-dollar" style="font-size:13px;color:#D97706;"></i> carregando...
-            </div>
-          </div>
-
-          <!-- Sessões realizadas -->
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between;">
-            <div>
-              <div style="font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">SESSÕES REALIZADAS</div>
-              <div style="font-size:22px;font-weight:700;letter-spacing:-0.5px;color:var(--t1);line-height:1;" id="dm-sessoes">—</div>
-            </div>
-            <div style="margin-top:8px;">
-              <div style="background:var(--bg);border-radius:4px;height:5px;overflow:hidden;margin-bottom:4px;">
-                <div id="dm-sessoes-bar" style="height:100%;background:#5046E5;border-radius:4px;width:0%;transition:width 1s ease;"></div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 20px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#D97706,#FCD34D);border-radius:16px 16px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:10.5px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">A receber</div>
+              <div style="width:32px;height:32px;border-radius:9px;background:#FFF7ED;display:flex;align-items:center;justify-content:center;">
+                <i class="ti ti-clock-dollar" style="font-size:15px;color:#D97706;"></i>
               </div>
-              <div style="font-size:11px;color:var(--t3);" id="dm-sessoes-sub">carregando...</div>
             </div>
+            <div style="font-size:24px;font-weight:700;letter-spacing:-0.5px;color:#D97706;line-height:1;" id="dm-receber">—</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:6px;display:flex;align-items:center;gap:4px;" id="dm-receber-sub">carregando...</div>
+          </div>
+        </div>
+
+        <!-- SEGUNDA ROW: sessões hoje + pacientes + progresso -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:12px;margin-bottom:16px;">
+
+          <!-- Sessões hoje -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 20px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#5046E5,#818CF8);border-radius:16px 16px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:10.5px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Sessões hoje</div>
+              <div style="width:32px;height:32px;border-radius:9px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;">
+                <i class="ti ti-calendar-event" style="font-size:15px;color:#5046E5;"></i>
+              </div>
+            </div>
+            <div style="font-size:36px;font-weight:700;letter-spacing:-1px;color:var(--t1);line-height:1;" id="dm-sessoes">—</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:6px;display:flex;align-items:center;gap:4px;" id="dm-sessoes-sub">carregando...</div>
           </div>
 
           <!-- Pacientes ativos -->
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between;">
-            <div>
-              <div style="font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">PACIENTES ATIVOS</div>
-              <div style="font-size:22px;font-weight:700;letter-spacing:-0.5px;color:var(--t1);line-height:1;" id="dm-pacs">—</div>
-            </div>
-            <div style="font-size:11px;color:var(--t3);margin-top:8px;display:flex;align-items:center;gap:4px;" id="dm-pacs-sub">
-              <i class="ti ti-users" style="font-size:13px;color:#7C3AED;"></i> carregando...
-            </div>
-          </div>
-
-        </div>
-
-        <!-- MENSAGEM DIÁRIA (compacta) -->
-        <div id="msg-diaria" style="margin-bottom:14px;border-radius:12px;overflow:hidden;display:none;border:1px solid rgba(80,70,229,0.12);">
-          <div style="padding:11px 16px;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(238,237,254,0.85),rgba(238,237,254,0.35));">
-            <div id="msg-diaria-icon" style="font-size:16px;flex-shrink:0;"></div>
-            <div style="flex:1;">
-              <div id="msg-diaria-label" style="font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:1px;color:#5046E5;"></div>
-              <div id="msg-diaria-texto" style="font-size:12px;line-height:1.45;color:var(--t1);"></div>
-            </div>
-            <button onclick="this.parentElement.parentElement.style.display='none'" style="background:none;border:none;cursor:pointer;opacity:.3;padding:4px;flex-shrink:0;" onmouseenter="this.style.opacity='.7'" onmouseleave="this.style.opacity='.3'"><i class="ti ti-x" style="font-size:12px;"></i></button>
-          </div>
-        </div>
-
-        <!-- SEGUNDA LINHA: Progresso + Visão de sessões -->
-        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:14px;">
-
-          <!-- Progresso da meta -->
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;">
-            <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px;">PROGRESSO DA SUA META</div>
-            <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:8px;">
-              <div>
-                <div style="font-size:15px;font-weight:600;color:var(--t1);">Meta de faturamento</div>
-                <div style="font-size:12px;color:var(--t3);margin-top:2px;" id="dash-prog-rec">Recebido: R$0 de R$0</div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 20px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#7C3AED,#A78BFA);border-radius:16px 16px 0 0;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-size:10.5px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Pacientes ativos</div>
+              <div style="width:32px;height:32px;border-radius:9px;background:#F5F3FF;display:flex;align-items:center;justify-content:center;">
+                <i class="ti ti-users" style="font-size:15px;color:#7C3AED;"></i>
               </div>
-              <div style="font-size:28px;font-weight:700;color:#5046E5;letter-spacing:-0.5px;" id="dash-prog-label">0%</div>
             </div>
-            <div style="background:var(--bg);border-radius:20px;height:8px;overflow:hidden;margin-bottom:10px;">
+            <div style="font-size:36px;font-weight:700;letter-spacing:-1px;color:var(--t1);line-height:1;" id="dm-pacs">—</div>
+            <div class="mc-sub" id="dm-pacs-sub">carregando...</div>
+          </div>
+
+          <!-- Progresso financeiro — ocupa 2 colunas -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 22px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--t1);">Meta do mês</div>
+                <div style="font-size:11px;color:var(--t3);margin-top:1px;" id="dash-prog-rec">Recebido: R$0</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:22px;font-weight:700;color:#5046E5;letter-spacing:-0.5px;" id="dash-prog-label">0%</div>
+                <div style="font-size:11px;color:var(--t3);" id="dash-prog-prev">de R$0 previsto</div>
+              </div>
+            </div>
+            <div style="background:var(--bg);border-radius:20px;height:10px;overflow:hidden;margin-bottom:6px;">
               <div id="dash-prog-bar" style="height:100%;background:linear-gradient(90deg,#5046E5,#818CF8);border-radius:20px;width:0%;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);"></div>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <div style="display:flex;align-items:center;gap:6px;background:#EEF2FF;border-radius:8px;padding:8px 12px;flex:1;margin-right:12px;">
-                <i class="ti ti-sparkles" style="font-size:13px;color:#5046E5;flex-shrink:0;"></i>
-                <span style="font-size:12px;color:#4338CA;" id="dash-prog-msg">Carregando...</span>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="display:flex;gap:12px;">
+                <span style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#5046E5;display:inline-block;"></span>Recebido</span>
+                <span style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#E5E7EB;display:inline-block;"></span>Pendente</span>
               </div>
-              <button onclick="irPara('relatorios',null)" style="background:none;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;white-space:nowrap;" onmouseenter="this.style.background='var(--bg)'" onmouseleave="this.style.background='none'">Ver relatório completo</button>
-            </div>
-          </div>
-
-          <!-- Visão geral de sessões -->
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;">VISÃO GERAL DE SESSÕES</div>
-              <span style="font-size:11px;color:var(--t3);" id="dash-dist-mes">—</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:20px;">
-              <div style="position:relative;width:110px;height:110px;flex-shrink:0;">
-                <canvas id="chart-dash-dist" role="img" aria-label="Distribuição presencial vs online"></canvas>
-              </div>
-              <div style="flex:1;display:flex;flex-direction:column;gap:12px;">
-                <div>
-                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
-                    <span style="width:10px;height:10px;border-radius:50%;background:#5046E5;display:inline-block;flex-shrink:0;"></span>
-                    <span style="font-size:12px;font-weight:500;color:var(--t1);">Presencial</span>
-                  </div>
-                  <div style="font-size:12px;color:var(--t3);" id="dash-pres-pct">— sessões</div>
-                </div>
-                <div>
-                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
-                    <span style="width:10px;height:10px;border-radius:50%;background:#059669;display:inline-block;flex-shrink:0;"></span>
-                    <span style="font-size:12px;font-weight:500;color:var(--t1);">Online</span>
-                  </div>
-                  <div style="font-size:12px;color:var(--t3);" id="dash-onl-pct">— sessões</div>
-                </div>
-                <button onclick="irPara('agenda',null)" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11.5px;font-weight:500;color:var(--t2);cursor:pointer;text-align:center;" onmouseenter="this.style.background='var(--bg)'" onmouseleave="this.style.background='none'">Ver agenda completa</button>
-              </div>
+              <span class="card-link" onclick="irPara('relatorios',null)" style="font-size:11px;">Ver relatório →</span>
             </div>
           </div>
         </div>
@@ -659,6 +633,46 @@ tr:hover td{background:#FAFAFF}
               <span style="font-size:11px;font-weight:600;color:#92400E;background:#FDE68A;padding:2px 8px;border-radius:20px;" id="dash-sol-count">—</span>
             </div>
             <div id="dash-solicitacoes"></div>
+          </div>
+        </div>
+
+        <!-- GRÁFICOS ROW -->
+        <div class="g32 mb16">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">Faturamento — últimos 6 meses</span>
+              <span class="card-link" onclick="irPara('relatorios',null)">Ver relatório</span>
+            </div>
+            <div style="padding:14px;position:relative;height:200px;">
+              <canvas id="chart-dash-fat" role="img" aria-label="Gráfico de faturamento mensal"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">Tipo de sessões</span>
+              <span style="font-size:11px;color:var(--t3);" id="dash-dist-mes">—</span>
+            </div>
+            <div style="padding:0 14px 14px;display:flex;align-items:center;gap:16px;">
+              <div style="position:relative;height:160px;width:160px;flex-shrink:0;">
+                <canvas id="chart-dash-dist" role="img" aria-label="Distribuição presencial vs online"></canvas>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px;flex:1;">
+                <div>
+                  <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;">
+                    <span style="width:10px;height:10px;border-radius:50%;background:#5046E5;display:inline-block;flex-shrink:0;"></span>
+                    <span style="font-size:11px;font-weight:500;color:var(--t2);">Presencial</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--t3);" id="dash-pres-pct">— sessões</div>
+                </div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;">
+                    <span style="width:10px;height:10px;border-radius:50%;background:#059669;display:inline-block;flex-shrink:0;"></span>
+                    <span style="font-size:11px;font-weight:500;color:var(--t2);">Online</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--t3);" id="dash-onl-pct">— sessões</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -684,6 +698,9 @@ tr:hover td{background:#FAFAFF}
             </div>
           </div>
         </div>
+
+        </div>
+
         <!-- ABA PESSOAL -->
 
 
@@ -1951,44 +1968,27 @@ async function carregarDashboard() {
   const previsto = recebido + aReceber;
   const progPct = previsto > 0 ? Math.round((recebido / previsto) * 100) : 0;
 
-  // Hero card saudação
-  const horaAtual = agora.getHours();
-  const saudacao = horaAtual < 12 ? 'Bom dia' : horaAtual < 18 ? 'Boa tarde' : 'Boa noite';
-  const nomeUser = document.getElementById('user-nome')?.textContent || 'Profissional';
-  const primeiroNome = nomeUser.split(' ')[0];
-  const numSessoes = (sessoesHoje || []).length;
-  const heroTit = document.getElementById('dash-hero-titulo');
-  const heroSub = document.getElementById('dash-hero-sub');
-  if (heroTit) heroTit.textContent = numSessoes === 0 ? saudacao + ', ' + primeiroNome + '! 👋' : 'Você tem ' + numSessoes + ' sessão' + (numSessoes !== 1 ? 'ões' : '') + ' hoje';
-  if (heroSub) heroSub.textContent = numSessoes === 0 ? 'Nenhuma sessão agendada hoje.' : numSessoes === 1 ? 'Cada atendimento é um novo começo.' : 'Um dia cheio pela frente!';
-
   // Métricas
-  document.getElementById('dm-sessoes').textContent = numSessoes;
-  const metaSessoes = 25;
-  const sessMes = (sessoesMes || []).filter(s => s.status === 'Realizada').length;
-  const sessBar = document.getElementById('dm-sessoes-bar');
-  if (sessBar) setTimeout(() => { sessBar.style.width = Math.min(100, Math.round(sessMes/metaSessoes*100)) + '%'; }, 300);
-  document.getElementById('dm-sessoes-sub').textContent = sessMes + ' realizadas · Meta: ' + metaSessoes;
+  document.getElementById('dm-sessoes').textContent = (sessoesHoje || []).length;
+  document.getElementById('dm-sessoes-sub').innerHTML = '<span class="dot dot-g"></span> ' + confirmadas + ' confirmadas';
   document.getElementById('dm-fat').textContent = 'R$\u2009' + recebido.toLocaleString('pt-BR');
-  document.getElementById('dm-fat-sub').innerHTML = '<i class="ti ti-trending-up" style="font-size:13px;"></i> já recebido';
+  document.getElementById('dm-fat-sub').innerHTML = '<span class="trend-up">↑</span> já recebido';
   document.getElementById('dm-receber').textContent = 'R$\u2009' + aReceber.toLocaleString('pt-BR');
-  const nPend = (sessoesMes || []).filter(s => s.status_pagamento === 'Pendente').length;
-  document.getElementById('dm-receber-sub').innerHTML = '<i class="ti ti-clock-dollar" style="font-size:13px;color:#D97706;"></i> ' + nPend + ' cobrança' + (nPend !== 1 ? 's' : '') + ' pendente' + (nPend !== 1 ? 's' : '');
-  const totalPacs = (pacsAtivos || []).length;
-  document.getElementById('dm-pacs').textContent = totalPacs;
-  const novoPacMes = todosPacientes.filter(p => p.created_at && p.created_at.startsWith(mesInicio.substring(0,7))).length;
-  document.getElementById('dm-pacs-sub').innerHTML = '<i class="ti ti-users" style="font-size:13px;color:#7C3AED;"></i> ' + (novoPacMes > 0 ? '+' + novoPacMes + ' novo' + (novoPacMes > 1 ? 's' : '') + ' este mês' : 'pacientes ativos');
+  document.getElementById('dm-receber-sub').innerHTML = '<span class="dot dot-a"></span> a receber este mês';
+  document.getElementById('dm-pacs').textContent = (pacsAtivos || []).length;
+  document.getElementById('dm-pacs-sub').textContent = 'pacientes ativos';
 
   // Badge sessões
-  document.getElementById('badge-sessoes').textContent = numSessoes;
+  document.getElementById('badge-sessoes').textContent = (sessoesHoje || []).length;
 
   // Progresso do mês
   document.getElementById('dash-prog-label').textContent = progPct + '%';
-  document.getElementById('dash-prog-rec').textContent = 'Recebido: R$\u2009' + recebido.toLocaleString('pt-BR') + ' de R$\u2009' + previsto.toLocaleString('pt-BR');
-  const falta = previsto - recebido;
-  const progMsg = document.getElementById('dash-prog-msg');
-  if (progMsg) { if (progPct >= 100) progMsg.textContent = 'Meta atingida! Parabéns!'; else if (progPct >= 80) progMsg.textContent = 'Faltam R$\u2009' + falta.toLocaleString('pt-BR') + ' para a meta. Continue assim!'; else progMsg.textContent = 'R$\u2009' + falta.toLocaleString('pt-BR') + ' ainda a receber este mês.'; }
-  setTimeout(() => { const bar = document.getElementById('dash-prog-bar'); if (bar) bar.style.width = progPct + '%'; }, 200);
+  document.getElementById('dash-prog-rec').textContent = 'Recebido: R$ ' + recebido.toLocaleString('pt-BR');
+  document.getElementById('dash-prog-prev').textContent = 'de R$ ' + previsto.toLocaleString('pt-BR') + ' previsto';
+  setTimeout(() => {
+    const bar = document.getElementById('dash-prog-bar');
+    if (bar) bar.style.width = progPct + '%';
+  }, 200);
 
   // Próxima sessão
   const proxima = (sessoesHoje || []).find(s => {
