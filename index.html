@@ -1627,6 +1627,98 @@ tr:hover td{background:#FAFAFF}
 <div class="modal-bd" id="modal-bd" onclick="fecharModal()">
 
 
+  <!-- MODAL RECIBO -->
+  <div class="modal" id="m-recibo" onclick="event.stopPropagation()" style="display:none;max-width:580px;padding:0;overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#1E1B4B,#3730A3);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;">
+          <i class="ti ti-receipt" style="color:#A5B4FC;font-size:17px;"></i>
+        </div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#fff;">Gerar Recibo</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.5);" id="recibo-pac-nome-sub">—</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="fecharModal()" style="color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.08);border-radius:8px;"><i class="ti ti-x"></i></button>
+    </div>
+    <div style="padding:20px 22px;overflow-y:auto;max-height:calc(90vh - 80px);">
+
+      <!-- Tipo de recibo -->
+      <div style="margin-bottom:16px;">
+        <label style="font-size:12px;font-weight:600;color:var(--t2);display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px;">Tipo de recibo</label>
+        <div style="display:flex;gap:8px;">
+          <button id="recibo-tipo-sessao" onclick="selecionarTipoRecibo('sessao')" style="flex:1;padding:10px;border-radius:10px;border:2px solid #4F46E5;background:#EEF2FF;color:#4F46E5;font-size:12.5px;font-weight:600;cursor:pointer;">
+            <i class="ti ti-calendar-event"></i> Sessão avulsa
+          </button>
+          <button id="recibo-tipo-mensal" onclick="selecionarTipoRecibo('mensal')" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:none;color:var(--t2);font-size:12.5px;font-weight:600;cursor:pointer;">
+            <i class="ti ti-calendar-month"></i> Pacote mensal
+          </button>
+        </div>
+      </div>
+
+      <!-- Quem foi atendido -->
+      <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Quem foi atendido</div>
+        <div class="form-row" style="margin-bottom:0;">
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">Nome do paciente</label><input class="form-input" id="recibo-pac-nome" placeholder="Nome do paciente" readonly style="background:#F3F4F6;"></div>
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">CPF do paciente</label><input class="form-input" id="recibo-pac-cpf" placeholder="—" readonly style="background:#F3F4F6;"></div>
+        </div>
+      </div>
+
+      <!-- Quem pagou -->
+      <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;">Quem pagou</div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--t2);cursor:pointer;">
+            <input type="checkbox" id="recibo-mesmo-pagador" checked onchange="togglePagadorRecibo()" style="accent-color:#4F46E5;"> Mesmo que o paciente
+          </label>
+        </div>
+        <div id="recibo-pagador-fields" style="display:none;">
+          <div class="form-row" style="margin-bottom:0;">
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Nome de quem pagou *</label><input class="form-input" id="recibo-pag-nome" placeholder="Nome completo"></div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">CPF de quem pagou</label><input class="form-input" id="recibo-pag-cpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)"></div>
+          </div>
+        </div>
+        <div id="recibo-mesmo-info" style="font-size:11.5px;color:var(--t3);">O recibo será emitido no nome do próprio paciente.</div>
+      </div>
+
+      <!-- Detalhes do pagamento -->
+      <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Detalhes do pagamento</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Valor total (R$) *</label><input class="form-input" type="number" id="recibo-valor" placeholder="0,00" oninput="atualizarTextoRecibo()"></div>
+          <div class="form-group"><label class="form-label">Data do pagamento *</label><input class="form-input" type="date" id="recibo-data" oninput="atualizarTextoRecibo()"></div>
+        </div>
+        <div id="recibo-sessoes-wrap">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Quantidade de sessões</label><input class="form-input" type="number" id="recibo-qtd-sess" placeholder="1" min="1" value="1" oninput="atualizarTextoRecibo()"></div>
+            <div class="form-group"><label class="form-label">Período de referência</label><input class="form-input" id="recibo-periodo" placeholder="Ex: julho/2025" oninput="atualizarTextoRecibo()"></div>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Forma de pagamento</label>
+          <select class="form-input" id="recibo-forma" onchange="atualizarTextoRecibo()">
+            <option>Pix</option><option>Transferência bancária</option><option>Cartão</option><option>Dinheiro</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Texto gerado -->
+      <div style="margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <label style="font-size:12px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;">Texto do recibo</label>
+          <button onclick="atualizarTextoRecibo()" style="font-size:11px;color:#4F46E5;background:#EEF2FF;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;"><i class="ti ti-refresh" style="font-size:11px;"></i> Atualizar</button>
+        </div>
+        <textarea id="recibo-texto" class="form-input" style="min-height:110px;font-size:12.5px;line-height:1.6;" placeholder="Preencha os campos acima para gerar o texto automaticamente..."></textarea>
+        <div style="font-size:11px;color:var(--t3);margin-top:4px;">Você pode editar o texto antes de gerar o PDF.</div>
+      </div>
+
+      <div style="display:flex;gap:8px;">
+        <button onclick="copiarTextoIA('recibo-texto')" class="btn btn-ghost" style="flex:1;"><i class="ti ti-copy"></i> Copiar texto</button>
+        <button onclick="gerarReciboPDF()" class="btn btn-primary" style="flex:1;"><i class="ti ti-file-invoice"></i> Gerar PDF</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL IA PACIENTE -->
   <div class="modal" id="m-ia-paciente" onclick="event.stopPropagation()" style="display:none;max-width:560px;padding:0;overflow:hidden;max-height:90vh;display:flex;flex-direction:column;">
     <div class="ia-pac-header">
@@ -1858,6 +1950,27 @@ tr:hover td{background:#FAFAFF}
         <div class="form-group"><label class="form-label">Abordagem</label><input class="form-input" id="np-abord" placeholder="Ex: TCC, Psicanálise..."></div>
       </div>
       <div class="form-group"><label class="form-label">Queixa principal</label><textarea class="form-input" id="np-queixa" placeholder="Descreva a demanda inicial..."></textarea></div>
+
+      <!-- RESPONSÁVEL FINANCEIRO -->
+      <div style="background:#F8F7FF;border-radius:10px;padding:14px 16px;border:1px solid #EEF2FF;margin-top:4px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:7px;">
+            <i class="ti ti-receipt" style="font-size:15px;color:#4F46E5;"></i>
+            <span style="font-size:12.5px;font-weight:600;color:var(--t1);">Responsável financeiro</span>
+          </div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);cursor:pointer;">
+            <input type="checkbox" id="np-resp-mesmo" checked onchange="toggleRespFinanceiro('np')" style="accent-color:#4F46E5;"> Mesmo que o paciente
+          </label>
+        </div>
+        <div id="np-resp-fields" style="display:none;">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Nome do responsável *</label><input class="form-input" id="np-resp-nome" placeholder="Nome completo de quem paga"></div>
+            <div class="form-group"><label class="form-label">CPF do responsável</label><input class="form-input" id="np-resp-cpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)"></div>
+          </div>
+          <div style="font-size:11px;color:var(--t3);margin-top:-4px;">O recibo será emitido no nome e CPF do responsável financeiro.</div>
+        </div>
+        <div id="np-resp-info" style="font-size:11.5px;color:var(--t3);">O recibo será emitido no nome do próprio paciente.</div>
+      </div>
     </div>
     <div class="modal-ft"><button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" onclick="salvarPaciente()"><i class="ti ti-check"></i> Cadastrar</button></div>
   </div>
@@ -1953,6 +2066,26 @@ tr:hover td{background:#FAFAFF}
         <div class="form-group"><label class="form-label">Abordagem</label><input class="form-input" id="ep-abord" placeholder="Ex: TCC, Psicanálise..."></div>
       </div>
       <div class="form-group"><label class="form-label">Queixa principal</label><textarea class="form-input" id="ep-queixa" placeholder="Descreva a demanda inicial..."></textarea></div>
+
+      <!-- RESPONSÁVEL FINANCEIRO -->
+      <div style="background:#F8F7FF;border-radius:10px;padding:14px 16px;border:1px solid #EEF2FF;margin-top:4px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:7px;">
+            <i class="ti ti-receipt" style="font-size:15px;color:#4F46E5;"></i>
+            <span style="font-size:12.5px;font-weight:600;color:var(--t1);">Responsável financeiro</span>
+          </div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);cursor:pointer;">
+            <input type="checkbox" id="ep-resp-mesmo" onchange="toggleRespFinanceiro('ep')" style="accent-color:#4F46E5;"> Mesmo que o paciente
+          </label>
+        </div>
+        <div id="ep-resp-fields">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Nome do responsável</label><input class="form-input" id="ep-resp-nome" placeholder="Nome completo de quem paga"></div>
+            <div class="form-group"><label class="form-label">CPF do responsável</label><input class="form-input" id="ep-resp-cpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)"></div>
+          </div>
+          <div style="font-size:11px;color:var(--t3);margin-top:-4px;">O recibo será emitido no nome e CPF do responsável financeiro.</div>
+        </div>
+      </div>
     </div>
     <div class="modal-ft">
       <button class="btn btn-red btn-sm" onclick="excluirPaciente()"><i class="ti ti-trash"></i> Excluir</button>
@@ -2678,6 +2811,7 @@ function renderPacientes(pacs) {
         '<div style="display:flex;gap:4px;margin-top:6px;justify-content:flex-end;">' +
           '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirPaciente(' + p.id + ')" title="Ver prontuário"><i class="ti ti-notes"></i></button>' +
           '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirIAPaciente(' + p.id + ')" title="IA do paciente" style="color:#818CF8;"><i class="ti ti-sparkles"></i></button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirGerarRecibo(' + p.id + ')" title="Gerar recibo" style="color:#059669;"><i class="ti ti-receipt"></i></button>' +
           '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirEditarPaciente(' + p.id + ')" title="Editar"><i class="ti ti-edit"></i></button>' +
         '</div>' +
       '</div>' +
@@ -2714,6 +2848,8 @@ async function salvarPaciente() {
     email: document.getElementById('np-email').value,
     telefone: document.getElementById('np-tel').value,
     cpf: document.getElementById('np-cpf').value.replace(/\D/g,'') || null,
+    resp_financeiro_nome: document.getElementById('np-resp-mesmo')?.checked ? null : (document.getElementById('np-resp-nome')?.value || null),
+    resp_financeiro_cpf: document.getElementById('np-resp-mesmo')?.checked ? null : (document.getElementById('np-resp-cpf')?.value?.replace(/\D/g,'') || null),
     data_nascimento: document.getElementById('np-nasc').value || null,
     modalidade: document.getElementById('np-modal').value,
     valor_sessao: parseFloat(document.getElementById('np-valor').value) || null,
@@ -2994,6 +3130,162 @@ function renderTabelaFin(lancamentos) {
       '<td><button class="btn btn-ghost btn-sm" onclick="excluirLancamento(' + l.id + ')"><i class="ti ti-trash" style="color:var(--red);"></i></button></td>' +
     '</tr>';
   }).join('');
+}
+
+// ═══ RESPONSÁVEL FINANCEIRO ═══
+function toggleRespFinanceiro(prefix) {
+  const mesmo = document.getElementById(prefix + '-resp-mesmo').checked;
+  const fields = document.getElementById(prefix + '-resp-fields');
+  const info = document.getElementById(prefix + '-resp-info');
+  if (fields) fields.style.display = mesmo ? 'none' : '';
+  if (info) info.style.display = mesmo ? '' : 'none';
+}
+
+// ═══ RECIBO ═══
+var reciboTipo = 'sessao';
+var reciboPacAtual = null;
+
+function abrirGerarRecibo(pacId) {
+  reciboPacAtual = todosPacientes.find(p => p.id == pacId);
+  if (!reciboPacAtual) return;
+  const p = reciboPacAtual;
+
+  // Preencher dados do paciente
+  document.getElementById('recibo-pac-nome-sub').textContent = p.nome || '—';
+  document.getElementById('recibo-pac-nome').value = p.nome || '';
+  document.getElementById('recibo-pac-cpf').value = p.cpf ? formatarCPF(p.cpf) : 'Não cadastrado';
+
+  // Preencher responsável financeiro se houver
+  const temResp = p.resp_financeiro_nome && p.resp_financeiro_nome !== p.nome;
+  const mesmoEl = document.getElementById('recibo-mesmo-pagador');
+  if (mesmoEl) mesmoEl.checked = !temResp;
+  if (temResp) {
+    document.getElementById('recibo-pag-nome').value = p.resp_financeiro_nome || '';
+    document.getElementById('recibo-pag-cpf').value = p.resp_financeiro_cpf ? formatarCPF(p.resp_financeiro_cpf) : '';
+  }
+  togglePagadorRecibo();
+
+  // Data de hoje
+  document.getElementById('recibo-data').value = new Date().toISOString().split('T')[0];
+  document.getElementById('recibo-qtd-sess').value = 1;
+  document.getElementById('recibo-valor').value = p.valor_sessao || '';
+  const mesAtual = new Date().toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+  document.getElementById('recibo-periodo').value = mesAtual;
+
+  selecionarTipoRecibo('sessao');
+  atualizarTextoRecibo();
+  abrirModal('recibo');
+}
+
+function selecionarTipoRecibo(tipo) {
+  reciboTipo = tipo;
+  const btnS = document.getElementById('recibo-tipo-sessao');
+  const btnM = document.getElementById('recibo-tipo-mensal');
+  const wrap = document.getElementById('recibo-sessoes-wrap');
+
+  if (tipo === 'sessao') {
+    btnS.style.border = '2px solid #4F46E5'; btnS.style.background = '#EEF2FF'; btnS.style.color = '#4F46E5';
+    btnM.style.border = '2px solid var(--border)'; btnM.style.background = 'none'; btnM.style.color = 'var(--t2)';
+    document.getElementById('recibo-qtd-sess').value = 1;
+  } else {
+    btnM.style.border = '2px solid #4F46E5'; btnM.style.background = '#EEF2FF'; btnM.style.color = '#4F46E5';
+    btnS.style.border = '2px solid var(--border)'; btnS.style.background = 'none'; btnS.style.color = 'var(--t2)';
+  }
+  atualizarTextoRecibo();
+}
+
+function togglePagadorRecibo() {
+  const mesmo = document.getElementById('recibo-mesmo-pagador').checked;
+  const fields = document.getElementById('recibo-pagador-fields');
+  const info = document.getElementById('recibo-mesmo-info');
+  if (fields) fields.style.display = mesmo ? 'none' : '';
+  if (info) info.style.display = mesmo ? '' : 'none';
+  atualizarTextoRecibo();
+}
+
+function atualizarTextoRecibo() {
+  const p = reciboPacAtual;
+  if (!p) return;
+
+  const mesmo = document.getElementById('recibo-mesmo-pagador')?.checked;
+  const nomePag = mesmo ? (p.nome || '—') : (document.getElementById('recibo-pag-nome')?.value || '—');
+  const cpfPag = mesmo ? (p.cpf ? formatarCPF(p.cpf) : '') : (document.getElementById('recibo-pag-cpf')?.value || '');
+  const nomePac = p.nome || '—';
+  const valor = parseFloat(document.getElementById('recibo-valor')?.value || 0);
+  const dataEl = document.getElementById('recibo-data')?.value;
+  const dataFmt = dataEl ? new Date(dataEl + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
+  const forma = document.getElementById('recibo-forma')?.value || 'Pix';
+  const qtd = parseInt(document.getElementById('recibo-qtd-sess')?.value || 1);
+  const periodo = document.getElementById('recibo-periodo')?.value || '';
+  const valorFmt = valor.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+
+  let texto = '';
+  if (reciboTipo === 'sessao') {
+    texto = 'Recebi de ' + nomePag + (cpfPag ? ', CPF ' + cpfPag + ',' : ',') +
+      ' a importância de ' + valorFmt +
+      ' referente a ' + (qtd === 1 ? '1 (uma) sessão' : qtd + ' sessões') + ' de psicoterapia' +
+      (nomePag !== nomePac ? ', realizadas por ' + nomePac + ',' : '') +
+      ' efetuado via ' + forma +
+      ', em ' + dataFmt + '.';
+  } else {
+    texto = 'Recebi de ' + nomePag + (cpfPag ? ', CPF ' + cpfPag + ',' : ',') +
+      ' a importância de ' + valorFmt +
+      ' referente ao pacote mensal de ' + qtd + ' sessão(ões) de psicoterapia' +
+      (periodo ? ' referente ao mês de ' + periodo : '') +
+      (nomePag !== nomePac ? ', realizadas por ' + nomePac + ',' : '') +
+      ', efetuado via ' + forma +
+      ', em ' + dataFmt + '.';
+  }
+
+  const textoEl = document.getElementById('recibo-texto');
+  if (textoEl) textoEl.value = texto;
+}
+
+async function gerarReciboPDF() {
+  const texto = document.getElementById('recibo-texto')?.value;
+  const p = reciboPacAtual;
+  if (!texto || !p) return;
+
+  const mesmo = document.getElementById('recibo-mesmo-pagador')?.checked;
+  const nomePag = mesmo ? (p.nome || '—') : (document.getElementById('recibo-pag-nome')?.value || '—');
+  const valor = parseFloat(document.getElementById('recibo-valor')?.value || 0);
+  const dataEl = document.getElementById('recibo-data')?.value;
+  const dataFmt = dataEl ? new Date(dataEl + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
+  const valorFmt = valor.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+
+  // Buscar dados do psicólogo
+  const { data: { user } } = await sb.auth.getUser();
+  const { data: cfg } = await sb.from('configuracoes').select('*').eq('user_id', user.id).single();
+  const nomePsi = cfg?.nome || 'Psicólogo(a)';
+  const crp = cfg?.crp || '—';
+
+  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Recibo</title>' +
+    '<style>body{font-family:Arial,sans-serif;max-width:600px;margin:40px auto;padding:40px;border:1px solid #ddd;border-radius:8px;}' +
+    'h1{font-size:20px;color:#1E1B4B;margin-bottom:4px;}' +
+    '.sub{font-size:12px;color:#666;margin-bottom:24px;}' +
+    '.valor{font-size:28px;font-weight:700;color:#4F46E5;margin:16px 0;}' +
+    '.texto{font-size:14px;line-height:1.8;padding:16px;background:#F8F7FF;border-radius:8px;border-left:4px solid #4F46E5;margin:20px 0;}' +
+    '.assinatura{margin-top:48px;text-align:center;border-top:1px solid #ddd;padding-top:20px;}' +
+    '.footer{font-size:11px;color:#999;text-align:center;margin-top:24px;}' +
+    '</style></head><body>' +
+    '<h1>Recibo de Pagamento</h1>' +
+    '<div class="sub">Serviços de Psicologia — CBO 2515-40</div>' +
+    '<div class="valor">' + valorFmt + '</div>' +
+    '<div class="texto">' + texto + '</div>' +
+    '<div class="assinatura">' +
+    '<div style="width:200px;border-top:1px solid #333;margin:0 auto 8px;"></div>' +
+    '<div style="font-size:13px;font-weight:600;">' + nomePsi + '</div>' +
+    '<div style="font-size:12px;color:#666;">Psicólogo(a) — CRP ' + crp + '</div>' +
+    '<div style="font-size:12px;color:#666;">Data: ' + dataFmt + '</div>' +
+    '</div>' +
+    '<div class="footer">Documento gerado pelo LumaPsi — Sistema Clínico</div>' +
+    '</body></html>';
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  setTimeout(() => win.print(), 500);
+  toast('Recibo gerado!', 'success');
 }
 
 function mascaraCPF(input) {
@@ -4325,6 +4617,15 @@ function abrirEditarPaciente(id) {
   document.getElementById('ep-tel').value = p.telefone || '';
   const cpfEl = document.getElementById('ep-cpf');
   if (cpfEl) cpfEl.value = p.cpf ? formatarCPF(p.cpf) : '';
+  // Responsável financeiro
+  const temResp = p.resp_financeiro_nome;
+  const epMesmo = document.getElementById('ep-resp-mesmo');
+  if (epMesmo) epMesmo.checked = !temResp;
+  const epRespNome = document.getElementById('ep-resp-nome');
+  const epRespCpf = document.getElementById('ep-resp-cpf');
+  if (epRespNome) epRespNome.value = p.resp_financeiro_nome || '';
+  if (epRespCpf) epRespCpf.value = p.resp_financeiro_cpf ? formatarCPF(p.resp_financeiro_cpf) : '';
+  toggleRespFinanceiro('ep');
   document.getElementById('ep-modal').value = p.modalidade || 'Semanal';
   document.getElementById('ep-valor').value = p.valor_sessao || '';
   document.getElementById('ep-status').value = p.status || 'ativo';
@@ -4342,6 +4643,8 @@ async function atualizarPaciente() {
     email: document.getElementById('ep-email').value,
     telefone: document.getElementById('ep-tel').value,
     cpf: document.getElementById('ep-cpf').value.replace(/\D/g,'') || null,
+    resp_financeiro_nome: document.getElementById('ep-resp-mesmo')?.checked ? null : (document.getElementById('ep-resp-nome')?.value || null),
+    resp_financeiro_cpf: document.getElementById('ep-resp-mesmo')?.checked ? null : (document.getElementById('ep-resp-cpf')?.value?.replace(/\D/g,'') || null),
     data_nascimento: document.getElementById('ep-nasc').value || null,
     modalidade: document.getElementById('ep-modal').value,
     valor_sessao: parseFloat(document.getElementById('ep-valor').value) || null,
