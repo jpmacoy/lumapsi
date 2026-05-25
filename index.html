@@ -840,6 +840,7 @@ tr:hover td{background:#FAFAFF}
           <button class="btn btn-ghost btn-sm" onclick="exportarPDF()"><i class="ti ti-file-type-pdf"></i> Exportar PDF</button>
           <button class="btn btn-sm" style="background:var(--brand-light);color:var(--brand-dark);border:none;" onclick="gerarResumoProntuarioIA(document.getElementById('sel-pac-pront').value)"><i class="ti ti-sparkles"></i> Resumo com IA</button>
           <button class="btn btn-sm" style="background:#EEF2FF;color:#4F46E5;border:none;" onclick="abrirDocumentos()"><i class="ti ti-file-certificate"></i> Documentos</button>
+          <button class="btn btn-sm" style="background:#ECFDF5;color:#059669;border:none;" onclick="abrirNovoPacote()"><i class="ti ti-calendar-month"></i> Pacote mensal</button>
           <div style="flex:1;"></div>
           <button class="btn btn-primary btn-sm" onclick="abrirModal('nova-evolucao')"><i class="ti ti-plus"></i> Nova evolução</button>
         </div>
@@ -847,6 +848,7 @@ tr:hover td{background:#FAFAFF}
           <div id="pront-evolucoes"><div class="empty"><i class="ti ti-notes"></i><p>Selecione um paciente para ver o prontuário</p></div></div>
           <div>
             <div class="card mb16" id="pront-dados"><div style="padding:16px;color:var(--t3);font-size:13px;">Selecione um paciente</div></div>
+            <div id="pront-pacotes"></div>
           </div>
         </div>
       </div>
@@ -2095,6 +2097,53 @@ tr:hover td{background:#FAFAFF}
     </div>
   </div>
 
+  <!-- MODAL PACOTE MENSAL -->
+  <div class="modal" id="m-pacote" onclick="event.stopPropagation()" style="display:none;max-width:480px;">
+    <div class="modal-hd">
+      <span class="modal-title"><i class="ti ti-calendar-month" style="color:#4F46E5;"></i> Novo pacote mensal</span>
+      <button class="modal-close" onclick="fecharModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="background:#EEF2FF;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:#3730A3;display:flex;align-items:flex-start;gap:8px;">
+        <i class="ti ti-info-circle" style="font-size:15px;flex-shrink:0;margin-top:1px;"></i>
+        <span>Registre o pagamento antecipado do pacote. O sistema vai controlar quantas sessões do pacote já foram realizadas.</span>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Paciente *</label>
+          <select class="form-input" id="pac-id-pacote"><option value="">Selecione...</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Mês de referência *</label>
+          <input class="form-input" type="month" id="pac-mes">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Total de sessões do pacote *</label>
+          <input class="form-input" type="number" id="pac-total-sess" placeholder="4" min="1" value="4">
+        </div>
+        <div class="form-group"><label class="form-label">Valor total pago (R$) *</label>
+          <input class="form-input" type="number" id="pac-valor" placeholder="0,00">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Data do pagamento *</label>
+          <input class="form-input" type="date" id="pac-data-pag">
+        </div>
+        <div class="form-group"><label class="form-label">Forma de pagamento</label>
+          <select class="form-input" id="pac-forma">
+            <option>Pix</option><option>Transferência</option><option>Cartão</option><option>Dinheiro</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Observações</label>
+        <input class="form-input" id="pac-obs" placeholder="Ex: Pacote de julho — 4 sessões semanais">
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPacote()"><i class="ti ti-check"></i> Registrar pacote</button>
+    </div>
+  </div>
+
   <!-- Editar Sessão -->
   <div class="modal" id="m-editar-sessao" onclick="event.stopPropagation()" style="display:none;">
     <div class="modal-hd"><span class="modal-title">Editar sessão</span><button class="modal-close" onclick="fecharModal()"><i class="ti ti-x"></i></button></div>
@@ -2911,6 +2960,8 @@ async function carregarProntuario() {
       (tags ? '<div class="evol-tags">' + tags + '</div>' : '') +
     '</div>';
   }).join('');
+  // Carregar pacotes do paciente
+  carregarPacotesPaciente(pacId);
 }
 
 async function salvarEvolucao() {
@@ -3144,6 +3195,143 @@ function toggleRespFinanceiro(prefix) {
 // ═══ RECIBO ═══
 var reciboTipo = 'sessao';
 var reciboPacAtual = null;
+
+// ═══ PACOTES MENSAIS ═══
+
+function abrirNovoPacote() {
+  const pacId = document.getElementById('sel-pac-pront')?.value;
+  // Preencher select de pacientes
+  const sel = document.getElementById('pac-id-pacote');
+  if (sel) {
+    sel.innerHTML = '<option value="">Selecione...</option>' +
+      todosPacientes.filter(p => p.status === 'ativo').map(p =>
+        '<option value="' + p.id + '" ' + (pacId && p.id == pacId ? 'selected' : '') + '>' + p.nome + '</option>'
+      ).join('');
+  }
+  // Data padrão
+  const hoje = new Date();
+  const mesInput = document.getElementById('pac-mes');
+  if (mesInput) mesInput.value = hoje.toISOString().substring(0,7);
+  const dataPag = document.getElementById('pac-data-pag');
+  if (dataPag) dataPag.value = hoje.toISOString().split('T')[0];
+  // Valor padrão do paciente
+  if (pacId) {
+    const pac = todosPacientes.find(p => p.id == pacId);
+    const valEl = document.getElementById('pac-valor');
+    if (valEl && pac?.valor_sessao) valEl.value = pac.valor_sessao * 4;
+  }
+  abrirModal('pacote');
+}
+
+async function salvarPacote() {
+  const pacId = document.getElementById('pac-id-pacote').value;
+  const mes = document.getElementById('pac-mes').value;
+  const totalSess = parseInt(document.getElementById('pac-total-sess').value);
+  const valor = parseFloat(document.getElementById('pac-valor').value);
+  const dataPag = document.getElementById('pac-data-pag').value;
+  const forma = document.getElementById('pac-forma').value;
+  const obs = document.getElementById('pac-obs').value;
+
+  if (!pacId) { toast('Selecione o paciente', 'error'); return; }
+  if (!mes) { toast('Selecione o mês de referência', 'error'); return; }
+  if (!totalSess || totalSess < 1) { toast('Informe o total de sessões', 'error'); return; }
+  if (!valor || valor <= 0) { toast('Informe o valor pago', 'error'); return; }
+
+  const { data: { user } } = await sb.auth.getUser();
+  const { error } = await sb.from('pacotes').insert({
+    user_id: user.id,
+    paciente_id: parseInt(pacId),
+    mes_referencia: mes,
+    total_sessoes: totalSess,
+    sessoes_utilizadas: 0,
+    valor_total: valor,
+    data_pagamento: dataPag || null,
+    forma_pagamento: forma,
+    observacoes: obs || null,
+    status: 'ativo'
+  });
+
+  if (error) { toast('Erro ao salvar pacote: ' + error.message, 'error'); return; }
+  toast('Pacote registrado com sucesso!', 'success');
+  fecharModal();
+  // Recarregar pacotes do prontuário se o paciente estiver aberto
+  const pacPront = document.getElementById('sel-pac-pront')?.value;
+  if (pacPront == pacId) carregarPacotesPaciente(pacId);
+}
+
+async function carregarPacotesPaciente(pacId) {
+  if (!pacId) return;
+  const el = document.getElementById('pront-pacotes');
+  if (!el) return;
+
+  const { data: pacotes } = await sb.from('pacotes')
+    .select('*')
+    .eq('paciente_id', pacId)
+    .eq('status', 'ativo')
+    .order('mes_referencia', { ascending: false })
+    .limit(3);
+
+  if (!pacotes || !pacotes.length) {
+    el.innerHTML = '';
+    return;
+  }
+
+  el.innerHTML = pacotes.map(pk => {
+    const utilizadas = pk.sessoes_utilizadas || 0;
+    const total = pk.total_sessoes || 0;
+    const restantes = total - utilizadas;
+    const pct = total > 0 ? Math.round(utilizadas / total * 100) : 0;
+    const mes = pk.mes_referencia ? new Date(pk.mes_referencia + '-01').toLocaleDateString('pt-BR', {month:'long', year:'numeric'}) : '—';
+    const cor = restantes === 0 ? '#059669' : restantes === 1 ? '#D97706' : '#4F46E5';
+    const bgCor = restantes === 0 ? '#ECFDF5' : restantes === 1 ? '#FEF3C7' : '#EEF2FF';
+
+    return '<div class="card mb12" style="padding:14px 16px;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
+        '<div style="display:flex;align-items:center;gap:7px;">' +
+          '<i class="ti ti-calendar-month" style="font-size:14px;color:#4F46E5;"></i>' +
+          '<span style="font-size:12.5px;font-weight:600;color:var(--t1);">Pacote — ' + mes + '</span>' +
+        '</div>' +
+        '<span style="font-size:11px;font-weight:600;background:' + bgCor + ';color:' + cor + ';padding:3px 9px;border-radius:20px;">' +
+          (restantes === 0 ? 'Concluído' : restantes + ' restante' + (restantes > 1 ? 's' : '')) +
+        '</span>' +
+      '</div>' +
+      '<div style="background:var(--bg);border-radius:6px;height:7px;overflow:hidden;margin-bottom:8px;">' +
+        '<div style="height:100%;background:' + cor + ';border-radius:6px;width:' + pct + '%;transition:width .6s ease;"></div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+        '<span style="font-size:11.5px;color:var(--t2);">' + utilizadas + ' de ' + total + ' sessões realizadas</span>' +
+        '<span style="font-size:11.5px;color:var(--t3);">R$ ' + (pk.valor_total || 0).toLocaleString('pt-BR') + '</span>' +
+      '</div>' +
+      '<div style="margin-top:8px;display:flex;gap:6px;">' +
+        '<button onclick="marcarSessaoPacote(' + pk.id + ',true)" class="btn btn-ghost btn-sm" style="flex:1;font-size:11px;" ' + (restantes === 0 ? 'disabled' : '') + '>' +
+          '<i class="ti ti-plus" style="font-size:12px;"></i> Registrar sessão' +
+        '</button>' +
+        '<button onclick="marcarSessaoPacote(' + pk.id + ',false)" class="btn btn-ghost btn-sm" style="font-size:11px;color:var(--t3);" ' + (utilizadas === 0 ? 'disabled' : '') + '>' +
+          '<i class="ti ti-minus" style="font-size:12px;"></i>' +
+        '</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function marcarSessaoPacote(pacoteId, incrementar) {
+  const { data: pk } = await sb.from('pacotes').select('*').eq('id', pacoteId).single();
+  if (!pk) return;
+
+  const novoVal = incrementar
+    ? Math.min(pk.total_sessoes, (pk.sessoes_utilizadas || 0) + 1)
+    : Math.max(0, (pk.sessoes_utilizadas || 0) - 1);
+
+  const novoStatus = novoVal >= pk.total_sessoes ? 'concluido' : 'ativo';
+
+  await sb.from('pacotes').update({ sessoes_utilizadas: novoVal, status: novoStatus }).eq('id', pacoteId);
+
+  const msg = incrementar
+    ? (novoVal >= pk.total_sessoes ? 'Pacote concluído! 🎉' : 'Sessão registrada — ' + novoVal + '/' + pk.total_sessoes)
+    : 'Sessão removida';
+  toast(msg, 'success');
+  carregarPacotesPaciente(pk.paciente_id);
+}
 
 function abrirGerarRecibo(pacId) {
   reciboPacAtual = todosPacientes.find(p => p.id == pacId);
