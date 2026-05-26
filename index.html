@@ -2072,6 +2072,22 @@ tr:hover td{background:#FAFAFF}
         </div>
       </div>
       <div class="form-group"><label class="form-label">Técnicas utilizadas</label><input class="form-input" id="ne-tec" placeholder="Ex: Reestruturação cognitiva, Exposição graduada..."></div>
+
+      <!-- INSTRUMENTOS PSICOLÓGICOS -->
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>Instrumentos utilizados <span style="font-size:10.5px;color:var(--t3);font-weight:400;">(opcional)</span></span>
+          <span style="font-size:10.5px;color:#4F46E5;cursor:pointer;" onclick="document.getElementById('ne-instr-busca').focus()">+ Adicionar</span>
+        </label>
+        <div style="position:relative;margin-bottom:8px;">
+          <input class="form-input" id="ne-instr-busca" placeholder="Buscar instrumento... (ex: BDI, Rorschach, WISC)" oninput="filtrarInstrumentos(this.value)" onfocus="mostrarListaInstrumentos()" style="padding-right:36px;">
+          <i class="ti ti-search" style="position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--t3);pointer-events:none;"></i>
+        </div>
+        <div id="ne-instr-lista" style="display:none;max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:9px;background:var(--surface);margin-bottom:8px;"></div>
+        <div id="ne-instr-selecionados" style="display:flex;flex-wrap:wrap;gap:6px;min-height:0;"></div>
+        <input type="hidden" id="ne-instrumentos">
+      </div>
+
       <div class="form-group"><label class="form-label">Próximos passos</label><textarea class="form-input" id="ne-prox" placeholder="Tarefas, objetivos para próxima sessão..."></textarea></div>
       <div class="form-group"><label class="form-label">Tags (separadas por vírgula)</label><input class="form-input" id="ne-tags" placeholder="Ex: TCC, Ansiedade, Trabalho"></div>
     </div>
@@ -3114,11 +3130,189 @@ async function carregarProntuario() {
       '</div>' +
       (e.texto ? '<div class="evol-text">' + e.texto + '</div>' : '') +
       (e.tecnicas ? '<div style="font-size:12px;color:var(--t2);margin-bottom:8px;"><strong>Técnicas:</strong> ' + e.tecnicas + '</div>' : '') +
+      (e.instrumentos ? '<div style="font-size:12px;color:var(--t2);margin-bottom:8px;display:flex;align-items:flex-start;gap:6px;"><i class=\'ti ti-tool\'style=\'font-size:13px;color:#4F46E5;margin-top:1px;flex-shrink:0;\'></i><span><strong>Instrumentos:</strong> ' + e.instrumentos + '</span></div>' : '') +
       (e.proximos_passos ? '<div style="font-size:12px;color:var(--t2);margin-bottom:8px;"><strong>Próximos passos:</strong> ' + e.proximos_passos + '</div>' : '') +
       (tags ? '<div class="evol-tags">' + tags + '</div>' : '') +
     '</div>';
   }).join('');
 
+}
+
+// ═══ INSTRUMENTOS PSICOLÓGICOS ═══
+const INSTRUMENTOS_CFP = [
+  // Personalidade e Projetivos
+  { nome:'HTP (Casa-Árvore-Pessoa)', cat:'Projetivo' },
+  { nome:'Rorschach', cat:'Projetivo' },
+  { nome:'TAT (Teste de Apercepção Temática)', cat:'Projetivo' },
+  { nome:'CAT (Teste de Apercepção Infantil)', cat:'Projetivo' },
+  { nome:'Zulliger (Z-Teste)', cat:'Projetivo' },
+  { nome:'Machover (Figura Humana)', cat:'Projetivo' },
+  { nome:'PMK (Psicodiagnóstico Miocinético)', cat:'Personalidade' },
+  { nome:'Palográfico', cat:'Personalidade' },
+  { nome:'MMPI-2 (Inventário de Personalidade)', cat:'Personalidade' },
+  { nome:'16PF (Fatores de Personalidade)', cat:'Personalidade' },
+  { nome:'IFP-II (Inventário Fatorial de Personalidade)', cat:'Personalidade' },
+  { nome:'NEOPI-3', cat:'Personalidade' },
+  // Inteligência e Cognição
+  { nome:'WISC-V (Crianças e Adolescentes)', cat:'Inteligência' },
+  { nome:'WAIS-IV (Adultos)', cat:'Inteligência' },
+  { nome:'WPPSI-IV (Pré-escolar)', cat:'Inteligência' },
+  { nome:'Raven (Matrizes Progressivas)', cat:'Inteligência' },
+  { nome:'TIG-NV (Teste de Inteligência Geral)', cat:'Inteligência' },
+  { nome:'Bender (Gestalt Visomotor)', cat:'Cognição' },
+  { nome:'Figura de Rey (Memória Visual)', cat:'Cognição' },
+  { nome:'Trail Making Test A e B', cat:'Cognição' },
+  { nome:'WCST (Classificação de Cartas)', cat:'Cognição' },
+  // Saúde Mental
+  { nome:'BDI-II (Depressão — Beck)', cat:'Saúde Mental' },
+  { nome:'BAI (Ansiedade — Beck)', cat:'Saúde Mental' },
+  { nome:'PHQ-9 (Depressão)', cat:'Saúde Mental' },
+  { nome:'GAD-7 (Ansiedade Generalizada)', cat:'Saúde Mental' },
+  { nome:'DASS-21 (Depressão, Ansiedade e Estresse)', cat:'Saúde Mental' },
+  { nome:'SCL-90-R (Sintomas Psicopatológicos)', cat:'Saúde Mental' },
+  { nome:'BSI (Inventário Breve de Sintomas)', cat:'Saúde Mental' },
+  { nome:'PANSS (Sintomas Psicóticos)', cat:'Saúde Mental' },
+  // Atenção e Neuropsicologia
+  { nome:'NEUPSILIN (Neuropsicologia)', cat:'Neuropsicologia' },
+  { nome:'MoCA (Avaliação Cognitiva)', cat:'Neuropsicologia' },
+  { nome:'MEEM (Mini-Exame Estado Mental)', cat:'Neuropsicologia' },
+  { nome:'CPT (Atenção Sustentada)', cat:'Atenção' },
+  { nome:'TAVIS-4 (Atenção Visual)', cat:'Atenção' },
+  { nome:'Cancelamento de Figuras', cat:'Atenção' },
+  // Desenvolvimento
+  { nome:'Denver II (Triagem Desenvolvimento)', cat:'Desenvolvimento' },
+  { nome:'Bayley (Desenvolvimento Infantil)', cat:'Desenvolvimento' },
+  { nome:'Vineland (Comportamento Adaptativo)', cat:'Desenvolvimento' },
+  { nome:'M-CHAT (Autismo)', cat:'Desenvolvimento' },
+  // Outros
+  { nome:'PCL-5 (TEPT)', cat:'Trauma' },
+  { nome:'IES-R (Estresse Pós-Traumático)', cat:'Trauma' },
+  { nome:'AUDIT (Álcool)', cat:'Dependência' },
+  { nome:'CAGE (Álcool)', cat:'Dependência' },
+  { nome:'Y-BOCS (TOC)', cat:'Saúde Mental' },
+  { nome:'SPIN (Fobia Social)', cat:'Saúde Mental' },
+];
+
+let instrumentosSelecionados = [];
+
+function mostrarListaInstrumentos() {
+  filtrarInstrumentos(document.getElementById('ne-instr-busca')?.value || '');
+  document.addEventListener('click', fecharListaInstrumentos, { once: true });
+}
+
+function fecharListaInstrumentos(e) {
+  const lista = document.getElementById('ne-instr-lista');
+  const busca = document.getElementById('ne-instr-busca');
+  if (lista && busca && !lista.contains(e.target) && e.target !== busca) {
+    lista.style.display = 'none';
+  }
+}
+
+function filtrarInstrumentos(query) {
+  const lista = document.getElementById('ne-instr-lista');
+  if (!lista) return;
+
+  const q = query.toLowerCase().trim();
+  const filtrados = q
+    ? INSTRUMENTOS_CFP.filter(i => i.nome.toLowerCase().includes(q) || i.cat.toLowerCase().includes(q))
+    : INSTRUMENTOS_CFP;
+
+  lista.style.display = 'block';
+  lista.innerHTML = '';
+
+  if (!filtrados.length) {
+    lista.innerHTML = '<div style="padding:10px 12px;font-size:12px;color:var(--t3);">Nenhum instrumento encontrado.</div>';
+    return;
+  }
+
+  const grupos = {};
+  filtrados.forEach(i => {
+    if (!grupos[i.cat]) grupos[i.cat] = [];
+    grupos[i.cat].push(i);
+  });
+
+  Object.entries(grupos).forEach(([cat, items]) => {
+    const catDiv = document.createElement('div');
+    catDiv.style.cssText = 'padding:6px 12px 2px;font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;';
+    catDiv.textContent = cat;
+    lista.appendChild(catDiv);
+    items.forEach(i => {
+      const jaSel = instrumentosSelecionados.includes(i.nome);
+      const div = document.createElement('div');
+      div.style.cssText = 'padding:8px 14px;font-size:12.5px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;' + (jaSel ? 'color:#4F46E5;background:#EEF2FF;' : '');
+      div.onmouseenter = function() { if (!jaSel) this.style.background='var(--bg)'; };
+      div.onmouseleave = function() { if (!jaSel) this.style.background=''; };
+      const nomeCopy = i.nome;
+      div.onclick = function() { selecionarInstrumento(nomeCopy); };
+      const span = document.createElement('span');
+      span.textContent = i.nome;
+      div.appendChild(span);
+      if (jaSel) {
+        const icon = document.createElement('i');
+        icon.className = 'ti ti-check';
+        icon.style.cssText = 'font-size:13px;color:#4F46E5;';
+        div.appendChild(icon);
+      }
+      lista.appendChild(div);
+    });
+  });
+
+  if (q && !INSTRUMENTOS_CFP.find(i => i.nome.toLowerCase() === q)) {
+    const addDiv = document.createElement('div');
+    addDiv.style.cssText = 'border-top:1px solid var(--border);padding:8px 14px;font-size:12px;color:#4F46E5;cursor:pointer;display:flex;align-items:center;gap:6px;';
+    addDiv.onmouseenter = function() { this.style.background='var(--bg)'; };
+    addDiv.onmouseleave = function() { this.style.background=''; };
+    const qCopy = query;
+    addDiv.onclick = function() { selecionarInstrumento(qCopy); };
+    addDiv.innerHTML = '<i class="ti ti-plus" style="font-size:13px;"></i>Adicionar "' + query + '"';
+    lista.appendChild(addDiv);
+  }
+}
+
+
+function selecionarInstrumento(nome) {
+  if (instrumentosSelecionados.includes(nome)) {
+    instrumentosSelecionados = instrumentosSelecionados.filter(i => i !== nome);
+  } else {
+    instrumentosSelecionados.push(nome);
+  }
+  renderInstrumentosSelecionados();
+  filtrarInstrumentos(document.getElementById('ne-instr-busca')?.value || '');
+  // Atualizar campo oculto
+  const hidden = document.getElementById('ne-instrumentos');
+  if (hidden) hidden.value = instrumentosSelecionados.join(', ');
+}
+
+function renderInstrumentosSelecionados() {
+  const el = document.getElementById('ne-instr-selecionados');
+  if (!el) return;
+  el.innerHTML = '';
+  if (!instrumentosSelecionados.length) return;
+  instrumentosSelecionados.forEach(nome => {
+    const span = document.createElement('span');
+    span.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:#EEF2FF;color:#3730A3;font-size:11.5px;font-weight:500;padding:4px 10px;border-radius:20px;';
+    const txt = document.createTextNode(nome.split('(')[0].trim() + ' ');
+    span.appendChild(txt);
+    const icon = document.createElement('i');
+    icon.className = 'ti ti-x';
+    icon.style.cssText = 'font-size:11px;cursor:pointer;opacity:.6;';
+    const nomeCopy = nome;
+    icon.onclick = function() { selecionarInstrumento(nomeCopy); };
+    span.appendChild(icon);
+    el.appendChild(span);
+  });
+}
+
+
+function limparInstrumentos() {
+  instrumentosSelecionados = [];
+  renderInstrumentosSelecionados();
+  const busca = document.getElementById('ne-instr-busca');
+  if (busca) busca.value = '';
+  const lista = document.getElementById('ne-instr-lista');
+  if (lista) lista.style.display = 'none';
+  const hidden = document.getElementById('ne-instrumentos');
+  if (hidden) hidden.value = '';
 }
 
 async function salvarEvolucao() {
@@ -3134,6 +3328,7 @@ async function salvarEvolucao() {
     tecnicas: document.getElementById('ne-tec').value,
     proximos_passos: document.getElementById('ne-prox').value,
     tags: document.getElementById('ne-tags').value,
+    instrumentos: document.getElementById('ne-instrumentos')?.value || null,
   }]);
   if (error) { toast('Erro ao salvar evolução: ' + error.message, 'error'); return; }
   fecharModal();
@@ -5806,6 +6001,8 @@ IMPORTANTE:
     if (!texto) throw new Error('Resposta vazia da IA');
 
     document.getElementById('ne-texto').value = texto.trim();
+  // Limpar instrumentos anteriores
+  limparInstrumentos();
     toast('Evolução gerada com sucesso!', 'success');
 
   } catch (e) {
