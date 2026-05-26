@@ -1901,9 +1901,19 @@ tr:hover td{background:#FAFAFF}
     <div class="modal-hd"><span class="modal-title">Nova sessão</span><button class="modal-close" onclick="fecharModal()"><i class="ti ti-x"></i></button></div>
     <div class="modal-body">
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Paciente *</label><select class="form-input" id="ns-pac"><option value="">Selecione...</option></select></div>
+        <div class="form-group"><label class="form-label">Paciente *</label><select class="form-input" id="ns-pac" onchange="mostrarSaldoPacote('ns')"><option value="">Selecione...</option></select></div>
         <div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="ns-tipo" onchange="toggleLinkNs(this.value)"><option>Presencial</option><option>Online</option></select></div>
       </div>
+
+      <!-- AVISO PACOTE -->
+      <div id="ns-pacote-aviso" style="display:none;border-radius:10px;padding:11px 14px;margin-bottom:8px;align-items:center;gap:10px;border:1px solid transparent;">
+        <i class="ti ti-calendar-month" style="font-size:16px;flex-shrink:0;"></i>
+        <div style="flex:1;">
+          <div style="font-size:12px;font-weight:600;" id="ns-pacote-aviso-titulo">—</div>
+          <div style="font-size:11.5px;margin-top:2px;" id="ns-pacote-aviso-sub">—</div>
+        </div>
+      </div>
+
       <div class="form-row">
         <div class="form-group"><label class="form-label">Data *</label><input class="form-input" type="date" id="ns-data"></div>
         <div class="form-group"><label class="form-label">Horário *</label><input class="form-input" type="time" id="ns-hora" value="09:00"></div>
@@ -2216,7 +2226,7 @@ tr:hover td{background:#FAFAFF}
     <div class="modal-body">
       <input type="hidden" id="es-id">
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Paciente</label><select class="form-input" id="es-pac"><option value="">Selecione...</option></select></div>
+        <div class="form-group"><label class="form-label">Paciente</label><select class="form-input" id="es-pac" onchange="mostrarSaldoPacote('es')"><option value="">Selecione...</option></select></div>
         <div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="es-tipo" onchange="toggleLinkEs(this.value)"><option>Presencial</option><option>Online</option></select></div>
       </div>
       <div class="form-row">
@@ -2225,11 +2235,14 @@ tr:hover td{background:#FAFAFF}
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Valor (R$)</label><input class="form-input" type="number" id="es-valor" placeholder="180"></div>
-        <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="es-status" onchange="verificarPacoteAviso('es')"><option>Agendada</option><option>Confirmada</option><option>Realizada</option><option>Cancelada</option></select></div>
+        <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="es-status" onchange="mostrarSaldoPacote('es')"><option>Agendada</option><option>Confirmada</option><option>Realizada</option><option>Cancelada</option></select></div>
       </div>
-      <div id="es-pacote-aviso" style="display:none;background:#ECFDF5;border-radius:9px;padding:10px 13px;border:1px solid #A7F3D0;margin-bottom:12px;display:none;align-items:center;gap:8px;">
-        <i class="ti ti-calendar-month" style="font-size:15px;color:#059669;flex-shrink:0;"></i>
-        <span style="font-size:12px;color:#065F46;" id="es-pacote-aviso-txt">—</span>
+      <div id="es-pacote-aviso" style="display:none;border-radius:10px;padding:11px 14px;margin-bottom:8px;align-items:center;gap:10px;border:1px solid transparent;">
+        <i class="ti ti-calendar-month" style="font-size:16px;flex-shrink:0;"></i>
+        <div style="flex:1;">
+          <div style="font-size:12px;font-weight:600;" id="es-pacote-aviso-titulo">—</div>
+          <div style="font-size:11.5px;margin-top:2px;" id="es-pacote-aviso-sub">—</div>
+        </div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Pagamento</label><select class="form-input" id="es-pag"><option value="">—</option><option>Pix</option><option>Transferência</option><option>Cartão</option><option>Dinheiro</option></select></div>
@@ -5118,55 +5131,84 @@ async function abrirEditarSessao(id) {
   document.getElementById('es-pagst').value = data.status_pagamento || 'Pendente';
   document.getElementById('es-obs').value = data.observacoes || '';
   abrirModal('editar-sessao');
-  // Mostrar saldo do pacote se paciente tem pacote ativo
-  setTimeout(() => verificarPacoteAviso('es'), 100);
+  setTimeout(() => mostrarSaldoPacote('es'), 150);
 }
 
 // ═══ INTEGRAÇÃO PACOTE ↔ SESSÃO ═══
-async function verificarPacoteAviso(prefix) {
+async function mostrarSaldoPacote(prefix) {
   const pacId = parseInt(document.getElementById(prefix + '-pac')?.value) || null;
-  const status = document.getElementById(prefix + '-status')?.value;
+  const status = document.getElementById(prefix + '-status')?.value || '';
   const avisoEl = document.getElementById(prefix + '-pacote-aviso');
-  const avisoTxt = document.getElementById(prefix + '-pacote-aviso-txt');
-  if (!avisoEl || !pacId) { if (avisoEl) avisoEl.style.display = 'none'; return; }
+  if (!avisoEl) return;
+
+  // Sem paciente selecionado
+  if (!pacId) { avisoEl.style.display = 'none'; return; }
 
   const pac = todosPacientes.find(p => p.id == pacId);
-  if (!pac || pac.tipo_pagamento !== 'pacote') { avisoEl.style.display = 'none'; return; }
 
+  // Paciente não é de pacote
+  if (!pac || pac.tipo_pagamento !== 'pacote') {
+    // Preencher valor da sessão automaticamente
+    const valEl = document.getElementById(prefix + '-valor');
+    if (valEl && !valEl.value && pac?.valor_sessao) valEl.value = pac.valor_sessao;
+    avisoEl.style.display = 'none';
+    return;
+  }
+
+  // Preencher valor do pacote automaticamente
+  const valEl = document.getElementById(prefix + '-valor');
+  if (valEl && !valEl.value && pac?.pacote_valor) valEl.value = (pac.pacote_valor / (pac.pacote_qtd || 4)).toFixed(0);
+
+  // Buscar pacote ativo
   const { data: pacotes } = await sb.from('pacotes')
-    .select('*').eq('paciente_id', pacId).eq('status', 'ativo')
+    .select('*').eq('paciente_id', pacId).in('status', ['ativo'])
     .order('mes_referencia', { ascending: false }).limit(1);
 
-  if (!pacotes || !pacotes.length) { avisoEl.style.display = 'none'; return; }
+  const pk = pacotes?.[0];
+  const titulo = document.getElementById(prefix + '-pacote-aviso-titulo');
+  const sub = document.getElementById(prefix + '-pacote-aviso-sub');
+  const icon = avisoEl.querySelector('i');
 
-  const pk = pacotes[0];
+  if (!pk) {
+    // Tem pacote no cadastro mas nenhum pacote registrado ainda
+    avisoEl.style.display = 'flex';
+    avisoEl.style.background = '#FEF3C7';
+    avisoEl.style.border = '1px solid #FDE68A';
+    if (icon) icon.style.color = '#D97706';
+    if (titulo) { titulo.textContent = 'Nenhum pacote ativo'; titulo.style.color = '#92400E'; }
+    if (sub) { sub.textContent = 'Este paciente paga por pacote. Registre o pagamento do mês em Pacientes → ' + pac.nome + '.'; sub.style.color = '#92400E'; }
+    return;
+  }
+
   const utilizadas = pk.sessoes_utilizadas || 0;
   const total = pk.total_sessoes || 0;
   const restantes = total - utilizadas;
   const mes = pk.mes_referencia ? new Date(pk.mes_referencia + '-15').toLocaleDateString('pt-BR', {month:'long', year:'numeric'}) : '—';
+  const mesCapit = mes.charAt(0).toUpperCase() + mes.slice(1);
 
   avisoEl.style.display = 'flex';
 
-  if (status === 'Realizada') {
-    if (restantes <= 0) {
-      avisoEl.style.background = '#FEE2E2';
-      avisoEl.style.borderColor = '#FECACA';
-      avisoTxt.style.color = '#991B1B';
-      avisoEl.querySelector('i').style.color = '#DC2626';
-      avisoTxt.textContent = 'Pacote ' + mes + ' já está concluído (' + utilizadas + '/' + total + ' sessões). Crie um novo pacote.';
-    } else {
-      avisoEl.style.background = '#ECFDF5';
-      avisoEl.style.borderColor = '#A7F3D0';
-      avisoTxt.style.color = '#065F46';
-      avisoEl.querySelector('i').style.color = '#059669';
-      avisoTxt.textContent = '📦 Pacote ' + mes + ' — ' + utilizadas + '/' + total + ' sessões · ' + restantes + ' restante' + (restantes > 1 ? 's' : '') + '. Marcar como Realizada vai debitar 1 sessão.';
-    }
+  if (restantes <= 0) {
+    // Pacote esgotado
+    avisoEl.style.background = '#FEE2E2';
+    avisoEl.style.border = '1px solid #FECACA';
+    if (icon) icon.style.color = '#DC2626';
+    if (titulo) { titulo.textContent = '📦 Pacote ' + mesCapit + ' — Esgotado'; titulo.style.color = '#991B1B'; }
+    if (sub) { sub.textContent = 'Todas as ' + total + ' sessões foram realizadas. Registre o pagamento do próximo mês.'; sub.style.color = '#991B1B'; }
+  } else if (status === 'Realizada') {
+    // Prestes a debitar
+    avisoEl.style.background = '#ECFDF5';
+    avisoEl.style.border = '1px solid #A7F3D0';
+    if (icon) icon.style.color = '#059669';
+    if (titulo) { titulo.textContent = '📦 Pacote ' + mesCapit + ' — ' + utilizadas + '/' + total + ' sessões realizadas'; titulo.style.color = '#065F46'; }
+    if (sub) { sub.textContent = 'Ao salvar como Realizada, ficará ' + (utilizadas + 1) + '/' + total + ' · ' + (restantes - 1) + ' restante' + (restantes - 1 !== 1 ? 's' : '') + '.'; sub.style.color = '#065F46'; }
   } else {
+    // Info normal
     avisoEl.style.background = '#EEF2FF';
-    avisoEl.style.borderColor = '#C7D2FE';
-    avisoTxt.style.color = '#3730A3';
-    avisoEl.querySelector('i').style.color = '#4F46E5';
-    avisoTxt.textContent = '📦 Pacote ' + mes + ' — ' + utilizadas + '/' + total + ' sessões · ' + restantes + ' restante' + (restantes > 1 ? 's' : '');
+    avisoEl.style.border = '1px solid #C7D2FE';
+    if (icon) icon.style.color = '#4F46E5';
+    if (titulo) { titulo.textContent = '📦 Pacote ' + mesCapit + ' — ' + utilizadas + '/' + total + ' sessões realizadas'; titulo.style.color = '#3730A3'; }
+    if (sub) { sub.textContent = restantes + ' sessão' + (restantes !== 1 ? 'ões' : '') + ' restante' + (restantes !== 1 ? 's' : '') + ' neste pacote.'; sub.style.color = '#3730A3'; }
   }
 }
 
