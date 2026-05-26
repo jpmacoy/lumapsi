@@ -787,6 +787,8 @@ tr:hover td{background:#FAFAFF}
             <div class="tab" onclick="filtrarPacientes(this,'ativo')">Ativos</div>
             <div class="tab" onclick="filtrarPacientes(this,'avaliacao')">Em avaliação</div>
             <div class="tab" onclick="filtrarPacientes(this,'inativo')">Inativos</div>
+            <div class="tab" onclick="filtrarPacientes(this,'avulso')" style="color:#4F46E5;">Avulso</div>
+            <div class="tab" onclick="filtrarPacientes(this,'pacote')" style="color:#059669;">Pacote</div>
           </div>
           <div style="flex:1;"></div>
           <div style="position:relative;">
@@ -2917,7 +2919,10 @@ function atualizarMetricasPacientes(pacs) {
 
 function renderPacientes(pacs) {
   const grid = document.getElementById('grid-pacientes');
-  const filtrados = filtroStatus ? pacs.filter(p => p.status === filtroStatus) : pacs;
+  let filtrados = pacs;
+  if (filtroStatus === 'avulso') filtrados = pacs.filter(p => !p.tipo_pagamento || p.tipo_pagamento === 'avulso');
+  else if (filtroStatus === 'pacote') filtrados = pacs.filter(p => p.tipo_pagamento === 'pacote');
+  else if (filtroStatus && filtroStatus !== 'todos') filtrados = pacs.filter(p => p.status === filtroStatus);
   if (!filtrados.length) {
     grid.innerHTML = '<div class="empty" style="grid-column:1/-1;"><i class="ti ti-users-off"></i><p>Nenhum paciente encontrado</p></div>';
     return;
@@ -2962,7 +2967,7 @@ function renderPacientes(pacs) {
 }
 
 function filtrarPacientes(el, status) {
-  filtroStatus = status === 'todos' ? '' : status;
+  filtroStatus = status;
   document.querySelectorAll('#sc-pacientes .tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   renderPacientes(todosPacientes);
