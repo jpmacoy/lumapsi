@@ -2982,25 +2982,33 @@ async function carregarDadosCards() {
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return;
   const agora = new Date();
+  const hoje = agora.toISOString().split('T')[0];
   const mesIni = agora.toISOString().substring(0,7) + '-01';
   const mesFim = agora.toISOString().substring(0,7) + '-31';
 
-  // Próximas sessões por paciente
+  // ── Sessões de hoje (todas, incluindo realizadas) ──
+  const { data: sessHojeData } = await sb.from('sessoes')
+    .select('paciente_id,data_hora,status,status_pagamento,valor')
+    .eq('user_id', user.id)
+    .gte('data_hora', hoje + 'T00:00:00')
+    .lte('data_hora', hoje + 'T23:59:59');
+
+  // ── Próximas sessões futuras por paciente (para mostrar no card) ──
   const { data: proxSess } = await sb.from('sessoes')
     .select('paciente_id,data_hora,status,status_pagamento,valor')
     .eq('user_id', user.id)
-    .gte('data_hora', new Date().toISOString())
+    .gte('data_hora', agora.toISOString())
     .in('status', ['Agendada','Confirmada'])
     .order('data_hora');
 
-  // Sessões do mês para pagamento
+  // ── Sessões do mês ──
   const { data: sessMes } = await sb.from('sessoes')
     .select('paciente_id,status_pagamento,valor,data_hora,status')
     .eq('user_id', user.id)
     .gte('data_hora', mesIni + 'T00:00:00')
     .lte('data_hora', mesFim + 'T23:59:59');
 
-  // Último pagamento por paciente
+  // ── Último pagamento por paciente ──
   const { data: ultPag } = await sb.from('sessoes')
     .select('paciente_id,data_hora,status_pagamento')
     .eq('user_id', user.id)
@@ -3008,22 +3016,42 @@ async function carregarDadosCards() {
     .order('data_hora', { ascending: false })
     .limit(200);
 
-  // Organizar por paciente
+  // ── Pacotes ativos por paciente ──
+  const { data: pacotesAtivos } = await sb.from('pacotes')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('status', 'ativo')
+    .order('mes_referencia', { ascending: false });
+
+  // ── Organizar dados ──
+
+  // Próxima sessão futura por paciente
   _pacSessoes = {};
   (proxSess || []).forEach(s => {
     if (!_pacSessoes[s.paciente_id]) _pacSessoes[s.paciente_id] = s;
   });
 
+  // Também incluir sessões de hoje como próxima se ainda não passou
+  (sessHojeData || []).forEach(s => {
+    if (!_pacSessoes[s.paciente_id] && (s.status === 'Agendada' || s.status === 'Confirmada')) {
+      if (new Date(s.data_hora) >= agora) _pacSessoes[s.paciente_id] = s;
+    }
+  });
+
+  // Pendências financeiras do mês por paciente
   _pacPagamentos = {};
   (sessMes || []).forEach(s => {
-    if (!_pacPagamentos[s.paciente_id]) _pacPagamentos[s.paciente_id] = { pendentes: 0, totalPend: 0 };
+    if (!_pacPagamentos[s.paciente_id]) _pacPagamentos[s.paciente_id] = { pendentes: 0, totalPend: 0, recebido: 0 };
     if (s.status_pagamento === 'Pendente' && s.status === 'Realizada') {
       _pacPagamentos[s.paciente_id].pendentes++;
       _pacPagamentos[s.paciente_id].totalPend += (s.valor || 0);
     }
+    if (s.status_pagamento === 'Pago') {
+      _pacPagamentos[s.paciente_id].recebido += (s.valor || 0);
+    }
   });
 
-  // Último pagamento
+  // Último pagamento por paciente
   _pacUltPag = {};
   (ultPag || []).forEach(s => {
     if (!_pacUltPag[s.paciente_id]) {
@@ -3032,12 +3060,32 @@ async function carregarDadosCards() {
     }
   });
 
-  // Atualizar métricas do topo
+  // Pacote ativo por paciente (mais recente)
+  _pacPacotes = {};
+  (pacotesAtivos || []).forEach(pk => {
+    if (!_pacPacotes[pk.paciente_id]) _pacPacotes[pk.paciente_id] = pk;
+  });
+
+  // Injetar _pacoteAtual nos objetos de todosPacientes
+  todosPacientes.forEach(p => {
+    p._pacoteAtual = _pacPacotes[p.id] || null;
+  });
+
+  // Total recebido no mês
+  const totalRecebMes = Object.values(_pacPagamentos).reduce((s, p) => s + (p.recebido || 0), 0);
+  _totalRecebMes = totalRecebMes;
+
+  // Total sessões hoje
+  _sessHoje = (sessHojeData || []).length;
+
   atualizarMetricasPacientes();
   renderPacientes(todosPacientes);
 }
 
 var _pacUltPag = {};
+var _pacPacotes = {};
+var _totalRecebMes = 0;
+var _sessHoje = 0;
 var ordemPacientes = 'nome';
 
 function ordenarPacientes(ordem) {
@@ -3051,14 +3099,10 @@ function atualizarMetricasPacientes() {
   const ativos = todosPacientes.filter(p => p.status === 'ativo');
   const novos = todosPacientes.filter(p => p.created_at && p.created_at.startsWith(mesAtual));
 
-  // Sessões hoje
-  const hoje = agora.toISOString().split('T')[0];
-  const sessHoje = Object.values(_pacSessoes).filter(s => s.data_hora && s.data_hora.startsWith(hoje)).length;
-
   // Sem agendamento (ativos sem próxima sessão)
   const semAgenda = ativos.filter(p => !_pacSessoes[p.id]).length;
 
-  // Inadimplentes (ativos com pagamento pendente)
+  // Inadimplentes
   const inadimp = ativos.filter(p => _pacPagamentos[p.id]?.pendentes > 0);
   const totalInadim = inadimp.reduce((s, p) => s + (_pacPagamentos[p.id]?.totalPend || 0), 0);
 
@@ -3067,21 +3111,15 @@ function atualizarMetricasPacientes() {
     ? Math.round(ativos.reduce((s, p) => s + (p.valor_sessao || p.pacote_valor || 0), 0) / ativos.length)
     : 0;
 
-  // Recebimentos do mês (aproximado pelos dados de sessões)
-  const recebMes = Object.values(_pacPagamentos).reduce((s, p) => s, 0);
-
   document.getElementById('pm-ativos').textContent = ativos.length;
   document.getElementById('pm-ativos-sub').textContent = '+' + novos.length + ' este mês';
-  document.getElementById('pm-sess-hoje').textContent = sessHoje;
+  document.getElementById('pm-sess-hoje').textContent = _sessHoje;
   document.getElementById('pm-sem-agenda').textContent = semAgenda;
   document.getElementById('pm-inadimp').textContent = inadimp.length;
-  document.getElementById('pm-inadimp-sub').textContent = inadimp.length > 0 ? 'R$' + totalInadim.toLocaleString('pt-BR') + ' pendentes' : 'Em dia';
+  document.getElementById('pm-inadimp-sub').textContent = inadimp.length > 0 ? 'R$ ' + totalInadim.toLocaleString('pt-BR') + ' pendentes' : 'Em dia ✓';
   document.getElementById('pm-novos').textContent = novos.length;
-  document.getElementById('pm-total').textContent = todosPacientes.length;
-  document.getElementById('pm-ticket').textContent = ticket > 0 ? 'R$' + ticket : '—';
-  document.getElementById('pm-receb').textContent = '—';
-  document.getElementById('pm-receb-sub').textContent = '';
-  // Contagens nas abas
+  const recebEl = document.getElementById('pm-receb');
+  if (recebEl) recebEl.textContent = _totalRecebMes > 0 ? 'R$ ' + _totalRecebMes.toLocaleString('pt-BR') : '—';
   const cntTodos = document.getElementById('pac-cnt-todos');
   const cntAtivos = document.getElementById('pac-cnt-ativos');
   if (cntTodos) cntTodos.textContent = todosPacientes.length;
@@ -3159,18 +3197,22 @@ function renderPacientes(pacs) {
     }
 
     // Saldo do pacote
+    const pkAtual = _pacPacotes[p.id];
     let pacoteHtml = '';
-    if (isPacote && p._pacoteAtual) {
-      const util = p._pacoteAtual.sessoes_utilizadas || 0;
-      const total = p._pacoteAtual.total_sessoes || 0;
+    if (isPacote && pkAtual) {
+      const util = pkAtual.sessoes_utilizadas || 0;
+      const total = pkAtual.total_sessoes || 0;
       const pct = total > 0 ? Math.round(util/total*100) : 0;
-      const corBar = util >= total ? '#059669' : util >= total * 0.75 ? '#D97706' : '#4F46E5';
+      const restantes = total - util;
+      const corBar = util >= total ? '#059669' : restantes === 1 ? '#D97706' : '#4F46E5';
+      const mesPk = pkAtual.mes_referencia ? new Date(pkAtual.mes_referencia + '-15').toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}) : '';
       pacoteHtml = '<div style="margin-top:4px;">' +
         '<div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--t3);margin-bottom:3px;">' +
-          '<span>Pacote: ' + util + ' de ' + total + ' usadas</span>' +
+          '<span>Pacote ' + mesPk + ': ' + util + '/' + total + ' sess.</span>' +
+          '<span style="color:' + corBar + ';font-weight:500;">' + restantes + ' restante' + (restantes !== 1 ? 's' : '') + '</span>' +
         '</div>' +
-        '<div style="background:#E5E7EB;border-radius:4px;height:4px;overflow:hidden;">' +
-          '<div style="height:100%;background:' + corBar + ';width:' + pct + '%;border-radius:4px;transition:width .5s;"></div>' +
+        '<div style="background:#E5E7EB;border-radius:4px;height:5px;overflow:hidden;">' +
+          '<div style="height:100%;background:' + corBar + ';width:' + pct + '%;border-radius:4px;transition:width .6s ease;"></div>' +
         '</div>' +
       '</div>';
     }
