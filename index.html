@@ -1973,6 +1973,7 @@ tr:hover td{background:#FAFAFF}
       <div class="form-row">
         <div class="form-group"><label class="form-label">Nome completo *</label><input class="form-input" id="np-nome" placeholder="Nome do paciente"></div>
         <div class="form-group"><label class="form-label">Data de nascimento</label><input class="form-input" type="date" id="np-nasc"></div>
+        <div class="form-group"><label class="form-label">Início do tratamento <span style="font-size:10px;background:#EEF2FF;color:#4F46E5;padding:1px 6px;border-radius:4px;">Reajuste anual</span></label><input class="form-input" type="date" id="np-inicio"></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" id="np-email" placeholder="email@exemplo.com"></div>
@@ -2107,6 +2108,7 @@ tr:hover td{background:#FAFAFF}
       <div class="form-row">
         <div class="form-group"><label class="form-label">Nome completo *</label><input class="form-input" id="ep-nome" placeholder="Nome do paciente"></div>
         <div class="form-group"><label class="form-label">Data de nascimento</label><input class="form-input" type="date" id="ep-nasc"></div>
+        <div class="form-group"><label class="form-label">Início do tratamento <span style="font-size:10px;background:#EEF2FF;color:#4F46E5;padding:1px 6px;border-radius:4px;">Reajuste anual</span></label><input class="form-input" type="date" id="ep-inicio"></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" id="ep-email" placeholder="email@exemplo.com"></div>
@@ -2673,14 +2675,43 @@ function renderAlertas(sessoesMes, todasSessoes) {
     alertas.push({ icon: 'ti-bell', cor: 'var(--amber)', bg: 'var(--amber-light)', msg: semConfirm.length + ' sessão(ões) de hoje ainda sem confirmação.', acao: 'Ver agenda', fn: "irPara('agenda',null)" });
   }
 
+  // ── REAJUSTE ANUAL ──
+  // Verificar pacientes com reajuste nos próximos 60 dias
+  const pacientesAtivos = todosPacientes.filter(p => p.status === 'ativo' && p.data_inicio_tratamento);
+  pacientesAtivos.forEach(p => {
+    const inicio = new Date(p.data_inicio_tratamento + 'T12:00:00');
+    // Calcular próxima data de reajuste (aniversário do tratamento)
+    const proximoReajuste = new Date(inicio);
+    proximoReajuste.setFullYear(agora.getFullYear());
+    // Se já passou esse ano, pegar do próximo ano
+    if (proximoReajuste < agora) proximoReajuste.setFullYear(agora.getFullYear() + 1);
+    const diasAteReajuste = Math.round((proximoReajuste - agora) / (1000 * 60 * 60 * 24));
+
+    if (diasAteReajuste <= 60 && diasAteReajuste >= 0) {
+      const dataFmt = proximoReajuste.toLocaleDateString('pt-BR', {day:'2-digit', month:'long'});
+      const urgente = diasAteReajuste <= 30;
+      const cor = urgente ? '#DC2626' : '#D97706';
+      const bg = urgente ? '#FEE2E2' : '#FEF3C7';
+      const msg = '📅 Reajuste de <strong>' + p.nome.split(' ')[0] + '</strong> em ' + dataFmt +
+        ' (' + diasAteReajuste + ' dias). ' +
+        (diasAteReajuste <= 60 ? 'Avise o paciente com antecedência.' : '');
+      alertas.push({
+        icon: urgente ? 'ti-alert-triangle' : 'ti-calendar-event',
+        cor, bg, msg,
+        acao: 'Editar paciente',
+        fn: "abrirEditarPaciente(" + p.id + ")"
+      });
+    }
+  });
+
   const el = document.getElementById('dash-alertas');
   if (!alertas.length) { el.innerHTML = ''; return; }
 
   el.innerHTML = alertas.map(a =>
-    '<div style="background:' + a.bg + ';border-radius:var(--rs);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
-      '<i class="ti ' + a.icon + '" style="font-size:16px;color:' + a.cor + ';flex-shrink:0;"></i>' +
-      '<span style="font-size:12px;flex:1;">' + a.msg + '</span>' +
-      '<button class="btn btn-sm" style="background:' + a.cor + ';color:#fff;border:none;white-space:nowrap;" onclick="' + a.fn + '">' + a.acao + '</button>' +
+    '<div style="background:' + a.bg + ';border-radius:var(--rs);padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;border:1px solid ' + a.cor + '22;">' +
+      '<i class="ti ' + a.icon + '" style="font-size:18px;color:' + a.cor + ';flex-shrink:0;"></i>' +
+      '<span style="font-size:12.5px;flex:1;line-height:1.5;">' + a.msg + '</span>' +
+      '<button class="btn btn-sm" style="background:' + a.cor + ';color:#fff;border:none;white-space:nowrap;font-size:11.5px;" onclick="' + a.fn + '">' + a.acao + '</button>' +
     '</div>'
   ).join('');
 }
@@ -2998,6 +3029,7 @@ async function salvarPaciente() {
     resp_financeiro_nome: document.getElementById('np-resp-mesmo')?.checked ? null : (document.getElementById('np-resp-nome')?.value || null),
     resp_financeiro_cpf: document.getElementById('np-resp-mesmo')?.checked ? null : (document.getElementById('np-resp-cpf')?.value?.replace(/\D/g,'') || null),
     data_nascimento: document.getElementById('np-nasc').value || null,
+    data_inicio_tratamento: document.getElementById('np-inicio').value || null,
     modalidade: document.getElementById('np-modal').value,
     tipo_pagamento: document.getElementById('np-tipo-pag')?.value || 'avulso',
     pacote_qtd: document.getElementById('np-tipo-pag')?.value === 'pacote' ? (parseInt(document.getElementById('np-pacote-qtd')?.value) || 4) : null,
@@ -5054,6 +5086,8 @@ function abrirEditarPaciente(id) {
   document.getElementById('ep-id').value = p.id;
   document.getElementById('ep-nome').value = p.nome || '';
   document.getElementById('ep-nasc').value = p.data_nascimento || '';
+  const epInicio = document.getElementById('ep-inicio');
+  if (epInicio) epInicio.value = p.data_inicio_tratamento || '';
   document.getElementById('ep-email').value = p.email || '';
   document.getElementById('ep-tel').value = p.telefone || '';
   const cpfEl = document.getElementById('ep-cpf');
@@ -5095,6 +5129,7 @@ async function atualizarPaciente() {
     resp_financeiro_nome: document.getElementById('ep-resp-mesmo')?.checked ? null : (document.getElementById('ep-resp-nome')?.value || null),
     resp_financeiro_cpf: document.getElementById('ep-resp-mesmo')?.checked ? null : (document.getElementById('ep-resp-cpf')?.value?.replace(/\D/g,'') || null),
     data_nascimento: document.getElementById('ep-nasc').value || null,
+    data_inicio_tratamento: document.getElementById('ep-inicio').value || null,
     modalidade: document.getElementById('ep-modal').value,
     tipo_pagamento: document.getElementById('ep-tipo-pag')?.value || 'avulso',
     pacote_qtd: document.getElementById('ep-tipo-pag')?.value === 'pacote' ? (parseInt(document.getElementById('ep-pacote-qtd')?.value) || 4) : null,
