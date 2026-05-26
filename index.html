@@ -2225,7 +2225,11 @@ tr:hover td{background:#FAFAFF}
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Valor (R$)</label><input class="form-input" type="number" id="es-valor" placeholder="180"></div>
-        <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="es-status"><option>Agendada</option><option>Confirmada</option><option>Realizada</option><option>Cancelada</option></select></div>
+        <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="es-status" onchange="verificarPacoteAviso('es')"><option>Agendada</option><option>Confirmada</option><option>Realizada</option><option>Cancelada</option></select></div>
+      </div>
+      <div id="es-pacote-aviso" style="display:none;background:#ECFDF5;border-radius:9px;padding:10px 13px;border:1px solid #A7F3D0;margin-bottom:12px;display:none;align-items:center;gap:8px;">
+        <i class="ti ti-calendar-month" style="font-size:15px;color:#059669;flex-shrink:0;"></i>
+        <span style="font-size:12px;color:#065F46;" id="es-pacote-aviso-txt">—</span>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Pagamento</label><select class="form-input" id="es-pag"><option value="">—</option><option>Pix</option><option>Transferência</option><option>Cartão</option><option>Dinheiro</option></select></div>
@@ -5114,6 +5118,98 @@ async function abrirEditarSessao(id) {
   document.getElementById('es-pagst').value = data.status_pagamento || 'Pendente';
   document.getElementById('es-obs').value = data.observacoes || '';
   abrirModal('editar-sessao');
+  // Mostrar saldo do pacote se paciente tem pacote ativo
+  setTimeout(() => verificarPacoteAviso('es'), 100);
+}
+
+// ═══ INTEGRAÇÃO PACOTE ↔ SESSÃO ═══
+async function verificarPacoteAviso(prefix) {
+  const pacId = parseInt(document.getElementById(prefix + '-pac')?.value) || null;
+  const status = document.getElementById(prefix + '-status')?.value;
+  const avisoEl = document.getElementById(prefix + '-pacote-aviso');
+  const avisoTxt = document.getElementById(prefix + '-pacote-aviso-txt');
+  if (!avisoEl || !pacId) { if (avisoEl) avisoEl.style.display = 'none'; return; }
+
+  const pac = todosPacientes.find(p => p.id == pacId);
+  if (!pac || pac.tipo_pagamento !== 'pacote') { avisoEl.style.display = 'none'; return; }
+
+  const { data: pacotes } = await sb.from('pacotes')
+    .select('*').eq('paciente_id', pacId).eq('status', 'ativo')
+    .order('mes_referencia', { ascending: false }).limit(1);
+
+  if (!pacotes || !pacotes.length) { avisoEl.style.display = 'none'; return; }
+
+  const pk = pacotes[0];
+  const utilizadas = pk.sessoes_utilizadas || 0;
+  const total = pk.total_sessoes || 0;
+  const restantes = total - utilizadas;
+  const mes = pk.mes_referencia ? new Date(pk.mes_referencia + '-15').toLocaleDateString('pt-BR', {month:'long', year:'numeric'}) : '—';
+
+  avisoEl.style.display = 'flex';
+
+  if (status === 'Realizada') {
+    if (restantes <= 0) {
+      avisoEl.style.background = '#FEE2E2';
+      avisoEl.style.borderColor = '#FECACA';
+      avisoTxt.style.color = '#991B1B';
+      avisoEl.querySelector('i').style.color = '#DC2626';
+      avisoTxt.textContent = 'Pacote ' + mes + ' já está concluído (' + utilizadas + '/' + total + ' sessões). Crie um novo pacote.';
+    } else {
+      avisoEl.style.background = '#ECFDF5';
+      avisoEl.style.borderColor = '#A7F3D0';
+      avisoTxt.style.color = '#065F46';
+      avisoEl.querySelector('i').style.color = '#059669';
+      avisoTxt.textContent = '📦 Pacote ' + mes + ' — ' + utilizadas + '/' + total + ' sessões · ' + restantes + ' restante' + (restantes > 1 ? 's' : '') + '. Marcar como Realizada vai debitar 1 sessão.';
+    }
+  } else {
+    avisoEl.style.background = '#EEF2FF';
+    avisoEl.style.borderColor = '#C7D2FE';
+    avisoTxt.style.color = '#3730A3';
+    avisoEl.querySelector('i').style.color = '#4F46E5';
+    avisoTxt.textContent = '📦 Pacote ' + mes + ' — ' + utilizadas + '/' + total + ' sessões · ' + restantes + ' restante' + (restantes > 1 ? 's' : '');
+  }
+}
+
+
+async function ajustarPacotePorSessao(pacId, statusAnterior, statusNovo) {
+  if (!pacId) return;
+  const pac = todosPacientes.find(p => p.id == pacId);
+  if (!pac || pac.tipo_pagamento !== 'pacote') return;
+
+  // Buscar pacote ativo do mês atual
+  const mesAtual = new Date().toISOString().substring(0, 7);
+  const { data: pacotes } = await sb.from('pacotes')
+    .select('*')
+    .eq('paciente_id', pacId)
+    .eq('status', 'ativo')
+    .order('mes_referencia', { ascending: false })
+    .limit(1);
+
+  if (!pacotes || !pacotes.length) return;
+  const pk = pacotes[0];
+
+  const eraRealizada = statusAnterior === 'Realizada';
+  const ficouRealizada = statusNovo === 'Realizada';
+
+  // Debitar: sessão foi marcada como Realizada
+  if (!eraRealizada && ficouRealizada) {
+    const novoVal = Math.min(pk.total_sessoes, (pk.sessoes_utilizadas || 0) + 1);
+    const novoStatus = novoVal >= pk.total_sessoes ? 'concluido' : 'ativo';
+    await sb.from('pacotes').update({ sessoes_utilizadas: novoVal, status: novoStatus }).eq('id', pk.id);
+    const restantes = pk.total_sessoes - novoVal;
+    if (novoVal >= pk.total_sessoes) {
+      toast('Pacote concluído! Todas as ' + pk.total_sessoes + ' sessões realizadas. 🎉', 'success');
+    } else {
+      toast('Sessão debitada do pacote — ' + novoVal + '/' + pk.total_sessoes + ' · ' + restantes + ' restante' + (restantes > 1 ? 's' : ''), 'success');
+    }
+  }
+
+  // Creditar: sessão foi desmarcada (era Realizada, virou outro status)
+  if (eraRealizada && !ficouRealizada) {
+    const novoVal = Math.max(0, (pk.sessoes_utilizadas || 0) - 1);
+    await sb.from('pacotes').update({ sessoes_utilizadas: novoVal, status: 'ativo' }).eq('id', pk.id);
+    toast('Sessão devolvida ao pacote — ' + novoVal + '/' + pk.total_sessoes, 'success');
+  }
 }
 
 async function atualizarSessao() {
@@ -5123,6 +5219,10 @@ async function atualizarSessao() {
   const novoStatus = document.getElementById('es-status').value;
   const pacId = parseInt(document.getElementById('es-pac').value) || null;
   if (!dataSess || !hora) { toast('Preencha data e horário', 'error'); return; }
+
+  // Buscar status anterior para ajustar pacote
+  const { data: sessaoAtual } = await sb.from('sessoes').select('status').eq('id', parseInt(id)).single();
+  const statusAnterior = sessaoAtual?.status || '';
 
   const tipoEditar = document.getElementById('es-tipo').value;
   const linkEditar = tipoEditar === 'Online' ? (document.getElementById('es-link').value || null) : null;
@@ -5139,6 +5239,9 @@ async function atualizarSessao() {
   }).eq('id', parseInt(id));
 
   if (error) { toast('Erro ao atualizar: ' + error.message, 'error'); return; }
+
+  // Ajustar pacote se paciente tem pacote mensal
+  await ajustarPacotePorSessao(pacId, statusAnterior, novoStatus);
 
   // Enviar mensagem de agradecimento quando marcar como Realizada
   if (novoStatus === 'Realizada' && pacId) {
