@@ -840,7 +840,7 @@ tr:hover td{background:#FAFAFF}
           <button class="btn btn-ghost btn-sm" onclick="exportarPDF()"><i class="ti ti-file-type-pdf"></i> Exportar PDF</button>
           <button class="btn btn-sm" style="background:var(--brand-light);color:var(--brand-dark);border:none;" onclick="gerarResumoProntuarioIA(document.getElementById('sel-pac-pront').value)"><i class="ti ti-sparkles"></i> Resumo com IA</button>
           <button class="btn btn-sm" style="background:#EEF2FF;color:#4F46E5;border:none;" onclick="abrirDocumentos()"><i class="ti ti-file-certificate"></i> Documentos</button>
-          <button class="btn btn-sm" style="background:#ECFDF5;color:#059669;border:none;" onclick="abrirNovoPacote()"><i class="ti ti-calendar-month"></i> Pacote mensal</button>
+
           <div style="flex:1;"></div>
           <button class="btn btn-primary btn-sm" onclick="abrirModal('nova-evolucao')"><i class="ti ti-plus"></i> Nova evolução</button>
         </div>
@@ -848,7 +848,7 @@ tr:hover td{background:#FAFAFF}
           <div id="pront-evolucoes"><div class="empty"><i class="ti ti-notes"></i><p>Selecione um paciente para ver o prontuário</p></div></div>
           <div>
             <div class="card mb16" id="pront-dados"><div style="padding:16px;color:var(--t3);font-size:13px;">Selecione um paciente</div></div>
-            <div id="pront-pacotes"></div>
+
           </div>
         </div>
       </div>
@@ -1629,6 +1629,36 @@ tr:hover td{background:#FAFAFF}
 <div class="modal-bd" id="modal-bd" onclick="fecharModal()">
 
 
+  <!-- MODAL DETALHE PACIENTE - PACOTES -->
+  <div class="modal" id="m-pac-detalhe" onclick="event.stopPropagation()" style="display:none;max-width:520px;padding:0;overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#064E3B,#059669);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;" id="pd-avatar">PS</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#fff;" id="pd-nome">—</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.6);" id="pd-sub">—</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="fecharModal()" style="color:rgba(255,255,255,0.6);background:rgba(255,255,255,0.1);border-radius:8px;"><i class="ti ti-x"></i></button>
+    </div>
+    <div style="padding:20px 22px;max-height:70vh;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-size:13.5px;font-weight:600;color:var(--t1);">Pacotes mensais</div>
+        <button onclick="abrirNovoPacoteModal()" style="font-size:12px;font-weight:500;color:#059669;background:#ECFDF5;border:none;border-radius:8px;padding:6px 12px;cursor:pointer;display:flex;align-items:center;gap:5px;">
+          <i class="ti ti-plus" style="font-size:13px;"></i> Novo pacote
+        </button>
+      </div>
+      <div id="pd-pacotes-lista">
+        <div style="text-align:center;padding:24px;color:var(--t3);font-size:13px;">Carregando...</div>
+      </div>
+    </div>
+    <div style="padding:12px 22px;border-top:1px solid var(--border);display:flex;gap:8px;">
+      <button onclick="abrirPaciente(pacDetalheAtual)" class="btn btn-ghost" style="flex:1;font-size:12px;"><i class="ti ti-notes"></i> Ver prontuário</button>
+      <button onclick="abrirGerarRecibo(pacDetalheAtual)" class="btn btn-ghost" style="flex:1;font-size:12px;color:#059669;"><i class="ti ti-receipt"></i> Gerar recibo</button>
+      <button onclick="abrirEditarPaciente(pacDetalheAtual);fecharModal()" class="btn btn-ghost" style="flex:1;font-size:12px;"><i class="ti ti-edit"></i> Editar</button>
+    </div>
+  </div>
+
   <!-- MODAL RECIBO -->
   <div class="modal" id="m-recibo" onclick="event.stopPropagation()" style="display:none;max-width:580px;padding:0;overflow:hidden;">
     <div style="background:linear-gradient(135deg,#1E1B4B,#3730A3);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;">
@@ -1945,7 +1975,25 @@ tr:hover td{background:#FAFAFF}
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Modalidade</label><select class="form-input" id="np-modal"><option>Semanal</option><option>Quinzenal</option><option>Mensal</option></select></div>
-        <div class="form-group"></div>
+        <div class="form-group">
+          <label class="form-label">Tipo de cobrança</label>
+          <select class="form-input" id="np-tipo-pag" onchange="togglePacoteFields('np')">
+            <option value="avulso">Avulso por sessão</option>
+            <option value="pacote">Pacote mensal</option>
+          </select>
+        </div>
+      </div>
+      <div id="np-pacote-fields" style="display:none;">
+        <div style="background:#ECFDF5;border-radius:10px;padding:12px 14px;border:1px solid #D1FAE5;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+            <i class="ti ti-calendar-month" style="font-size:14px;color:#059669;"></i>
+            <span style="font-size:12px;font-weight:600;color:#065F46;">Configuração do pacote mensal</span>
+          </div>
+          <div class="form-row" style="margin-bottom:0;">
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Sessões por pacote</label><input class="form-input" type="number" id="np-pacote-qtd" placeholder="4" min="1" value="4"></div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Valor do pacote (R$)</label><input class="form-input" type="number" id="np-pacote-valor" placeholder="Ex: 700"></div>
+          </div>
+        </div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="np-status"><option value="ativo">Ativo</option><option value="avaliacao">Em avaliação</option><option value="inativo">Inativo</option></select></div>
@@ -2061,7 +2109,25 @@ tr:hover td{background:#FAFAFF}
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Modalidade</label><select class="form-input" id="ep-modal"><option>Semanal</option><option>Quinzenal</option><option>Mensal</option></select></div>
-        <div class="form-group"></div>
+        <div class="form-group">
+          <label class="form-label">Tipo de cobrança</label>
+          <select class="form-input" id="ep-tipo-pag" onchange="togglePacoteFields('ep')">
+            <option value="avulso">Avulso por sessão</option>
+            <option value="pacote">Pacote mensal</option>
+          </select>
+        </div>
+      </div>
+      <div id="ep-pacote-fields" style="display:none;">
+        <div style="background:#ECFDF5;border-radius:10px;padding:12px 14px;border:1px solid #D1FAE5;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+            <i class="ti ti-calendar-month" style="font-size:14px;color:#059669;"></i>
+            <span style="font-size:12px;font-weight:600;color:#065F46;">Configuração do pacote mensal</span>
+          </div>
+          <div class="form-row" style="margin-bottom:0;">
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Sessões por pacote</label><input class="form-input" type="number" id="ep-pacote-qtd" placeholder="4" min="1"></div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Valor do pacote (R$)</label><input class="form-input" type="number" id="ep-pacote-valor" placeholder="Ex: 700"></div>
+          </div>
+        </div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="ep-status"><option value="ativo">Ativo</option><option value="avaliacao">Em avaliação</option><option value="inativo">Inativo</option></select></div>
@@ -2847,16 +2913,26 @@ function renderPacientes(pacs) {
     const cor = cores[i % cores.length];
     const ts = tagStatus[p.status] || 'tag-gray';
     const ls = lblStatus[p.status] || p.status;
-    return '<div class="pat-card">' +
+    const isPacote = p.tipo_pagamento === 'pacote';
+    const valorLabel = isPacote
+      ? (p.pacote_valor ? 'R$' + p.pacote_valor : '—')
+      : (p.valor_sessao ? 'R$' + p.valor_sessao : '—');
+    const freqLabel = isPacote
+      ? 'pacote (' + (p.pacote_qtd || 4) + ' sess.)'
+      : 'por sessão';
+    const onClickCard = isPacote ? 'abrirPacDetalhe(' + p.id + ')' : 'abrirPaciente(' + p.id + ')';
+    return '<div class="pat-card" onclick="' + onClickCard + '">' +
       '<div class="av av-md ' + cor + '">' + ini + '</div>' +
       '<div class="pat-info">' +
-        '<div class="pat-name">' + (p.nome||'—') + '</div>' +
+        '<div class="pat-name" style="display:flex;align-items:center;gap:6px;">' + (p.nome||'—') +
+          (isPacote ? '<span style="font-size:9.5px;background:#ECFDF5;color:#059669;padding:2px 6px;border-radius:20px;font-weight:600;white-space:nowrap;">Pacote</span>' : '') +
+        '</div>' +
         '<div class="pat-meta">' + (p.modalidade||'') + '</div>' +
         '<div class="pat-tags"><span class="tag ' + ts + '">' + ls + '</span></div>' +
       '</div>' +
       '<div class="pat-stat">' +
-        '<div class="pat-val">' + (p.valor_sessao ? 'R$' + p.valor_sessao : '—') + '</div>' +
-        '<div class="pat-freq">por sessão</div>' +
+        '<div class="pat-val">' + valorLabel + '</div>' +
+        '<div class="pat-freq">' + freqLabel + '</div>' +
         '<div style="display:flex;gap:4px;margin-top:6px;justify-content:flex-end;">' +
           '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirPaciente(' + p.id + ')" title="Ver prontuário"><i class="ti ti-notes"></i></button>' +
           '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirIAPaciente(' + p.id + ')" title="IA do paciente" style="color:#818CF8;"><i class="ti ti-sparkles"></i></button>' +
@@ -2901,6 +2977,9 @@ async function salvarPaciente() {
     resp_financeiro_cpf: document.getElementById('np-resp-mesmo')?.checked ? null : (document.getElementById('np-resp-cpf')?.value?.replace(/\D/g,'') || null),
     data_nascimento: document.getElementById('np-nasc').value || null,
     modalidade: document.getElementById('np-modal').value,
+    tipo_pagamento: document.getElementById('np-tipo-pag')?.value || 'avulso',
+    pacote_qtd: document.getElementById('np-tipo-pag')?.value === 'pacote' ? (parseInt(document.getElementById('np-pacote-qtd')?.value) || 4) : null,
+    pacote_valor: document.getElementById('np-tipo-pag')?.value === 'pacote' ? (parseFloat(document.getElementById('np-pacote-valor')?.value) || null) : null,
     valor_sessao: parseFloat(document.getElementById('np-valor').value) || null,
     status: document.getElementById('np-status').value,
     abordagem: document.getElementById('np-abord').value,
@@ -2960,8 +3039,7 @@ async function carregarProntuario() {
       (tags ? '<div class="evol-tags">' + tags + '</div>' : '') +
     '</div>';
   }).join('');
-  // Carregar pacotes do paciente
-  carregarPacotesPaciente(pacId);
+
 }
 
 async function salvarEvolucao() {
@@ -3184,6 +3262,134 @@ function renderTabelaFin(lancamentos) {
 }
 
 // ═══ RESPONSÁVEL FINANCEIRO ═══
+var pacDetalheAtual = null;
+
+async function abrirPacDetalhe(pacId) {
+  const pac = todosPacientes.find(p => p.id == pacId);
+  if (!pac) return;
+  pacDetalheAtual = pacId;
+
+  const ini = pac.nome ? pac.nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase() : 'PS';
+  document.getElementById('pd-avatar').textContent = ini;
+  document.getElementById('pd-nome').textContent = pac.nome || '—';
+  const isPacote = pac.tipo_pagamento === 'pacote';
+  document.getElementById('pd-sub').textContent = isPacote
+    ? 'Pacote mensal · ' + (pac.pacote_qtd || 4) + ' sessões'
+    : 'Pagamento avulso por sessão';
+
+  abrirModal('pac-detalhe');
+  await renderPdPacotes(pacId);
+}
+
+async function renderPdPacotes(pacId) {
+  const el = document.getElementById('pd-pacotes-lista');
+  if (!el) return;
+
+  const { data: pacotes } = await sb.from('pacotes')
+    .select('*')
+    .eq('paciente_id', pacId)
+    .order('mes_referencia', { ascending: false })
+    .limit(6);
+
+  if (!pacotes || !pacotes.length) {
+    el.innerHTML = '<div style="text-align:center;padding:28px;color:var(--t3);">' +
+      '<i class="ti ti-calendar-off" style="font-size:28px;display:block;margin-bottom:8px;"></i>' +
+      '<div style="font-size:13px;">Nenhum pacote registrado</div>' +
+      '<div style="font-size:11.5px;margin-top:4px;">Clique em "Novo pacote" para registrar o pagamento mensal</div>' +
+    '</div>';
+    return;
+  }
+
+  el.innerHTML = pacotes.map(pk => {
+    const utilizadas = pk.sessoes_utilizadas || 0;
+    const total = pk.total_sessoes || 0;
+    const restantes = total - utilizadas;
+    const pct = total > 0 ? Math.round(utilizadas / total * 100) : 0;
+    const mes = pk.mes_referencia ? new Date(pk.mes_referencia + '-15').toLocaleDateString('pt-BR', {month:'long', year:'numeric'}) : '—';
+    const concluido = restantes <= 0;
+    const cor = concluido ? '#059669' : restantes === 1 ? '#D97706' : '#4F46E5';
+    const bg = concluido ? '#ECFDF5' : restantes === 1 ? '#FEF3C7' : '#EEF2FF';
+
+    return '<div style="border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">' +
+        '<div style="font-size:13px;font-weight:600;color:var(--t1);">' + mes.charAt(0).toUpperCase() + mes.slice(1) + '</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<span style="font-size:11px;font-weight:600;background:' + bg + ';color:' + cor + ';padding:3px 10px;border-radius:20px;">' +
+            (concluido ? '✓ Concluído' : restantes + ' sess. restante' + (restantes > 1 ? 's' : '')) +
+          '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div style="background:var(--bg);border-radius:6px;height:8px;overflow:hidden;margin-bottom:8px;">' +
+        '<div style="height:100%;background:' + cor + ';border-radius:6px;width:' + pct + '%;transition:width .6s ease;"></div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">' +
+        '<span style="font-size:12px;color:var(--t2);">' + utilizadas + ' de ' + total + ' sessões realizadas</span>' +
+        '<span style="font-size:12px;font-weight:500;color:var(--t1);">R$ ' + (pk.valor_total || 0).toLocaleString('pt-BR') + '</span>' +
+      '</div>' +
+      '<div style="display:flex;gap:6px;">' +
+        '<button onclick="marcarSessaoPacote(' + pk.id + ',true,' + pacId + ')" class="btn btn-ghost btn-sm" style="flex:1;font-size:11.5px;" ' + (concluido ? 'disabled style="opacity:.4;"' : '') + '>' +
+          '<i class="ti ti-plus" style="font-size:12px;"></i> Registrar sessão' +
+        '</button>' +
+        '<button onclick="marcarSessaoPacote(' + pk.id + ',false,' + pacId + ')" class="btn btn-ghost btn-sm" style="font-size:11px;color:var(--t3);" ' + (utilizadas === 0 ? 'disabled style="opacity:.4;"' : '') + '>' +
+          '<i class="ti ti-minus" style="font-size:12px;"></i>' +
+        '</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function marcarSessaoPacote(pacoteId, incrementar, pacId) {
+  const { data: pk } = await sb.from('pacotes').select('*').eq('id', pacoteId).single();
+  if (!pk) return;
+  const novoVal = incrementar
+    ? Math.min(pk.total_sessoes, (pk.sessoes_utilizadas || 0) + 1)
+    : Math.max(0, (pk.sessoes_utilizadas || 0) - 1);
+  const novoStatus = novoVal >= pk.total_sessoes ? 'concluido' : 'ativo';
+  await sb.from('pacotes').update({ sessoes_utilizadas: novoVal, status: novoStatus }).eq('id', pacoteId);
+  const msg = incrementar
+    ? (novoVal >= pk.total_sessoes ? 'Pacote concluído! 🎉' : novoVal + '/' + pk.total_sessoes + ' sessões realizadas')
+    : 'Sessão removida';
+  toast(msg, 'success');
+  renderPdPacotes(pacId || pk.paciente_id);
+}
+
+function abrirNovoPacoteModal() {
+  const sel = document.getElementById('pac-id-pacote');
+  if (sel && pacDetalheAtual) {
+    todosPacientes.filter(p => p.status === 'ativo').forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.id; opt.textContent = p.nome;
+      if (p.id == pacDetalheAtual) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+  const hoje = new Date();
+  const mesEl = document.getElementById('pac-mes');
+  if (mesEl) mesEl.value = hoje.toISOString().substring(0,7);
+  const datEl = document.getElementById('pac-data-pag');
+  if (datEl) datEl.value = hoje.toISOString().split('T')[0];
+  const pac = todosPacientes.find(p => p.id == pacDetalheAtual);
+  const valEl = document.getElementById('pac-valor');
+  if (valEl && pac?.pacote_valor) valEl.value = pac.pacote_valor;
+  const qtdEl = document.getElementById('pac-total-sess');
+  if (qtdEl && pac?.pacote_qtd) qtdEl.value = pac.pacote_qtd;
+  fecharModal();
+  setTimeout(() => abrirModal('pacote'), 100);
+}
+
+// Override salvarPacote to refresh pd-pacotes after save
+const _salvarPacoteOrig = salvarPacote;
+async function salvarPacote() {
+  await _salvarPacoteOrig();
+  if (pacDetalheAtual) setTimeout(() => { abrirModal('pac-detalhe'); renderPdPacotes(pacDetalheAtual); }, 300);
+}
+
+function togglePacoteFields(prefix) {
+  const tipo = document.getElementById(prefix + '-tipo-pag')?.value;
+  const fields = document.getElementById(prefix + '-pacote-fields');
+  if (fields) fields.style.display = tipo === 'pacote' ? '' : 'none';
+}
+
 function toggleRespFinanceiro(prefix) {
   const mesmo = document.getElementById(prefix + '-resp-mesmo').checked;
   const fields = document.getElementById(prefix + '-resp-fields');
@@ -4814,6 +5020,14 @@ function abrirEditarPaciente(id) {
   if (epRespNome) epRespNome.value = p.resp_financeiro_nome || '';
   if (epRespCpf) epRespCpf.value = p.resp_financeiro_cpf ? formatarCPF(p.resp_financeiro_cpf) : '';
   toggleRespFinanceiro('ep');
+  // Tipo de pagamento
+  const epTipoPag = document.getElementById('ep-tipo-pag');
+  if (epTipoPag) epTipoPag.value = p.tipo_pagamento || 'avulso';
+  const epPacQtd = document.getElementById('ep-pacote-qtd');
+  if (epPacQtd) epPacQtd.value = p.pacote_qtd || 4;
+  const epPacVal = document.getElementById('ep-pacote-valor');
+  if (epPacVal) epPacVal.value = p.pacote_valor || '';
+  togglePacoteFields('ep');
   document.getElementById('ep-modal').value = p.modalidade || 'Semanal';
   document.getElementById('ep-valor').value = p.valor_sessao || '';
   document.getElementById('ep-status').value = p.status || 'ativo';
@@ -4835,6 +5049,9 @@ async function atualizarPaciente() {
     resp_financeiro_cpf: document.getElementById('ep-resp-mesmo')?.checked ? null : (document.getElementById('ep-resp-cpf')?.value?.replace(/\D/g,'') || null),
     data_nascimento: document.getElementById('ep-nasc').value || null,
     modalidade: document.getElementById('ep-modal').value,
+    tipo_pagamento: document.getElementById('ep-tipo-pag')?.value || 'avulso',
+    pacote_qtd: document.getElementById('ep-tipo-pag')?.value === 'pacote' ? (parseInt(document.getElementById('ep-pacote-qtd')?.value) || 4) : null,
+    pacote_valor: document.getElementById('ep-tipo-pag')?.value === 'pacote' ? (parseFloat(document.getElementById('ep-pacote-valor')?.value) || null) : null,
     valor_sessao: parseFloat(document.getElementById('ep-valor').value) || null,
     status: document.getElementById('ep-status').value,
     abordagem: document.getElementById('ep-abord').value,
