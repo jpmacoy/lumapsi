@@ -781,55 +781,65 @@ tr:hover td{background:#FAFAFF}
 
       <!-- ── PACIENTES ── -->
       <div class="screen" id="sc-pacientes">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-          <div class="tabs">
-            <div class="tab active" onclick="filtrarPacientes(this,'todos')">Todos</div>
-            <div class="tab" onclick="filtrarPacientes(this,'ativo')">Ativos</div>
+
+        <!-- MÉTRICAS TOPO -->
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px;">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
+            <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;">Ativos</div>
+            <div style="font-size:22px;font-weight:700;color:var(--t1);" id="pm-ativos">—</div>
+            <div style="font-size:11px;color:#059669;margin-top:2px;" id="pm-ativos-sub">—</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
+            <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;">Sessões hoje</div>
+            <div style="font-size:22px;font-weight:700;color:var(--t1);" id="pm-sess-hoje">—</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px;cursor:pointer;color:#4F46E5;" onclick="irPara('agenda',null)">Ver agenda →</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
+            <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;">Recebimentos (mês)</div>
+            <div style="font-size:22px;font-weight:700;color:var(--t1);" id="pm-receb">—</div>
+            <div style="font-size:11px;color:#059669;margin-top:2px;" id="pm-receb-sub">—</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;" onclick="filtrarPacientes(document.querySelector('#sc-pacientes .tab:nth-child(1)'), 'sem-agenda')">
+            <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;">Sem agendamento</div>
+            <div style="font-size:22px;font-weight:700;color:#D97706;" id="pm-sem-agenda">—</div>
+            <div style="font-size:11px;color:#D97706;margin-top:2px;">Atenção necessária</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;" onclick="filtrarPacientes(document.querySelector('#sc-pacientes .tab:nth-child(1)'), 'inadimplente')">
+            <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;">Inadimplentes</div>
+            <div style="font-size:22px;font-weight:700;color:#DC2626;" id="pm-inadimp">—</div>
+            <div style="font-size:11px;color:#DC2626;margin-top:2px;" id="pm-inadimp-sub">—</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
+            <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;">Novos (mês)</div>
+            <div style="font-size:22px;font-weight:700;color:#7C3AED;" id="pm-novos">—</div>
+            <div style="font-size:11px;color:#7C3AED;margin-top:2px;">Boas-vindas!</div>
+          </div>
+        </div>
+
+        <!-- FILTROS E BUSCA -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+          <div class="tabs" style="flex-wrap:wrap;">
+            <div class="tab active" onclick="filtrarPacientes(this,'todos')" id="pac-tab-todos">Todos <span id="pac-cnt-todos" style="font-size:10px;background:#E5E7EB;color:#374151;padding:1px 6px;border-radius:20px;margin-left:3px;"></span></div>
+            <div class="tab" onclick="filtrarPacientes(this,'ativo')">Ativos <span id="pac-cnt-ativos" style="font-size:10px;background:#D1FAE5;color:#065F46;padding:1px 6px;border-radius:20px;margin-left:3px;"></span></div>
             <div class="tab" onclick="filtrarPacientes(this,'avaliacao')">Em avaliação</div>
             <div class="tab" onclick="filtrarPacientes(this,'inativo')">Inativos</div>
-            <div class="tab" onclick="filtrarPacientes(this,'avulso')" style="color:#4F46E5;">Avulso</div>
+            <div class="tab" onclick="filtrarPacientes(this,'avulso')">Avulso</div>
             <div class="tab" onclick="filtrarPacientes(this,'pacote')" style="color:#059669;">Pacote</div>
+            <div class="tab" onclick="filtrarPacientes(this,'inadimplente')" style="color:#DC2626;">Inadimplentes</div>
           </div>
           <div style="flex:1;"></div>
           <div style="position:relative;">
             <i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--t3);"></i>
-            <input class="form-input" style="padding-left:32px;width:200px;" placeholder="Buscar..." oninput="buscarPaciente(this.value)">
+            <input class="form-input" style="padding-left:32px;width:220px;" placeholder="Buscar por nome, telefone, tag..." oninput="buscarPaciente(this.value)">
           </div>
+          <select class="form-input" style="width:170px;" onchange="ordenarPacientes(this.value)" id="pac-ordem">
+            <option value="nome">Ordenar: Nome</option>
+            <option value="prox-sessao">Próx. sessão</option>
+            <option value="ultimo-pag">Último pagamento</option>
+            <option value="valor">Valor (maior)</option>
+          </select>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
-          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#059669,#34D399);border-radius:14px 14px 0 0;"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Ativos</div>
-              <div style="width:30px;height:30px;border-radius:8px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;"><i class="ti ti-heart-handshake" style="font-size:14px;color:#059669;"></i></div>
-            </div>
-            <div style="font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--t1);" id="pm-ativos">—</div>
-          </div>
-          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#D97706,#FCD34D);border-radius:14px 14px 0 0;"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Em avaliação</div>
-              <div style="width:30px;height:30px;border-radius:8px;background:#FFF7ED;display:flex;align-items:center;justify-content:center;"><i class="ti ti-user-check" style="font-size:14px;color:#D97706;"></i></div>
-            </div>
-            <div style="font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--t1);" id="pm-aval">—</div>
-          </div>
-          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#5046E5,#818CF8);border-radius:14px 14px 0 0;"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Ticket médio</div>
-              <div style="width:30px;height:30px;border-radius:8px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;"><i class="ti ti-currency-dollar" style="font-size:14px;color:#5046E5;"></i></div>
-            </div>
-            <div style="font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--t1);" id="pm-ticket">—</div>
-          </div>
-          <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#7C3AED,#A78BFA);border-radius:14px 14px 0 0;"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-              <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;">Total</div>
-              <div style="width:30px;height:30px;border-radius:8px;background:#F5F3FF;display:flex;align-items:center;justify-content:center;"><i class="ti ti-users" style="font-size:14px;color:#7C3AED;"></i></div>
-            </div>
-            <div style="font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--t1);" id="pm-total">—</div>
-          </div>
-        </div>
+
         <div class="g2" id="grid-pacientes"><div class="loading">Carregando pacientes...</div></div>
       </div>
 
@@ -2949,9 +2959,9 @@ async function carregarPacientes() {
   const { data } = await sb.from('pacientes').select('*').order('nome');
   todosPacientes = data || [];
   popularSelects();
-  renderPacientes(todosPacientes);
-  atualizarMetricasPacientes(todosPacientes);
+  await carregarDadosCards();
 }
+
 
 function atualizarMetricasPacientes(pacs) {
   const ativos = pacs.filter(p => p.status === 'ativo').length;
@@ -2964,59 +2974,321 @@ function atualizarMetricasPacientes(pacs) {
   document.getElementById('pm-total').textContent = pacs.length;
 }
 
+// Cache de sessões e pagamentos para os cards
+var _pacSessoes = {};
+var _pacPagamentos = {};
+
+async function carregarDadosCards() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+  const agora = new Date();
+  const mesIni = agora.toISOString().substring(0,7) + '-01';
+  const mesFim = agora.toISOString().substring(0,7) + '-31';
+
+  // Próximas sessões por paciente
+  const { data: proxSess } = await sb.from('sessoes')
+    .select('paciente_id,data_hora,status,status_pagamento,valor')
+    .eq('user_id', user.id)
+    .gte('data_hora', new Date().toISOString())
+    .in('status', ['Agendada','Confirmada'])
+    .order('data_hora');
+
+  // Sessões do mês para pagamento
+  const { data: sessMes } = await sb.from('sessoes')
+    .select('paciente_id,status_pagamento,valor,data_hora,status')
+    .eq('user_id', user.id)
+    .gte('data_hora', mesIni + 'T00:00:00')
+    .lte('data_hora', mesFim + 'T23:59:59');
+
+  // Último pagamento por paciente
+  const { data: ultPag } = await sb.from('sessoes')
+    .select('paciente_id,data_hora,status_pagamento')
+    .eq('user_id', user.id)
+    .eq('status_pagamento', 'Pago')
+    .order('data_hora', { ascending: false })
+    .limit(200);
+
+  // Organizar por paciente
+  _pacSessoes = {};
+  (proxSess || []).forEach(s => {
+    if (!_pacSessoes[s.paciente_id]) _pacSessoes[s.paciente_id] = s;
+  });
+
+  _pacPagamentos = {};
+  (sessMes || []).forEach(s => {
+    if (!_pacPagamentos[s.paciente_id]) _pacPagamentos[s.paciente_id] = { pendentes: 0, totalPend: 0 };
+    if (s.status_pagamento === 'Pendente' && s.status === 'Realizada') {
+      _pacPagamentos[s.paciente_id].pendentes++;
+      _pacPagamentos[s.paciente_id].totalPend += (s.valor || 0);
+    }
+  });
+
+  // Último pagamento
+  _pacUltPag = {};
+  (ultPag || []).forEach(s => {
+    if (!_pacUltPag[s.paciente_id]) {
+      const dt = new Date(s.data_hora);
+      _pacUltPag[s.paciente_id] = dt.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+    }
+  });
+
+  // Atualizar métricas do topo
+  atualizarMetricasPacientes();
+  renderPacientes(todosPacientes);
+}
+
+var _pacUltPag = {};
+var ordemPacientes = 'nome';
+
+function ordenarPacientes(ordem) {
+  ordemPacientes = ordem;
+  renderPacientes(todosPacientes);
+}
+
+function atualizarMetricasPacientes() {
+  const agora = new Date();
+  const mesAtual = agora.toISOString().substring(0,7);
+  const ativos = todosPacientes.filter(p => p.status === 'ativo');
+  const novos = todosPacientes.filter(p => p.created_at && p.created_at.startsWith(mesAtual));
+
+  // Sessões hoje
+  const hoje = agora.toISOString().split('T')[0];
+  const sessHoje = Object.values(_pacSessoes).filter(s => s.data_hora && s.data_hora.startsWith(hoje)).length;
+
+  // Sem agendamento (ativos sem próxima sessão)
+  const semAgenda = ativos.filter(p => !_pacSessoes[p.id]).length;
+
+  // Inadimplentes (ativos com pagamento pendente)
+  const inadimp = ativos.filter(p => _pacPagamentos[p.id]?.pendentes > 0);
+  const totalInadim = inadimp.reduce((s, p) => s + (_pacPagamentos[p.id]?.totalPend || 0), 0);
+
+  // Ticket médio
+  const ticket = ativos.length > 0
+    ? Math.round(ativos.reduce((s, p) => s + (p.valor_sessao || p.pacote_valor || 0), 0) / ativos.length)
+    : 0;
+
+  // Recebimentos do mês (aproximado pelos dados de sessões)
+  const recebMes = Object.values(_pacPagamentos).reduce((s, p) => s, 0);
+
+  document.getElementById('pm-ativos').textContent = ativos.length;
+  document.getElementById('pm-ativos-sub').textContent = '+' + novos.length + ' este mês';
+  document.getElementById('pm-sess-hoje').textContent = sessHoje;
+  document.getElementById('pm-sem-agenda').textContent = semAgenda;
+  document.getElementById('pm-inadimp').textContent = inadimp.length;
+  document.getElementById('pm-inadimp-sub').textContent = inadimp.length > 0 ? 'R$' + totalInadim.toLocaleString('pt-BR') + ' pendentes' : 'Em dia';
+  document.getElementById('pm-novos').textContent = novos.length;
+  document.getElementById('pm-total').textContent = todosPacientes.length;
+  document.getElementById('pm-ticket').textContent = ticket > 0 ? 'R$' + ticket : '—';
+  document.getElementById('pm-receb').textContent = '—';
+  document.getElementById('pm-receb-sub').textContent = '';
+  // Contagens nas abas
+  const cntTodos = document.getElementById('pac-cnt-todos');
+  const cntAtivos = document.getElementById('pac-cnt-ativos');
+  if (cntTodos) cntTodos.textContent = todosPacientes.length;
+  if (cntAtivos) cntAtivos.textContent = ativos.length;
+}
+
 function renderPacientes(pacs) {
   const grid = document.getElementById('grid-pacientes');
-  let filtrados = pacs;
-  if (filtroStatus === 'avulso') filtrados = pacs.filter(p => !p.tipo_pagamento || p.tipo_pagamento === 'avulso');
-  else if (filtroStatus === 'pacote') filtrados = pacs.filter(p => p.tipo_pagamento === 'pacote');
-  else if (filtroStatus && filtroStatus !== 'todos') filtrados = pacs.filter(p => p.status === filtroStatus);
+  let filtrados = [...pacs];
+
+  // Filtro por status/tipo
+  if (filtroStatus === 'avulso') filtrados = filtrados.filter(p => !p.tipo_pagamento || p.tipo_pagamento === 'avulso');
+  else if (filtroStatus === 'pacote') filtrados = filtrados.filter(p => p.tipo_pagamento === 'pacote');
+  else if (filtroStatus === 'inadimplente') filtrados = filtrados.filter(p => _pacPagamentos[p.id]?.pendentes > 0);
+  else if (filtroStatus === 'sem-agenda') filtrados = filtrados.filter(p => p.status === 'ativo' && !_pacSessoes[p.id]);
+  else if (filtroStatus && filtroStatus !== 'todos') filtrados = filtrados.filter(p => p.status === filtroStatus);
+
+  // Ordenação
+  if (ordemPacientes === 'prox-sessao') {
+    filtrados.sort((a, b) => {
+      const sa = _pacSessoes[a.id]?.data_hora || 'Z';
+      const sb2 = _pacSessoes[b.id]?.data_hora || 'Z';
+      return sa.localeCompare(sb2);
+    });
+  } else if (ordemPacientes === 'valor') {
+    filtrados.sort((a, b) => (b.valor_sessao || b.pacote_valor || 0) - (a.valor_sessao || a.pacote_valor || 0));
+  } else if (ordemPacientes === 'ultimo-pag') {
+    filtrados.sort((a, b) => {
+      const pa = _pacUltPag[a.id] || '00/00';
+      const pb2 = _pacUltPag[b.id] || '00/00';
+      return pb2.localeCompare(pa);
+    });
+  } else {
+    filtrados.sort((a, b) => (a.nome||'').localeCompare(b.nome||''));
+  }
+
   if (!filtrados.length) {
     grid.innerHTML = '<div class="empty" style="grid-column:1/-1;"><i class="ti ti-users-off"></i><p>Nenhum paciente encontrado</p></div>';
     return;
   }
+
   const cores = ['av-purple','av-teal','av-amber','av-coral','av-blue','av-pink','av-green'];
   const tagStatus = { 'ativo':'tag-green', 'avaliacao':'tag-amber', 'inativo':'tag-gray' };
   const lblStatus = { 'ativo':'Ativo', 'avaliacao':'Em avaliação', 'inativo':'Inativo' };
+
   grid.innerHTML = filtrados.map((p, i) => {
     const ini = p.nome ? p.nome.split(' ').map(n=>n[0]).slice(0,2).join('') : 'PS';
     const cor = cores[i % cores.length];
     const ts = tagStatus[p.status] || 'tag-gray';
     const ls = lblStatus[p.status] || p.status;
     const isPacote = p.tipo_pagamento === 'pacote';
+
+    // Próxima sessão
+    const proxS = _pacSessoes[p.id];
+    let proxSessHtml = '';
+    if (proxS) {
+      const dt = new Date(proxS.data_hora);
+      const hoje = new Date();
+      const amanha = new Date(); amanha.setDate(amanha.getDate() + 1);
+      let diaLabel = dt.toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'2-digit'});
+      if (dt.toDateString() === hoje.toDateString()) diaLabel = 'Hoje';
+      else if (dt.toDateString() === amanha.toDateString()) diaLabel = 'Amanhã';
+      const hora = dt.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+      proxSessHtml = '<div style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--t2);margin-bottom:5px;">' +
+        '<i class="ti ti-calendar-event" style="font-size:12px;color:#4F46E5;"></i>' +
+        '<span style="font-weight:500;color:#4F46E5;">' + diaLabel + '</span>' +
+        '<span style="color:var(--t3);">·</span>' +
+        '<span>' + hora + '</span>' +
+        '<span style="font-size:10.5px;color:var(--t3);margin-left:2px;">' + (proxS.status === 'Confirmada' ? '✓' : '') + '</span>' +
+        '</div>';
+    } else if (p.status === 'ativo') {
+      proxSessHtml = '<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#D97706;margin-bottom:5px;">' +
+        '<i class="ti ti-alert-circle" style="font-size:12px;"></i>Sem agendamento' +
+        '</div>';
+    }
+
+    // Saldo do pacote
+    let pacoteHtml = '';
+    if (isPacote && p._pacoteAtual) {
+      const util = p._pacoteAtual.sessoes_utilizadas || 0;
+      const total = p._pacoteAtual.total_sessoes || 0;
+      const pct = total > 0 ? Math.round(util/total*100) : 0;
+      const corBar = util >= total ? '#059669' : util >= total * 0.75 ? '#D97706' : '#4F46E5';
+      pacoteHtml = '<div style="margin-top:4px;">' +
+        '<div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--t3);margin-bottom:3px;">' +
+          '<span>Pacote: ' + util + ' de ' + total + ' usadas</span>' +
+        '</div>' +
+        '<div style="background:#E5E7EB;border-radius:4px;height:4px;overflow:hidden;">' +
+          '<div style="height:100%;background:' + corBar + ';width:' + pct + '%;border-radius:4px;transition:width .5s;"></div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    // Inadimplência
+    const pend = _pacPagamentos[p.id];
+    let inadimpBadge = '';
+    if (pend && pend.pendentes > 0) {
+      inadimpBadge = '<span style="font-size:9.5px;background:#FEE2E2;color:#DC2626;padding:2px 7px;border-radius:20px;font-weight:600;white-space:nowrap;">Pagamento em atraso</span>';
+    }
+
+    // Último pagamento
+    const ultP = _pacUltPag[p.id];
+    let ultPagHtml = ultP
+      ? '<div style="font-size:10.5px;color:#059669;display:flex;align-items:center;gap:3px;margin-top:3px;"><i class="ti ti-check" style="font-size:11px;"></i>Último pagamento: ' + ultP + '</div>'
+      : '';
+
+    // Valor
     const valorLabel = isPacote
-      ? (p.pacote_valor ? 'R$' + p.pacote_valor : '—')
-      : (p.valor_sessao ? 'R$' + p.valor_sessao : '—');
+      ? (p.pacote_valor ? 'R$' + Number(p.pacote_valor).toLocaleString('pt-BR') : '—')
+      : (p.valor_sessao ? 'R$' + Number(p.valor_sessao).toLocaleString('pt-BR') : '—');
     const freqLabel = isPacote
-      ? 'pacote (' + (p.pacote_qtd || 4) + ' sess.)'
-      : 'por sessão';
-    const onClickCard = isPacote ? 'abrirPacDetalhe(' + p.id + ')' : 'abrirPaciente(' + p.id + ')';
-    return '<div class="pat-card" onclick="' + onClickCard + '">' +
-      '<div class="av av-md ' + cor + '">' + ini + '</div>' +
-      '<div class="pat-info">' +
-        '<div class="pat-name" style="display:flex;align-items:center;gap:6px;">' + (p.nome||'—') +
-          (isPacote ? '<span style="font-size:9.5px;background:#ECFDF5;color:#059669;padding:2px 6px;border-radius:20px;font-weight:600;white-space:nowrap;">Pacote</span>' : '') +
+      ? '/ pacote (' + (p.pacote_qtd||4) + ' sess.)'
+      : '/ sessão';
+
+    // Tags abordagem
+    const tags = [p.abordagem, p.modalidade].filter(Boolean);
+    const tagsHtml = tags.map(t => '<span class="tag tag-brand" style="font-size:9.5px;">' + t + '</span>').join('');
+
+    const onClickCard = 'abrirPaciente(' + p.id + ')';
+
+    return '<div class="pat-card" style="flex-direction:column;align-items:stretch;padding:14px 16px;gap:0;cursor:pointer;" onclick="' + onClickCard + '">' +
+      // Header do card
+      '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">' +
+        '<div class="av av-md ' + cor + '" style="flex-shrink:0;">' + ini + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">' +
+            '<span style="font-size:14px;font-weight:600;color:var(--t1);">' + (p.nome||'—') + '</span>' +
+            '<span class="tag ' + ts + '" style="font-size:9.5px;">' + ls + '</span>' +
+            (isPacote ? '<span style="font-size:9.5px;background:#ECFDF5;color:#059669;padding:2px 6px;border-radius:20px;font-weight:600;">Pacote</span>' : '') +
+            inadimpBadge +
+          '</div>' +
+          '<div style="font-size:11px;color:var(--t3);">' + (p.modalidade||'') + (p.abordagem ? ' · ' + p.abordagem : '') + '</div>' +
         '</div>' +
-        '<div class="pat-meta">' + (p.modalidade||'') + '</div>' +
-        '<div class="pat-tags"><span class="tag ' + ts + '">' + ls + '</span></div>' +
+        // Valor
+        '<div style="text-align:right;flex-shrink:0;">' +
+          '<div style="font-size:15px;font-weight:700;color:var(--t1);">' + valorLabel + '</div>' +
+          '<div style="font-size:10.5px;color:var(--t3);">' + freqLabel + '</div>' +
+        '</div>' +
       '</div>' +
-      '<div class="pat-stat">' +
-        '<div class="pat-val">' + valorLabel + '</div>' +
-        '<div class="pat-freq">' + freqLabel + '</div>' +
-        '<div style="display:flex;gap:4px;margin-top:6px;justify-content:flex-end;">' +
-          '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirPaciente(' + p.id + ')" title="Ver prontuário"><i class="ti ti-notes"></i></button>' +
-          '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirIAPaciente(' + p.id + ')" title="IA do paciente" style="color:#818CF8;"><i class="ti ti-sparkles"></i></button>' +
-          '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirGerarRecibo(' + p.id + ')" title="Gerar recibo" style="color:#059669;"><i class="ti ti-receipt"></i></button>' +
-          '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirEditarPaciente(' + p.id + ')" title="Editar"><i class="ti ti-edit"></i></button>' +
-        '</div>' +
+      // Próxima sessão
+      proxSessHtml +
+      // Saldo pacote
+      pacoteHtml +
+      // Último pagamento
+      ultPagHtml +
+      // Ações
+      '<div style="display:flex;gap:4px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">' +
+        '<button class="btn btn-primary btn-sm" style="flex:1;font-size:11.5px;" onclick="event.stopPropagation();agendarSessaoRapido(' + p.id + ')">' +
+          '<i class="ti ti-calendar-plus" style="font-size:12px;"></i> Agendar' +
+        '</button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirPaciente(' + p.id + ')" title="Prontuário"><i class="ti ti-notes" style="font-size:14px;"></i></button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();enviarWhatsAppPaciente(' + p.id + ')" title="WhatsApp" style="color:#25D366;"><i class="ti ti-brand-whatsapp" style="font-size:14px;"></i></button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();abrirGerarRecibo(' + p.id + ')" title="Recibo" style="color:#059669;"><i class="ti ti-receipt" style="font-size:14px;"></i></button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();mostrarMaisPaciente(event,' + p.id + ')" title="Mais"><i class="ti ti-dots-vertical" style="font-size:14px;"></i></button>' +
       '</div>' +
     '</div>';
   }).join('');
 }
 
+function agendarSessaoRapido(pacId) {
+  // Abre modal de nova sessão com paciente pré-selecionado
+  const sel = document.getElementById('ns-pac');
+  if (sel) sel.value = pacId;
+  abrirModal('nova-sessao');
+  setTimeout(() => mostrarSaldoPacote('ns'), 150);
+}
+
+function enviarWhatsAppPaciente(pacId) {
+  const pac = todosPacientes.find(p => p.id == pacId);
+  if (!pac?.telefone) { toast('Paciente sem WhatsApp cadastrado', 'error'); return; }
+  const tel = pac.telefone.replace(/\D/g,'');
+  window.open('https://wa.me/55' + tel, '_blank');
+}
+
+function mostrarMaisPaciente(event, pacId) {
+  event.stopPropagation();
+  // Mini menu contextual
+  const existing = document.getElementById('pac-ctx-menu');
+  if (existing) existing.remove();
+  const menu = document.createElement('div');
+  menu.id = 'pac-ctx-menu';
+  menu.style.cssText = 'position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:9999;min-width:160px;overflow:hidden;';
+  menu.style.top = (event.clientY + 4) + 'px';
+  menu.style.left = Math.min(event.clientX, window.innerWidth - 180) + 'px';
+
+  const itens = [
+    { icon:'ti-sparkles', label:'IA do paciente', cor:'#818CF8', fn: () => abrirIAPaciente(pacId) },
+    { icon:'ti-edit', label:'Editar paciente', fn: () => abrirEditarPaciente(pacId) },
+    { icon:'ti-calendar-month', label:'Novo pacote', fn: () => { pacDetalheAtual = pacId; abrirNovoPacoteModal(); } },
+  ];
+  itens.forEach(it => {
+    const div = document.createElement('div');
+    div.style.cssText = 'padding:10px 14px;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:8px;color:' + (it.cor || 'var(--t1)') + ';';
+    div.onmouseenter = function() { this.style.background='var(--bg)'; };
+    div.onmouseleave = function() { this.style.background=''; };
+    div.onclick = function() { menu.remove(); it.fn(); };
+    div.innerHTML = '<i class="ti ' + it.icon + '" style="font-size:14px;"></i>' + it.label;
+    menu.appendChild(div);
+  });
+  document.body.appendChild(menu);
+  setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 10);
+}
+
 function filtrarPacientes(el, status) {
   filtroStatus = status;
   document.querySelectorAll('#sc-pacientes .tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
+  if (el && el.classList) el.classList.add('active');
   renderPacientes(todosPacientes);
 }
 
