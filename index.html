@@ -3003,8 +3003,33 @@ async function salvarPaciente() {
     queixa_principal: document.getElementById('np-queixa').value,
   }]);
   if (error) { toast('Erro ao cadastrar paciente: ' + error.message, 'error'); return; }
+
+  // Se for pacote, buscar o ID do paciente recém criado e criar pacote do mês atual
+  const tipoPag = document.getElementById('np-tipo-pag')?.value;
+  if (tipoPag === 'pacote') {
+    const { data: pacCriado } = await sb.from('pacientes')
+      .select('id').eq('user_id', usuarioAtual.id).eq('nome', nome)
+      .order('created_at', { ascending: false }).limit(1).single();
+
+    if (pacCriado) {
+      const qtd = parseInt(document.getElementById('np-pacote-qtd')?.value) || 4;
+      const valor = parseFloat(document.getElementById('np-pacote-valor')?.value) || null;
+      const mesAtual = new Date().toISOString().substring(0, 7);
+      await sb.from('pacotes').insert({
+        user_id: usuarioAtual.id,
+        paciente_id: pacCriado.id,
+        mes_referencia: mesAtual,
+        total_sessoes: qtd,
+        sessoes_utilizadas: 0,
+        valor_total: valor,
+        data_pagamento: new Date().toISOString().split('T')[0],
+        status: 'ativo'
+      });
+    }
+  }
+
   fecharModal();
-  toast('Paciente cadastrado com sucesso!', 'success');
+  toast('Paciente cadastrado com sucesso!' + (tipoPag === 'pacote' ? ' Pacote do mês criado automaticamente.' : ''), 'success');
   await carregarPacientes();
 }
 
@@ -5175,8 +5200,12 @@ async function mostrarSaldoPacote(prefix) {
     avisoEl.style.background = '#FEF3C7';
     avisoEl.style.border = '1px solid #FDE68A';
     if (icon) icon.style.color = '#D97706';
-    if (titulo) { titulo.textContent = 'Nenhum pacote ativo'; titulo.style.color = '#92400E'; }
-    if (sub) { sub.textContent = 'Este paciente paga por pacote. Registre o pagamento do mês em Pacientes → ' + pac.nome + '.'; sub.style.color = '#92400E'; }
+    if (titulo) { titulo.textContent = 'Nenhum pacote ativo para ' + new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'}); titulo.style.color = '#92400E'; }
+    if (sub) {
+      sub.innerHTML = 'Paciente paga por pacote mas ainda não há registro este mês. ' +
+        '<span onclick="criarPacoteMesAtual(' + pac.id + ')" style="color:#D97706;font-weight:600;cursor:pointer;text-decoration:underline;">Criar pacote agora</span>.';
+      sub.style.color = '#92400E';
+    }
     return;
   }
 
@@ -5212,6 +5241,27 @@ async function mostrarSaldoPacote(prefix) {
   }
 }
 
+
+async function criarPacoteMesAtual(pacId) {
+  const pac = todosPacientes.find(p => p.id == pacId);
+  if (!pac) return;
+  const mesAtual = new Date().toISOString().substring(0, 7);
+  const { error } = await sb.from('pacotes').insert({
+    user_id: usuarioAtual.id,
+    paciente_id: pacId,
+    mes_referencia: mesAtual,
+    total_sessoes: pac.pacote_qtd || 4,
+    sessoes_utilizadas: 0,
+    valor_total: pac.pacote_valor || null,
+    data_pagamento: new Date().toISOString().split('T')[0],
+    status: 'ativo'
+  });
+  if (error) { toast('Erro: ' + error.message, 'error'); return; }
+  toast('Pacote de ' + new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'}) + ' criado!', 'success');
+  // Recarregar aviso
+  const prefix = document.getElementById('ns-pac') ? 'ns' : 'es';
+  await mostrarSaldoPacote(prefix);
+}
 
 async function ajustarPacotePorSessao(pacId, statusAnterior, statusNovo) {
   if (!pacId) return;
